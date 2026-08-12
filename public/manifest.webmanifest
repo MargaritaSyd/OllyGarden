@@ -1,0 +1,17 @@
+{
+  "name": "OllyGarden",
+  "short_name": "OllyGarden",
+  "description": "Plan, nurture, and enjoy your garden with OllyGarden.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fafaf9",
+  "theme_color": "#047857",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}
