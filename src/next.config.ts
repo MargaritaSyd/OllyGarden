@@ -3,15 +3,6 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactCompiler: true,
   poweredByHeader: false,
-  async redirects() {
-    return [
-      {
-        source: "/about",
-        destination: "/company",
-        permanent: true,
-      },
-    ];
-  },
 };
 
 export default nextConfig;

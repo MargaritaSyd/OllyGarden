@@ -1,51 +1,55 @@
-import { JsonLdScript } from "@/components/seo/JsonLdScript";
-import { webPageJsonLd } from "@/lib/seo/json-ld";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import Link from "next/link";
+import { JsonLd } from "@/components/json-ld";
+import { createPageMetadata } from "@/lib/metadata";
+import { siteConfig } from "@/lib/site";
+import { aboutPageSchema, breadcrumbSchema } from "@/lib/structured-data";
 
-const description =
-  "Learn about OllyGarden — our mission to make gardening approachable, joyful, and sustainable for everyone.";
-
-export const metadata = buildPageMetadata({
+export const metadata = createPageMetadata({
   title: "About",
-  description,
+  description: `Learn what ${siteConfig.name} is and how this starter approaches technical SEO in Next.js.`,
   path: "/about",
 });
 
 export default function AboutPage() {
   return (
-    <>
-      <JsonLdScript
-        data={webPageJsonLd({
-          title: "About",
-          description,
-          path: "/about",
-        })}
+    <article className="mx-auto w-full max-w-3xl px-6 py-16 sm:py-24">
+      <JsonLd data={aboutPageSchema()} />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "About", path: "/about" },
+        ])}
       />
-      <main className="mx-auto max-w-3xl px-6 py-16">
-        <h1 className="mb-6 text-4xl font-bold tracking-tight text-emerald-950">
-          About OllyGarden
-        </h1>
-        <div className="space-y-6 text-lg leading-relaxed text-stone-600">
-          <p>
-            OllyGarden was built for people who love the idea of a garden but
-            feel unsure where to start. We believe everyone deserves a green
-            space they can be proud of — whether it is a windowsill herb box or
-            a full backyard oasis.
-          </p>
-          <p>
-            Our team combines horticulture expertise with thoughtful design to
-            create tools that are simple to use and grounded in real-world
-            gardening experience. We focus on clarity over complexity, so you
-            can spend less time searching and more time growing.
-          </p>
-          <p>
-            From planning and planting to maintenance and harvest, OllyGarden
-            supports you at every stage of the journey. We are committed to
-            sustainable practices and helping gardeners build healthy ecosystems
-            in their own backyards.
-          </p>
-        </div>
-      </main>
-    </>
+      <p className="text-sm text-zinc-500">
+        <Link href="/" className="hover:text-zinc-950 dark:hover:text-zinc-50">
+          Home
+        </Link>
+        <span aria-hidden="true"> / </span>
+        About
+      </p>
+      <h1 className="mt-4 text-4xl font-semibold tracking-tight">
+        About {siteConfig.name}
+      </h1>
+      <div className="mt-8 space-y-5 text-lg leading-8 text-zinc-700 dark:text-zinc-300">
+        <p>
+          {siteConfig.name} is a Next.js 16 project set up for search engines
+          from the first commit. Pages render on the server, metadata is typed,
+          and crawl files are generated from the same site configuration used
+          for canonical URLs.
+        </p>
+        <p>
+          Add a page by creating a route in <code>src/app</code>, exporting
+          metadata with a unique title and description, and including JSON-LD
+          when the page maps to a schema.org type. Keep copy in English and
+          visible in the HTML so crawlers do not have to execute client
+          JavaScript to understand the content.
+        </p>
+        <p>
+          Set <code>NEXT_PUBLIC_SITE_URL</code> to your production origin before
+          deploying. That value drives canonical links, Open Graph URLs, the
+          sitemap, and robots.txt.
+        </p>
+      </div>
+    </article>
   );
 }

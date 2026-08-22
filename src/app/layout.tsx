@@ -1,34 +1,37 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import { Footer } from "@/components/layout/Footer";
-import { Header } from "@/components/layout/Header";
-import { JsonLdScript } from "@/components/seo/JsonLdScript";
-import { organizationJsonLd, websiteJsonLd } from "@/lib/seo/json-ld";
-import { buildPageMetadata } from "@/lib/seo/metadata";
-import { siteConfig } from "@/lib/seo/site";
+import type { Metadata, Viewport } from "next";
+import { Space_Grotesk } from "next/font/google";
+import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
+import { rootMetadata } from "@/lib/metadata";
+import { siteConfig } from "@/lib/site";
+import { tokens } from "@/lib/tokens";
 import "./globals.css";
 
-const inter = Inter({
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
-  variable: "--font-inter",
+  display: "swap",
+  weight: ["300", "400", "500", "700"],
 });
 
-export const metadata: Metadata = {
-  ...buildPageMetadata(),
-  manifest: "/manifest.webmanifest",
-  icons: {
-    icon: "/favicon.ico",
-  },
+export const metadata: Metadata = rootMetadata;
+
+export const viewport: Viewport = {
+  themeColor: tokens.forest,
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang={siteConfig.language} className={`${inter.variable} h-full`}>
-      <body className="flex min-h-full flex-col bg-stone-50 font-sans text-stone-900 antialiased">
-        <JsonLdScript data={[organizationJsonLd(), websiteJsonLd()]} />
-        <Header />
-        {children}
-        <Footer />
+    <html
+      lang={siteConfig.language}
+      className={`${spaceGrotesk.variable} h-full antialiased`}
+    >
+      <body className="relative flex min-h-full flex-col bg-forest font-sans text-mist">
+        <SiteHeader />
+        <main className="flex-1">{children}</main>
+        <SiteFooter />
       </body>
     </html>
   );
