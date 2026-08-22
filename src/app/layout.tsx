@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Space_Grotesk } from "next/font/google";
+import { PageMotif } from "@/components/page-motif";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { rootMetadata } from "@/lib/metadata";
@@ -28,7 +29,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang={siteConfig.language}
       className={`${spaceGrotesk.variable} h-full antialiased`}
     >
-      <body className="relative flex min-h-full flex-col bg-forest font-sans text-mist">
+      <body className="relative isolate flex min-h-full flex-col bg-forest font-sans text-mist">
+        <PageMotif />
         <SiteHeader />
         <main className="flex-1">{children}</main>
         <SiteFooter />

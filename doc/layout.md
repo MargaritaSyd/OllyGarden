@@ -52,3 +52,15 @@ Keep the noise desaturated. RGB turbulence + `screen` reads as colored camera no
 Reuse `surface-grain` for other forest chrome (footer, panels) instead of a second noise recipe.
 
 The large pixel mosaic behind the page is separate. It belongs on the home/page background, not on the header fill.
+
+## Page motif
+
+`PageMotif` sits in the root layout, `absolute` at the top of `body` (`-z-10` inside `body.isolate`), first viewport only (`h-[100dvh]`), `pointer-events-none`. It is a **frame**, not side columns: the same `public/brand/layout/image.svg` (native 317px) is clipped to the edges.
+
+| Edge | Visible band |
+| --- | --- |
+| Top | `h-16` / `sm:h-20` (~1 square) |
+| Sides | `w-[6.5rem]` / `lg:w-[7.5rem]` (~1–2 squares) |
+| Bottom | `min(22dvh, 18rem)`, four Y-flipped copies across the width |
+
+The header stays `z-50` and sits on the thin top edge. Page copy paints above the motif; do not put an opaque full-bleed fill on `main`.
