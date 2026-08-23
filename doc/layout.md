@@ -55,12 +55,6 @@ The large pixel mosaic behind the page is separate. It belongs on the home/page 
 
 ## Page motif
 
-`PageMotif` sits in the root layout, `absolute` at the top of `body` (`-z-10` inside `body.isolate`), first viewport only (`h-[100dvh]`), `pointer-events-none`. It is a **frame**, not side columns: the same `public/brand/layout/image.svg` (native 317px) is clipped to the edges.
-
-| Edge | Visible band |
-| --- | --- |
-| Top | `h-16` / `sm:h-20` (~1 square) |
-| Sides | `w-[6.5rem]` / `lg:w-[7.5rem]` (~1–2 squares) |
-| Bottom | `min(22dvh, 18rem)`, four Y-flipped copies across the width |
+`PageMotif` sits in the root layout, `absolute` at the top of `body` (`-z-10` inside `body.isolate`), first viewport only (`h-[100dvh]`), `pointer-events-none`. It is a **frame** of 48px bitmap cells (`src/lib/motif.ts`): colored squares from the bitmap tokens, `public/brand/layout/flower.svg` on the left, `public/brand/layout/chevrons.svg` on the top / right / bottom. Cells within 170px of the cursor redraw at full opacity. `public/brand/layout/image.svg` is the Figma cluster (vocabulary), not the live frame.
 
 The header stays `z-50` and sits on the thin top edge. Page copy paints above the motif; do not put an opaque full-bleed fill on `main`.
