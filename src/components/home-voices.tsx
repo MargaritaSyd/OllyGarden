@@ -83,37 +83,15 @@ function VoicePhoto({
 }: {
   quote: (typeof homeVoices.quotes)[number];
 }) {
-  if ("image" in quote) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={quote.image}
-        alt={quote.imageAlt}
-        width={84}
-        height={104}
-        className="row-span-2 h-[104px] w-[84px] object-cover"
-      />
-    );
-  }
-
-  return <Initials name={quote.name} />;
-}
-
-function Initials({ name }: { name: string }) {
-  const initials = name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("");
-
   return (
-    <div
-      className="row-span-2 flex h-[104px] w-[84px] items-center justify-center bg-bitmap-shadow text-sm font-semibold tracking-[0.04em] text-mist"
-      aria-hidden="true"
-    >
-      {initials}
-    </div>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={quote.image}
+      alt={quote.imageAlt}
+      width={84}
+      height={104}
+      className="row-span-2 h-[104px] w-[84px] object-cover"
+    />
   );
 }
 
