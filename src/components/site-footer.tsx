@@ -10,7 +10,7 @@ const STRIP_COPIES = 16;
 
 export function SiteFooter() {
   return (
-    <footer className="mt-auto">
+    <footer className="mt-auto bg-[#00280e]">
       <div className="mx-auto grid w-full max-w-7xl gap-y-14 px-6 pt-16 pb-20 sm:px-8 lg:grid-cols-[minmax(240px,320px)_minmax(0,1fr)] lg:gap-x-[clamp(3rem,6.5vw,6.875rem)] lg:px-12 lg:pt-[88px] lg:pb-24">
         <div>
           <BrandLogo className="h-8" height={32} />

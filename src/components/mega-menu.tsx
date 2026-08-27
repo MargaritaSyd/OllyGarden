@@ -1,9 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import type { MouseEvent } from "react";
 import { MenuItemIcon } from "@/components/menu-icons";
 import type { NavGroup, NavLink } from "@/lib/nav";
+
+export function isPlainLeftClick(event: MouseEvent) {
+  return (
+    event.button === 0 &&
+    !event.metaKey &&
+    !event.ctrlKey &&
+    !event.shiftKey &&
+    !event.altKey
+  );
+}
 
 export function MegaMenu({ menu }: { menu: NavGroup }) {
   return (
@@ -25,6 +36,7 @@ export function MegaMenu({ menu }: { menu: NavGroup }) {
 
 export function MegaMenuItem({ item }: { item: NavLink }) {
   const pathname = usePathname();
+  const router = useRouter();
   const active = !item.hash && pathname === item.href;
 
   const content = (
@@ -62,7 +74,17 @@ export function MegaMenuItem({ item }: { item: NavLink }) {
   }
 
   return (
-    <Link href={item.href} className={className}>
+    <Link
+      href={item.href}
+      className={className}
+      onClick={(event) => {
+        if (!isPlainLeftClick(event)) {
+          return;
+        }
+        event.preventDefault();
+        router.push(item.href);
+      }}
+    >
       {content}
     </Link>
   );

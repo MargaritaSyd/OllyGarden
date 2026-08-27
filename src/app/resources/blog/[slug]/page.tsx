@@ -1,16 +1,10 @@
 import { notFound } from "next/navigation";
 import { ComingSoon } from "@/components/coming-soon";
-import { featuredResources } from "@/lib/nav";
+import { blogPosts, getBlogPost } from "@/lib/blog";
 import { stubMetadata } from "@/lib/stub";
 
-const titles = Object.fromEntries(
-  featuredResources
-    .filter((item) => item.href.startsWith("/resources/blog/"))
-    .map((item) => [item.href.slice("/resources/blog/".length), item.title]),
-);
-
 export function generateStaticParams() {
-  return Object.keys(titles).map((slug) => ({ slug }));
+  return blogPosts.map((post) => ({ slug: post.slug }));
 }
 
 export const dynamicParams = false;
@@ -21,22 +15,22 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const title = titles[slug] ?? "Article";
+  const post = getBlogPost(slug);
 
-  return stubMetadata(title, `/resources/blog/${slug}`);
+  return stubMetadata(post?.title ?? "Article", `/resources/blog/${slug}`);
 }
 
-export default async function FeaturedBlogStubPage({
+export default async function BlogArticleStubPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const title = titles[slug];
+  const post = getBlogPost(slug);
 
-  if (!title) {
+  if (!post) {
     notFound();
   }
 
-  return <ComingSoon title={title} />;
+  return <ComingSoon title={post.title} />;
 }

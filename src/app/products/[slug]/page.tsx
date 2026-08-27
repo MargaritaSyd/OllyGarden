@@ -3,9 +3,6 @@ import { ComingSoon } from "@/components/coming-soon";
 import { stubMetadata } from "@/lib/stub";
 
 const titles: Record<string, string> = {
-  insights: "Insights",
-  rose: "Rose",
-  tulip: "Tulip",
   polder: "Polder",
 };
 
@@ -41,11 +38,7 @@ export default async function ProductStubPage({
   return (
     <ComingSoon
       title={title}
-      description={
-        slug === "polder"
-          ? "Polder is coming soon."
-          : `${title} will land here in the next stage.`
-      }
+      description="Polder is coming soon."
     />
   );
 }

@@ -4,7 +4,7 @@ export const tokens = {
   mistTint: "#f4f3df",
   sunflower: "#d1d100",
   sprout: "#0ead47",
-  forest: "#00280e",
+  forest: "#011e0c",
   olive: "#697d07",
   bitmap: {
     highlight: "#e3e270",
@@ -12,6 +12,6 @@ export const tokens = {
     mid: "#9da704",
     olive: "#697d07",
     shadow: "#34520b",
-    forest: "#00280e",
+    forest: "#011e0c",
   },
 } as const;

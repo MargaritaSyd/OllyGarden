@@ -10,6 +10,16 @@ const nextConfig: NextConfig = {
         destination: "/company",
         permanent: true,
       },
+      {
+        source: "/blog",
+        destination: "/resources/blog",
+        permanent: true,
+      },
+      {
+        source: "/resources/webinars",
+        destination: "/resources/webinars-conferences",
+        permanent: true,
+      },
     ];
   },
 };

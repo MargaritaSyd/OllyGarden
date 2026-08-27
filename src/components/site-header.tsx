@@ -16,10 +16,33 @@ export function SiteHeader() {
 }
 
 function SiteHeaderBar() {
+  const pathname = usePathname();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activeMenu = headerMenus.find((menu) => menu.id === openMenu);
+
+  function cancelClose() {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+  }
+
+  function open(id: string) {
+    cancelClose();
+    setOpenMenu(id);
+  }
+
+  function scheduleClose() {
+    cancelClose();
+    closeTimer.current = setTimeout(() => setOpenMenu(null), 180);
+  }
+
+  useEffect(() => {
+    return () => cancelClose();
+  }, []);
 
   useEffect(() => {
     if (!openMenu && !mobileOpen) {
@@ -27,10 +50,12 @@ function SiteHeaderBar() {
     }
 
     const onPointer = (event: MouseEvent) => {
-      if (!panelRef.current?.contains(event.target as Node)) {
-        setOpenMenu(null);
-        setMobileOpen(false);
+      const path = event.composedPath();
+      if (panelRef.current && path.includes(panelRef.current)) {
+        return;
       }
+      setOpenMenu(null);
+      setMobileOpen(false);
     };
 
     const onKey = (event: KeyboardEvent) => {
@@ -40,10 +65,10 @@ function SiteHeaderBar() {
       }
     };
 
-    document.addEventListener("mousedown", onPointer);
+    document.addEventListener("click", onPointer);
     document.addEventListener("keydown", onKey);
     return () => {
-      document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("click", onPointer);
       document.removeEventListener("keydown", onKey);
     };
   }, [openMenu, mobileOpen]);
@@ -52,12 +77,13 @@ function SiteHeaderBar() {
     <header className="absolute inset-x-0 top-0 z-50 px-4 pt-4 pb-2 sm:px-6">
       <div
         ref={panelRef}
-        className={`surface-grain relative mx-auto max-w-7xl rounded-2xl border border-mist/20 bg-forest shadow-[0_8px_40px_rgba(0,40,14,0.45)] ${
+        className={`nav-grain texture-grain relative mx-auto max-w-7xl rounded-2xl border border-mist/20 shadow-[0_8px_40px_rgba(1,30,12,0.45)] ${
           mobileOpen
             ? "flex h-auto max-h-[calc(100dvh-1.5rem)] flex-col overflow-x-hidden overflow-y-clip"
             : "overflow-hidden"
         }`}
-        onMouseLeave={() => setOpenMenu(null)}
+        onMouseEnter={cancelClose}
+        onMouseLeave={scheduleClose}
       >
         <div className="shrink-0 px-4 py-3 sm:px-5">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-3">
@@ -68,7 +94,7 @@ function SiteHeaderBar() {
                 <li>
                   <Link
                     href="/"
-                    className="rounded-lg px-3 py-2 text-sm text-mist/90 transition-colors hover:text-sunflower"
+                    className={navItemClass(pathname === "/")}
                   >
                     Home
                   </Link>
@@ -78,7 +104,8 @@ function SiteHeaderBar() {
                     <MenuTrigger
                       menu={menu}
                       open={openMenu === menu.id}
-                      onOpen={() => setOpenMenu(menu.id)}
+                      active={isMenuActive(menu.id, pathname)}
+                      onOpen={() => open(menu.id)}
                     />
                   </li>
                 ))}
@@ -127,29 +154,58 @@ function SiteHeaderBar() {
 function MenuTrigger({
   menu,
   open,
+  active,
   onOpen,
 }: {
   menu: NavGroup;
   open: boolean;
+  active: boolean;
   onOpen: () => void;
 }) {
   return (
     <button
       type="button"
-      className={`rounded-lg px-3 py-2 text-sm transition-colors ${
-        open
-          ? "border border-mist/35 bg-mist/10 text-mist"
-          : "text-mist/90 hover:text-sunflower"
-      }`}
+      className={navItemClass(open || active)}
       aria-expanded={open}
       aria-controls={`mega-${menu.id}`}
       aria-haspopup="true"
       onMouseEnter={onOpen}
       onFocus={onOpen}
+      onClick={onOpen}
     >
       {menu.label}
     </button>
   );
+}
+
+function navItemClass(active: boolean) {
+  return active
+    ? "rounded-lg border border-mist/35 bg-mist/10 px-3 py-2 text-sm text-mist"
+    : "rounded-lg px-3 py-2 text-sm text-mist/90 transition-colors hover:text-sunflower";
+}
+
+function isMenuActive(id: string, pathname: string) {
+  if (id === "products") {
+    return pathname.startsWith("/products");
+  }
+  if (id === "solutions") {
+    return pathname.startsWith("/solutions");
+  }
+  if (id === "resources") {
+    return (
+      pathname.startsWith("/resources") ||
+      pathname.startsWith("/blog") ||
+      pathname.startsWith("/contact")
+    );
+  }
+  if (id === "company") {
+    return (
+      pathname.startsWith("/company") ||
+      pathname.startsWith("/careers") ||
+      pathname.startsWith("/about")
+    );
+  }
+  return false;
 }
 
 function MenuIcon({ open }: { open: boolean }) {

@@ -34,13 +34,6 @@ export type NavGroup = {
 
 export const productLinks: NavLink[] = [
   {
-    href: "/products/insights",
-    label: "Insights",
-    heading: "OllyGarden Insights",
-    description: "Analyze and score telemetry quality.",
-    icon: "insights",
-  },
-  {
     href: "/products/rose",
     label: "Rose",
     heading: "OllyGarden Rose",
@@ -53,6 +46,13 @@ export const productLinks: NavLink[] = [
     heading: "OllyGarden Tulip",
     description: "Run OpenTelemetry Collector with confidence.",
     icon: "tulip",
+  },
+  {
+    href: "/products/insights",
+    label: "Insights",
+    heading: "OllyGarden Insights",
+    description: "Analyze and score telemetry quality.",
+    icon: "insights",
   },
   {
     href: "/products/polder",
@@ -122,7 +122,7 @@ const headerResourceKnowledge: NavLink = {
 };
 
 const headerResourcePress: NavLink = {
-  href: "/company",
+  href: "/resources/press-releases",
   label: "Press Releases",
   description: "Announcements and news from OllyGarden.",
 };

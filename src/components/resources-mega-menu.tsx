@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
+import { isPlainLeftClick } from "@/components/mega-menu";
 import {
   featuredResources,
   headerResourceColumns,
@@ -73,6 +74,7 @@ export function ResourcesMegaMenu() {
 
 function ResourceMenuLink({ item }: { item: NavLink }) {
   const pathname = usePathname();
+  const router = useRouter();
   const active = pathname === item.href;
 
   return (
@@ -81,6 +83,13 @@ function ResourceMenuLink({ item }: { item: NavLink }) {
       className={`group flex h-full w-full flex-col gap-1 rounded-xl px-4 py-3 text-left transition-colors hover:bg-mist/10 ${
         active ? "bg-mist/10" : ""
       }`}
+      onClick={(event) => {
+        if (!isPlainLeftClick(event)) {
+          return;
+        }
+        event.preventDefault();
+        router.push(item.href);
+      }}
     >
       <span
         className={`text-base font-semibold ${
@@ -188,12 +197,21 @@ function FeaturedResourceSlide({
   slide: FeaturedResource;
   active: boolean;
 }) {
+  const router = useRouter();
+
   return (
     <Link
       href={slide.href}
       className="group block min-w-0"
       aria-hidden={!active}
       tabIndex={active ? 0 : -1}
+      onClick={(event) => {
+        if (!isPlainLeftClick(event)) {
+          return;
+        }
+        event.preventDefault();
+        router.push(slide.href);
+      }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img

@@ -5,7 +5,7 @@
   --color-mist-tint: #f4f3df;
   --color-sunflower: #d1d100;
   --color-sprout: #0ead47;
-  --color-forest: #00280e;
+  --color-forest: #011e0c;
   --color-olive: #697d07;
 
   --color-bitmap-highlight: #e3e270;
@@ -13,7 +13,7 @@
   --color-bitmap-mid: #9da704;
   --color-bitmap-olive: #697d07;
   --color-bitmap-shadow: #34520b;
-  --color-bitmap-forest: #00280e;
+  --color-bitmap-forest: #011e0c;
 
   --color-background: var(--color-forest);
   --color-foreground: var(--color-mist);
@@ -31,6 +31,7 @@ body {
 
 .surface-grain {
   isolation: isolate;
+  position: relative;
 }
 
 .surface-grain::before {
@@ -49,4 +50,264 @@ body {
 .surface-grain > * {
   position: relative;
   z-index: 1;
+}
+
+.surface-grain > .plan-pixels {
+  position: absolute;
+}
+
+.rose-card-float {
+  --rose-rot: 0deg;
+}
+
+@media (min-width: 1024px) {
+  .rose-card-float {
+    animation: rose-card-float 9s ease-in-out infinite;
+  }
+}
+
+.rose-context-line {
+  animation: rose-dash-flow 1.6s linear infinite;
+}
+
+.rose-context-pulse {
+  animation: rose-context-pulse 3.4s ease-in-out infinite;
+}
+
+@keyframes rose-card-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--rose-rot));
+  }
+  50% {
+    transform: translateY(-10px) rotate(var(--rose-rot));
+  }
+}
+
+@keyframes rose-dash-flow {
+  to {
+    stroke-dashoffset: -12;
+  }
+}
+
+@keyframes rose-context-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rose-card-float,
+  .rose-context-line,
+  .rose-context-pulse {
+    animation: none;
+  }
+}
+
+/* Tulip page: dashed layout grid after the hero motif (matches reference). */
+.tulip-grid {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cpath d='M0 .5H120M.5 0V120' stroke='%23FAF9F0' stroke-opacity='.09' stroke-dasharray='7 10'/%3E%3C/svg%3E");
+  background-size: 120px 120px;
+  animation: tulip-grid-drift 90s linear infinite;
+}
+
+@keyframes tulip-grid-drift {
+  to {
+    background-position: 120px 120px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tulip-grid {
+    animation: none;
+  }
+}
+
+/* Paper grain from the live OllyGarden site (`texture-grain.png` tiled 328×140). */
+.texture-grain {
+  background-image: url("/images/texture-grain.png");
+  background-position: 0 0;
+  background-repeat: repeat;
+  background-size: 328px 140px;
+}
+
+.paper-grain {
+  background-color: rgb(0 40 14 / 0.6);
+}
+
+.nav-grain {
+  background-color: #19321e;
+}
+
+.tulip-faq-item[open] svg {
+  transform: rotate(180deg);
+}
+
+.fs-pr-card {
+  background-color: #19321e;
+  background-image:
+    radial-gradient(125% 80% at 50% -10%, rgba(156, 167, 3, 0.14), transparent 60%),
+    url("/images/texture-grain.png");
+  background-position: center top, 0 0;
+  background-repeat: no-repeat, repeat;
+  background-size: 100% 100%, 328px 140px;
+}
+
+.fs-pr-card::before {
+  content: "";
+  position: absolute;
+  right: -40%;
+  bottom: -45%;
+  z-index: 0;
+  width: 591px;
+  height: 591px;
+  pointer-events: none;
+  border-radius: 40px;
+  background: #07180d;
+  opacity: 0.5;
+  transform: rotate(12deg);
+}
+
+.fs-pr-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (width <= 720px) {
+  .fs-pr-card {
+    min-height: 0;
+  }
+
+  .fs-pr-card::before {
+    display: none;
+  }
+}
+
+.insights-flow-item {
+  animation: insights-flow-in 0.55s ease both;
+}
+
+@keyframes insights-flow-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .insights-flow-item {
+    animation: none;
+  }
+}
+
+@keyframes ov-mask-in {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@keyframes ov-img-in {
+  from {
+    opacity: 0;
+    transform: scale(1.09);
+  }
+  to {
+    opacity: 0.32;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes ov-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ov-blur-rise {
+  from {
+    opacity: 0;
+    filter: blur(14px);
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+.ov-mask-in {
+  animation: ov-mask-in 1.1s cubic-bezier(0.33, 1, 0.68, 1) 0.45s both;
+}
+
+.ov-img-in {
+  animation: ov-img-in 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+}
+
+.ov-fade-up {
+  animation: ov-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.ov-blur-rise {
+  animation: ov-blur-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes fs-img-in {
+  from {
+    opacity: 0;
+    transform: scale(1.09);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+.fs-mask-in {
+  animation: ov-mask-in 1.1s cubic-bezier(0.33, 1, 0.68, 1) 0.45s both;
+}
+
+.fs-img-in {
+  animation: fs-img-in 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ov-mask-in,
+  .fs-mask-in,
+  .ov-fade-up,
+  .ov-blur-rise {
+    animation: none;
+  }
+
+  .ov-img-in {
+    animation: none;
+    opacity: 0.32;
+  }
+
+  .fs-img-in {
+    animation: none;
+    opacity: 1;
+  }
 }

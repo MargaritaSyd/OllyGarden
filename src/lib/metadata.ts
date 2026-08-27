@@ -13,6 +13,7 @@ type PageMetadataInput = {
   modifiedTime?: string;
   authors?: string[];
   noIndex?: boolean;
+  absoluteTitle?: boolean;
 };
 
 export const rootMetadata: Metadata = {
@@ -76,11 +77,12 @@ export function createPageMetadata({
   modifiedTime,
   authors,
   noIndex = false,
+  absoluteTitle = false,
 }: PageMetadataInput): Metadata {
   const url = getAbsoluteUrl(path);
 
   return {
-    title,
+    title: absoluteTitle ? { absolute: title } : title,
     description,
     alternates: {
       canonical: path,
