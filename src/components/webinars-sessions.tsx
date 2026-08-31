@@ -1,10 +1,9 @@
 import { CtaArrow } from "@/components/cta-arrow";
-import { BlogMeta } from "@/components/blog-ui";
 import { WebinarVideoCard } from "@/components/webinar-video-card";
 import { webinarsSessions } from "@/lib/webinars";
 
 export function WebinarsSessions() {
-  const { eyebrow, title, sub, cta, youtubeHref, videos, featured } = webinarsSessions;
+  const { eyebrow, title, sub, cta, youtubeHref, videos } = webinarsSessions;
 
   return (
     <section
@@ -56,26 +55,6 @@ export function WebinarsSessions() {
             </li>
           ))}
         </ul>
-
-        <article className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-sunflower/40 bg-[#00280e] p-6 min-[881px]:flex-row min-[881px]:items-center">
-          <div className="flex flex-col gap-2">
-            <p className="text-xs font-bold tracking-[0.1em] text-bitmap-mid uppercase">
-              {featured.eyebrow}
-            </p>
-            <h3 className="text-2xl font-bold tracking-[-0.02em] text-mist">{featured.title}</h3>
-            <BlogMeta date={featured.date} suffix={featured.suffix} />
-            <p className="text-base text-mist">{featured.description}</p>
-          </div>
-          <a
-            href={featured.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex h-12 w-full max-w-[340px] shrink-0 items-center justify-center rounded-2xl bg-mist px-[30px] text-base font-semibold text-forest transition-colors hover:bg-sunflower sm:w-auto"
-            aria-label={`${featured.cta}: ${featured.title} (opens in a new tab)`}
-          >
-            {featured.cta}
-          </a>
-        </article>
       </div>
     </section>
   );

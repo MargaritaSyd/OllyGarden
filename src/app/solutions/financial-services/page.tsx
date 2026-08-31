@@ -1,4 +1,5 @@
 import { FinancialHero } from "@/components/financial-hero";
+import { FinancialPageFx } from "@/components/financial-page-fx";
 import { FinancialPains } from "@/components/financial-pains";
 import { FinancialProducts } from "@/components/financial-products";
 import { FinancialStats } from "@/components/financial-stats";
@@ -24,6 +25,7 @@ export default function FinancialServicesPage() {
       <FinancialStats />
       <FinancialProducts />
       <SiteCta content={financialCta} />
+      <FinancialPageFx />
     </>
   );
 }

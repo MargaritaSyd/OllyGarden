@@ -100,35 +100,94 @@ export function ResourceCardImage({
   );
 }
 
+type EventHostLogo = {
+  icon: "kubecon" | "cloudnativecon";
+  label: string;
+};
+
 export function ResourceCardPoster({
   host,
+  hostLogos,
   posterTitle,
+  highlight,
   note,
 }: {
   host: string;
+  hostLogos?: readonly EventHostLogo[];
   posterTitle: string;
+  highlight: string;
   note: string;
 }) {
   return (
-    <span className="flex h-[381px] flex-col rounded-2xl border border-sunflower/40 bg-[#00260d] p-6">
+    <span className="@container flex h-[381px] flex-col overflow-hidden rounded-[20px] border border-sunflower/40 bg-[#00260d] p-[clamp(1.25rem,6.3cqw,1.875rem)] transition-[border-color] duration-200 ease-out group-hover:border-sunflower/65">
       <span className="flex items-start justify-between gap-3">
-        <span className="text-[13px] font-bold tracking-[0.02em]">{host}</span>
+        {hostLogos?.length ? (
+          <span className="flex items-start gap-3 text-mist">
+            {hostLogos.map((logo) => (
+              <span key={logo.label} className="flex flex-col items-center gap-1">
+                <EventHostIcon icon={logo.icon} />
+                <span className="text-[10px] leading-none font-medium tracking-[0.01em]">
+                  {logo.label}
+                </span>
+              </span>
+            ))}
+          </span>
+        ) : (
+          <span className="max-w-[62%] truncate text-[clamp(12px,3.35cqw,15px)] font-bold tracking-[0.02em]">
+            {host}
+          </span>
+        )}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/brand/logo-group.svg"
           alt=""
-          width={110}
-          height={17}
-          className="mt-0.5 h-[17px] w-auto"
+          width={124}
+          height={19}
+          className="mt-0.5 h-auto w-[clamp(88px,28.7cqw,124px)] shrink-0"
         />
       </span>
-      <span className="mt-auto flex flex-col gap-1">
-        <span className="text-[15px] font-medium text-sunflower">OllyGarden at</span>
-        <span className="text-[clamp(1.25rem,1.7vw,1.675rem)] leading-[1.48] font-bold tracking-[0.01em] text-mist uppercase">
+      <span className="mt-auto flex flex-col items-start">
+        <span className="text-[clamp(0.9375rem,4.2cqw,1.0625rem)] leading-[1.3] font-medium text-sunflower">
+          OllyGarden at
+        </span>
+        <span className="mt-3 line-clamp-3 text-[clamp(1.5rem,9cqw,1.875rem)] leading-[1.2] font-bold tracking-[0.01em] text-mist uppercase">
           {posterTitle}
         </span>
-        <span className="text-[13px] leading-[1.5] font-medium text-[#cdcdcd]">{note}</span>
+        <span className="mt-4 inline-flex max-w-full rounded-[4px] bg-sunflower px-3 py-1.5 text-[clamp(0.8125rem,3.8cqw,0.9375rem)] leading-tight font-semibold tracking-[0.01em] text-forest">
+          {highlight}
+        </span>
+        <span className="mt-2.5 text-[clamp(0.8125rem,3.8cqw,0.9375rem)] leading-[1.45] font-medium text-sunflower">
+          {note}
+        </span>
       </span>
     </span>
+  );
+}
+
+function EventHostIcon({ icon }: { icon: EventHostLogo["icon"] }) {
+  if (icon === "cloudnativecon") {
+    return (
+      <svg width="36" height="24" viewBox="0 0 36 24" fill="none" aria-hidden="true">
+        <path
+          d="M11.2 21.5h14.4c4.1 0 7.4-3.1 7.4-7 0-3.6-2.8-6.6-6.4-6.9C25.7 4 22 1.2 17.6 1.2c-4.2 0-7.8 2.5-9.2 6.1C4.4 8 1.5 11.4 1.5 15.5c0 3.3 2.9 6 6.5 6h3.2Z"
+          fill="currentColor"
+        />
+      </svg>
+    );
+  }
+
+  const spokes = Array.from({ length: 7 }, (_, i) => i * (360 / 7) - 90);
+
+  return (
+    <svg width="32" height="32" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <circle cx="24" cy="24" r="8.2" stroke="currentColor" strokeWidth="2.4" />
+      <circle cx="24" cy="24" r="3.3" fill="currentColor" />
+      {spokes.map((deg) => (
+        <g key={deg} transform={`rotate(${deg} 24 24)`}>
+          <rect x="22.7" y="3.6" width="2.6" height="11.2" rx="0.6" fill="currentColor" />
+          <rect x="19.1" y="3" width="9.8" height="3.1" rx="0.8" fill="currentColor" />
+        </g>
+      ))}
+    </svg>
   );
 }

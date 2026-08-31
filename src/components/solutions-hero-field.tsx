@@ -201,11 +201,11 @@ export function SolutionsHeroField({ variant = "overview" }: SolutionsHeroFieldP
       return sprout;
     }
 
-    function drawCell(cell: PaintedCell, scale: number) {
+    function drawCell(cell: PaintedCell, scale: number, ox: number, oy: number) {
       const w = cell.w * scale;
       const h = cell.h * scale;
-      const x = cell.cx - w / 2;
-      const y = cell.cy - h / 2;
+      const x = cell.cx - w / 2 + ox;
+      const y = cell.cy - h / 2 + oy;
 
       if (cell.icon) {
         const image = iconImage(cell.icon);
@@ -227,6 +227,8 @@ export function SolutionsHeroField({ variant = "overview" }: SolutionsHeroFieldP
       glowY += (mouseY - glowY) * 0.14;
 
       const elapsed = now - startedAt;
+      const driftX = reducedMotion ? 0 : Math.round(Math.sin(now * 0.00022) * 2);
+      const driftY = reducedMotion ? 0 : Math.round(Math.cos(now * 0.00018) * 2);
 
       for (const cell of cells) {
         let intro = reducedMotion
@@ -237,7 +239,7 @@ export function SolutionsHeroField({ variant = "overview" }: SolutionsHeroFieldP
         }
         intro *= 2 - intro;
         context.globalAlpha = cell.rest * intro;
-        drawCell(cell, intro >= 1 ? 1 : 0.72 + 0.28 * intro);
+        drawCell(cell, intro >= 1 ? 1 : 0.72 + 0.28 * intro, driftX, driftY);
 
         if (reducedMotion) {
           continue;
@@ -248,7 +250,7 @@ export function SolutionsHeroField({ variant = "overview" }: SolutionsHeroFieldP
         }
         const glow = 1 - distance / GLOW_RADIUS;
         context.globalAlpha = Math.min(cell.cap, glow * 1.4) * intro;
-        drawCell(cell, 1);
+        drawCell(cell, 1, driftX, driftY);
       }
 
       context.globalAlpha = 1;

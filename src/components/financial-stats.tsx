@@ -1,5 +1,7 @@
 import { FinancialStat } from "@/components/financial-stat";
+import { InView } from "@/components/in-view";
 import { financialStats } from "@/lib/financial";
+import type { CSSProperties } from "react";
 
 type StatsContent = {
   eyebrow: string;
@@ -23,7 +25,12 @@ export function FinancialStats({ content = financialStats }: { content?: StatsCo
     >
       <div className="tulip-grid" aria-hidden="true" />
       <div className="relative z-[1] mx-auto max-w-[1232px]">
-        <div className="mx-auto mb-16 max-w-[920px] text-center max-[880px]:mb-12">
+        <InView
+          mark="rv-in"
+          threshold={0.2}
+          rootMargin="0px"
+          className="fi-rv mx-auto mb-16 max-w-[920px] text-center max-[880px]:mb-12"
+        >
           <PetalMark />
           <p className="mb-4 text-sm font-bold tracking-[0.14em] text-bitmap-mid uppercase">
             {content.eyebrow}
@@ -37,13 +44,18 @@ export function FinancialStats({ content = financialStats }: { content?: StatsCo
           <p className="mx-auto max-w-[720px] text-base leading-[1.5] tracking-[0.01em] text-[#e2e5c0]/72">
             {content.sub}
           </p>
-        </div>
+        </InView>
 
         <div className="grid grid-cols-1 gap-5 min-[881px]:grid-cols-2 min-[881px]:gap-8 min-[1101px]:grid-cols-3">
-          {content.cards.map((card) => (
-            <article
+          {content.cards.map((card, index) => (
+            <InView
               key={card.eyebrow}
-              className="surface-grain rounded-2xl border border-white/8 bg-[#19321e] px-10 pt-9 pb-11 shadow-[inset_0_1px_rgba(255,255,255,0.05)] max-[880px]:px-7 max-[880px]:pt-7 max-[880px]:pb-8"
+              as="article"
+              mark="rv-in"
+              threshold={0.2}
+              rootMargin="0px"
+              className="fi-rv fi-stagger surface-grain rounded-2xl border border-white/8 bg-[#19321e] px-10 pt-9 pb-11 shadow-[inset_0_1px_rgba(255,255,255,0.05)] transition-[transform,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-safe:hover:-translate-y-1.5 hover:border-[#d3de3c]/35 hover:shadow-[0_24px_50px_rgba(0,0,0,0.4),0_0_30px_rgba(217,229,51,0.12),inset_0_1px_rgba(255,255,255,0.08)] max-[880px]:px-7 max-[880px]:pt-7 max-[880px]:pb-8"
+              style={{ "--i": index } as CSSProperties}
             >
               <p className="mb-3.5 text-[13px] font-bold tracking-[0.12em] text-bitmap-mid uppercase">
                 {card.eyebrow}
@@ -55,7 +67,7 @@ export function FinancialStats({ content = financialStats }: { content?: StatsCo
                 prefix={card.prefix}
               />
               <p className="text-[15px] leading-6 text-[#e2e5c0]/72">{card.body}</p>
-            </article>
+            </InView>
           ))}
         </div>
       </div>

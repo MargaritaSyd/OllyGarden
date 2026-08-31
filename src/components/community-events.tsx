@@ -38,7 +38,9 @@ export function CommunityEvents() {
                 media={
                   <ResourceCardPoster
                     host={event.host}
+                    hostLogos={event.hostLogos}
                     posterTitle={event.posterTitle}
+                    highlight={event.highlight}
                     note={event.note}
                   />
                 }

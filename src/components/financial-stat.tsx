@@ -51,7 +51,7 @@ export function FinancialStat({ end, suffix, sep, prefix = "" }: FinancialStatPr
       return;
     }
 
-    const duration = 1200;
+    const duration = 1200 + Math.min(400, end / 30);
     const startedAt = performance.now();
     let frame = 0;
 

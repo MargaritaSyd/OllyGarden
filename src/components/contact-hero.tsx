@@ -15,20 +15,20 @@ export function ContactHero() {
         className="pointer-events-none absolute inset-0 -z-10 overflow-hidden select-none"
       />
       <div className="relative z-[1] mx-auto max-w-[1232px]">
-        <div className="grid items-start gap-12 min-[961px]:grid-cols-2 min-[961px]:gap-[72px]">
-          <div className="flex max-w-[580px] flex-col items-start">
+        <div className="grid items-start gap-6 min-[1024px]:grid-cols-2 min-[1024px]:gap-12 min-[1280px]:gap-[72px]">
+          <div className="flex max-w-[580px] flex-col items-start gap-6">
             <div className="ov-fade-up surface-grain inline-flex items-center gap-2 rounded-full border border-white/14 bg-[#19321e] px-4 py-1 text-[13px] font-medium tracking-[0.01em] whitespace-nowrap text-bitmap-highlight [animation-delay:0.15s]">
               <BadgeChevrons />
               {contactHero.badge}
             </div>
             <h1
               id="ct-title"
-              className="mt-6 text-[clamp(2.5rem,4.45vw,4rem)] leading-[1.12] font-bold tracking-[-0.02em] text-mist max-[880px]:text-[clamp(2.25rem,9.5vw,2.75rem)]"
+              className="text-[clamp(2.75rem,5.4vw,4rem)] leading-[1.12] font-bold tracking-[-0.02em] text-mist max-[767px]:text-[clamp(2.5rem,8vw,2.75rem)] max-[479px]:text-[2.25rem] max-[479px]:leading-[1.22]"
             >
               {contactHero.title.map((line, index) => (
                 <span
                   key={line}
-                  className={`ov-blur-rise block min-[961px]:whitespace-nowrap ${
+                  className={`ov-blur-rise block min-[1024px]:whitespace-nowrap ${
                     index === 0 ? "[animation-delay:0.25s]" : "[animation-delay:0.42s]"
                   }`}
                 >
@@ -36,48 +36,48 @@ export function ContactHero() {
                 </span>
               ))}
             </h1>
-            <p className="ov-fade-up mt-6 text-base leading-[1.4] tracking-[0.02em] text-mist [animation-delay:0.7s]">
+            <p className="ov-fade-up max-w-[560px] text-base leading-[1.5] text-mist/75 [animation-delay:0.7s]">
               {contactHero.lede}
             </p>
           </div>
 
-          <div className="relative z-[1] flex flex-col gap-6">
-            <ContactInfoCard>
-              <h2 className="text-[22px] leading-[1.28] font-bold tracking-[-0.01em] text-mist">
+          <div className="relative z-[1] flex flex-col gap-6 max-[1023px]:mt-2">
+            <ContactInfoCard className="ov-fade-up [animation-delay:0.55s]">
+              <h2 className="mb-3 text-xl leading-[1.3] font-bold tracking-[-0.01em] text-mist">
                 {contactHero.connect.title}
               </h2>
-              <p className="mt-3 text-base leading-[1.4] text-mist/75">
+              <p className="text-base leading-[1.5] text-mist/75">
                 {contactHero.connect.body}
               </p>
-              <div className="mt-5 flex items-center gap-3">
+              <div className="mt-5 flex items-center gap-2">
                 <a
                   href={siteConfig.social.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Visit our LinkedIn page"
-                  className="grid size-11 place-items-center rounded-[10px] text-sunflower transition-opacity hover:opacity-80"
+                  className="grid size-11 place-items-center rounded-[10px] text-sunflower transition-[transform,color,background-color] duration-[180ms] ease-out hover:bg-bitmap-highlight/8 hover:text-bitmap-highlight motion-safe:hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bitmap-highlight"
                 >
                   <LinkedInIcon />
                 </a>
                 <a
                   href={siteConfig.social.email}
                   aria-label="Send us an email"
-                  className="grid size-11 place-items-center rounded-[10px] text-sunflower transition-opacity hover:opacity-80"
+                  className="grid size-11 place-items-center rounded-[10px] text-sunflower transition-[transform,color,background-color] duration-[180ms] ease-out hover:bg-bitmap-highlight/8 hover:text-bitmap-highlight motion-safe:hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bitmap-highlight"
                 >
                   <MailIcon />
                 </a>
               </div>
             </ContactInfoCard>
-            <ContactInfoCard>
-              <h2 className="text-[22px] leading-[1.28] font-bold tracking-[-0.01em] text-mist">
+            <ContactInfoCard className="ov-fade-up [animation-delay:0.63s]">
+              <h2 className="mb-3 text-xl leading-[1.3] font-bold tracking-[-0.01em] text-mist">
                 {contactHero.email.title}
               </h2>
-              <p className="mt-3 text-base leading-[1.4] text-mist/75">
+              <p className="text-base leading-[1.5] text-mist/75">
                 {contactHero.email.body}
               </p>
               <a
                 href={siteConfig.social.email}
-                className="mt-5 inline-block text-lg font-bold text-sunflower underline-offset-2 hover:underline"
+                className="mt-[18px] inline-block text-lg font-bold tracking-[-0.01em] text-sunflower transition-colors duration-[180ms] ease-out hover:text-bitmap-highlight hover:underline focus-visible:rounded-[3px] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-bitmap-highlight"
               >
                 {contactEmail}
               </a>
@@ -85,7 +85,7 @@ export function ContactHero() {
           </div>
         </div>
 
-        <div className="mt-14">
+        <div className="mt-[clamp(2.5rem,4.5vw,3.5rem)]">
           <ContactForm />
         </div>
       </div>
@@ -93,14 +93,18 @@ export function ContactHero() {
   );
 }
 
-function ContactInfoCard({ children }: { children: ReactNode }) {
+function ContactInfoCard({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <article className="relative isolate overflow-hidden rounded-3xl border border-bitmap-highlight/40 bg-forest">
-      <div
-        className="surface-grain pointer-events-none absolute inset-0 bg-forest"
-        aria-hidden="true"
-      />
-      <div className="relative px-7 pt-7 pb-8">{children}</div>
+    <article
+      className={`ct-info-card relative overflow-hidden rounded-3xl border border-bitmap-highlight/40 px-7 pt-7 pb-8 transition-[transform,border-color,box-shadow,background-color] duration-200 ease-out motion-safe:hover:-translate-y-[3px] hover:border-bitmap-highlight/60 hover:bg-[rgba(0,45,16,0.66)] hover:shadow-[0_18px_40px_rgba(0,0,0,0.38),0_0_26px_rgba(217,229,51,0.1)] ${className}`.trim()}
+    >
+      {children}
     </article>
   );
 }

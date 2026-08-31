@@ -47,7 +47,7 @@ export function SolutionsHero() {
         {mobilePixels.map((pixel) => (
           <div
             key={pixel.className}
-            className={`absolute opacity-30 ${pixel.className}`}
+            className={`sol-ipx absolute opacity-30 ${pixel.className}`}
           />
         ))}
       </div>

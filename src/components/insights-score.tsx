@@ -1,16 +1,51 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { insightsScore } from "@/lib/insights";
+
+const SCORE_END = Number(insightsScore.value);
+const COUNT_MS = 800;
+const COUNT_DELAY_MS = 500;
 
 export function InsightsScore() {
   const [open, setOpen] = useState(true);
   const detailsId = useId();
   const label = open ? insightsScore.hide : insightsScore.show;
+  const [score, setScore] = useState(0);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setScore(SCORE_END);
+      return;
+    }
+
+    let frame = 0;
+    const delay = window.setTimeout(() => {
+      const startedAt = performance.now();
+
+      function tick(now: number) {
+        const progress = Math.min(1, (now - startedAt) / COUNT_MS);
+        const eased = 1 - (1 - progress) ** 3;
+        setScore(Math.round(SCORE_END * eased));
+        if (progress < 1) {
+          frame = window.requestAnimationFrame(tick);
+        } else {
+          setScore(SCORE_END);
+        }
+      }
+
+      frame = window.requestAnimationFrame(tick);
+    }, COUNT_DELAY_MS);
+
+    return () => {
+      window.clearTimeout(delay);
+      window.cancelAnimationFrame(frame);
+    };
+  }, []);
 
   return (
     <div className="relative mx-auto w-full max-w-[48rem] aspect-[736/623] lg:mx-0">
-      <div className="absolute top-0 left-0 z-0 h-[62%] w-[56%]">
+      <div className="iscore-bob-a absolute top-0 left-0 z-0 h-[62%] w-[56%]">
         <section
           className="surface-grain flex size-full flex-col overflow-hidden rounded-3xl border border-[#e3e270]/40 bg-[#19321e]/90 shadow-[inset_0_1px_rgba(255,255,255,0.06),0_24px_60px_rgba(0,0,0,0.35)]"
           aria-label="Instrumentation Score summary"
@@ -27,8 +62,8 @@ export function InsightsScore() {
             />
           </div>
           <div className="flex flex-1 flex-col items-center justify-center pb-6">
-            <p className="text-[clamp(4.5rem,10vw,6.5rem)] leading-none font-bold tracking-[-0.04em] text-bitmap-highlight">
-              {insightsScore.value}
+            <p className="text-[clamp(4.5rem,10vw,6.5rem)] leading-none font-bold tracking-[-0.04em] text-bitmap-highlight tabular-nums">
+              {score}
             </p>
             <p className="mt-2 text-xl font-semibold text-bitmap-highlight">
               {insightsScore.verdict}
@@ -38,7 +73,7 @@ export function InsightsScore() {
       </div>
 
       {open ? (
-        <div className="absolute top-[38%] left-[42%] z-10 h-[62%] w-[58%]">
+        <div className="iscore-bob-b absolute top-[38%] left-[42%] z-10 h-[62%] w-[58%]">
           <section
             id={detailsId}
             className="surface-grain flex size-full flex-col overflow-hidden rounded-3xl border border-[#e3e270]/40 bg-[#19321e]/90 shadow-[inset_0_1px_rgba(255,255,255,0.06),0_24px_60px_rgba(0,0,0,0.35)]"
@@ -47,8 +82,8 @@ export function InsightsScore() {
             <div className="flex items-center justify-between gap-4 px-6 pt-6">
               <h2 className="flex items-baseline gap-2.5 text-base font-bold tracking-[0.01em] text-mist">
                 {insightsScore.title}
-                <span className="text-lg font-bold text-bitmap-highlight">
-                  {insightsScore.value}
+                <span className="text-lg font-bold text-bitmap-highlight tabular-nums">
+                  {score}
                 </span>
               </h2>
               <ToggleButton

@@ -81,7 +81,7 @@ export const insightsAction = {
   title: "See OllyGarden Insights in action",
   sub: "Watch how teams use the Insights dashboard to review organization health, inspect service-level findings, and share specific insights with the right people.",
   video: {
-    src: "https://ollygarden-website.pages.dev/videos/insights-demo.mp4",
+    src: "/videos/insights-demo.mp4",
     label:
       "Demo video: OllyGarden Insights dashboard reviewing telemetry quality",
   },

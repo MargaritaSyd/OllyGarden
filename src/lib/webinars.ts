@@ -20,15 +20,6 @@ export const webinarsSessions = {
   cta: "Check our YouTube",
   youtubeHref: webinarsYoutubeHref,
   videos: blogVideos,
-  featured: {
-    eyebrow: "New event",
-    title: "Event Name",
-    date: "July 30, 2026",
-    suffix: "YouTube",
-    description: "[description of the event]",
-    cta: "Set a Reminder",
-    href: webinarsYoutubeHref,
-  },
 } as const;
 
 export type StageTalk = {

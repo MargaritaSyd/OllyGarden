@@ -54,7 +54,7 @@ export const roseAction = {
   title: "See what Rose finds in your instrumentation",
   sub: "Watch OllyGarden Rose in action and see how it turns service analysis into practical OpenTelemetry recommendations your team can use.",
   video: {
-    src: "https://ollygarden.com/videos/meet-rose.mp4",
+    src: "/videos/meet-rose.mp4",
     label:
       "Demo video: Rose analyzing a repository and producing OpenTelemetry recommendations",
   },

@@ -1,21 +1,29 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
+
+const hoverClass = {
+  none: "",
+  tint: "transition-[border-color,background-color,box-shadow] duration-200 ease-out hover:border-bitmap-highlight/60 hover:bg-[rgba(0,44,16,0.66)]",
+  lift: "group transition-[transform,border-color,background-color,box-shadow] duration-[180ms] ease-out motion-safe:hover:-translate-y-0.5 hover:border-bitmap-highlight/70 hover:bg-[rgba(0,44,16,0.66)] hover:shadow-[0_16px_38px_rgba(0,0,0,0.36),0_0_24px_rgba(217,229,51,0.08),inset_0_1px_rgba(255,255,255,0.08)]",
+  rise: "group transition-[transform,border-color,background-color,box-shadow] duration-[180ms] ease-out motion-safe:hover:-translate-y-1 hover:border-bitmap-highlight/70 hover:bg-[rgba(0,44,16,0.66)] hover:shadow-[0_20px_44px_rgba(0,0,0,0.4),0_0_26px_rgba(217,229,51,0.1),inset_0_1px_rgba(255,255,255,0.08)]",
+} as const;
 
 export function CareersCard({
   children,
   className = "",
+  hover = "none",
+  style,
 }: {
   children: ReactNode;
   className?: string;
+  hover?: keyof typeof hoverClass;
+  style?: CSSProperties;
 }) {
   return (
     <article
-      className={`relative isolate overflow-hidden rounded-3xl border border-bitmap-highlight/40 bg-forest ${className}`}
+      style={style}
+      className={`cr-card relative overflow-hidden rounded-3xl border border-bitmap-highlight/40 p-8 ${hoverClass[hover]} ${className}`.trim()}
     >
-      <div
-        className="surface-grain pointer-events-none absolute inset-0 bg-forest"
-        aria-hidden="true"
-      />
-      <div className="relative p-8">{children}</div>
+      {children}
     </article>
   );
 }
@@ -23,7 +31,7 @@ export function CareersCard({
 export function CareersIconTile({ children }: { children: ReactNode }) {
   return (
     <span
-      className="grid size-12 place-items-center rounded-lg border border-bitmap-shadow/15 bg-bitmap-mid/20"
+      className="inline-flex size-12 shrink-0 items-center justify-center rounded-lg border border-bitmap-shadow/15 bg-bitmap-mid/20 shadow-[0_4px_12px_rgba(0,40,14,0.1)] transition-[border-color,background-color] duration-[180ms] ease-out group-hover:border-bitmap-mid/50 group-hover:bg-bitmap-mid/28"
       aria-hidden="true"
     >
       {children}
@@ -55,7 +63,7 @@ export function CareersMailLink({
   return (
     <a
       href={href}
-      className="group inline-flex h-12 w-full shrink-0 items-center justify-center gap-2.5 rounded-xl bg-mist px-6 text-base font-semibold text-forest transition-colors hover:bg-sunflower sm:w-auto"
+      className="group inline-flex w-full shrink-0 items-center justify-center gap-2.5 rounded-xl bg-mist px-6 py-3.5 text-base leading-none font-semibold whitespace-nowrap text-forest transition-[transform,box-shadow] duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-safe:hover:scale-[1.04] motion-safe:hover:shadow-[0_0_28px_rgba(227,226,112,0.4)] sm:w-auto max-[767px]:w-full"
     >
       {children}
     </a>

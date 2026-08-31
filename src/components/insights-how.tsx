@@ -1,14 +1,16 @@
 import { InsightsFlow } from "@/components/insights-flow";
+import { InView } from "@/components/in-view";
 import { insightsHow } from "@/lib/insights";
 
 export function InsightsHow() {
   return (
     <section
+      id="how-it-works"
       aria-labelledby="hiw-title"
       className="px-6 py-20 sm:px-12 lg:px-[104px] lg:py-24"
     >
       <div className="mx-auto max-w-[1328px]">
-        <div className="mx-auto max-w-[940px] text-center">
+        <InView className="ov-stagger mx-auto max-w-[940px] text-center">
           <HowMark />
           <p className="mt-4 text-sm font-bold tracking-[0.14em] text-bitmap-mid uppercase">
             {insightsHow.eyebrow}
@@ -24,11 +26,11 @@ export function InsightsHow() {
           <p className="mx-auto mt-5 max-w-[680px] text-base leading-[1.66] text-mist/75">
             {insightsHow.body}
           </p>
-        </div>
+        </InView>
 
         <InsightsFlow />
 
-        <div className="mt-12 grid gap-5 lg:grid-cols-3 lg:gap-6">
+        <InView className="ov-stagger mt-12 grid gap-5 lg:grid-cols-3 lg:gap-6">
           {insightsHow.steps.map((step) => (
             <article
               key={step.title}
@@ -40,7 +42,7 @@ export function InsightsHow() {
               <p className="mt-3 text-[15px] leading-[1.6] text-mist/75">{step.body}</p>
             </article>
           ))}
-        </div>
+        </InView>
       </div>
     </section>
   );

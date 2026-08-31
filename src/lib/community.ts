@@ -11,11 +11,25 @@ export const communityHero = {
   lede: "Where to find us next — conferences, meetups, and community days.",
 } as const;
 
-export const communityEvents = [
+export type CommunityEvent = {
+  host: string;
+  hostLogos?: readonly { icon: "kubecon" | "cloudnativecon"; label: string }[];
+  posterTitle: string;
+  highlight: string;
+  note: string;
+  date: string;
+  place: string;
+  title: string;
+  summary: string;
+  href: string;
+};
+
+export const communityEvents: readonly CommunityEvent[] = [
   {
     host: "Signals Conf",
     posterTitle: "Signals Berlin 2026",
-    note: "OllyGarden will be there as a Gold Sponsor.",
+    highlight: "Gold Sponsor",
+    note: "Two days on reliability in the age of AI.",
     date: "September 10–11, 2026",
     place: "Berlin 🇩🇪",
     title: "Signals Berlin 2026",
@@ -26,7 +40,8 @@ export const communityEvents = [
   {
     host: "Code Europe",
     posterTitle: "Code Europe 2026",
-    note: "OllyGarden will be attending the event.",
+    highlight: "Attending",
+    note: "Three parallel tracks for senior engineers.",
     date: "September 15, 2026",
     place: "Warsaw 🇵🇱",
     title: "Code Europe 2026",
@@ -36,8 +51,13 @@ export const communityEvents = [
   },
   {
     host: "KubeCon + CloudNativeCon",
+    hostLogos: [
+      { icon: "kubecon", label: "KubeCon" },
+      { icon: "cloudnativecon", label: "CloudNativeCon" },
+    ],
     posterTitle: "KubeCon + CloudNativeCon NA 2026",
-    note: "OllyGarden will be there as a sponsor.",
+    highlight: "Sponsor",
+    note: "Four days of keynotes, sessions and co-located events.",
     date: "November 9–12, 2026",
     place: "Salt Lake City 🇺🇸",
     title: "KubeCon + CloudNativeCon North America 2026",
@@ -45,7 +65,7 @@ export const communityEvents = [
       "The CNCF's flagship cloud native conference — four days of keynotes, maintainer sessions and co-located events.",
     href: "https://events.linuxfoundation.org/kubecon-cloudnativecon-north-america/register/",
   },
-] as const;
+];
 
 export const communityWebinars = {
   eyebrow: "Webinars",

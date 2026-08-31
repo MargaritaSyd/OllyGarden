@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { CtaArrow } from "@/components/cta-arrow";
 import {
   CareersCard,
@@ -5,41 +6,32 @@ import {
   CareersMailLink,
   CareersStrokeIcon,
 } from "@/components/careers-card";
+import { InView } from "@/components/in-view";
 import { careersIcons, careersInterview } from "@/lib/careers";
 
-const decoPixels = [
-  { className: "top-0 left-0 bg-sunflower" },
-  { className: "top-0 left-[205px] bg-sunflower" },
-  { className: "top-[68px] left-[68px] bg-bitmap-highlight" },
-  { className: "top-[68px] left-[137px] bg-sunflower" },
-  { className: "top-[68px] left-[273px] bg-sunflower" },
-  { className: "top-0 left-[341px] bg-sunflower" },
-  { className: "top-[136px] left-[341px] bg-sunflower" },
-] as const;
+const delay = (i: number) => ({ "--i": i }) as CSSProperties;
 
 export function CareersInterview() {
   return (
-    <section
-      className="relative overflow-hidden px-[clamp(1.5rem,7.25vw,6.5rem)] py-[clamp(4.5rem,8vw,6rem)] max-[880px]:px-6"
+    <InView
+      as="section"
+      threshold={0.08}
+      rootMargin="0px"
+      className="iv relative isolate overflow-hidden px-[clamp(1.5rem,7.25vw,6.5rem)] py-[clamp(3.5rem,7vw,6rem)] max-[1023px]:px-16 max-[1023px]:py-[72px] max-[767px]:px-6 max-[767px]:py-14"
       aria-labelledby="iv-title"
     >
-      <div
-        className="pointer-events-none absolute top-0 left-0 opacity-30"
-        aria-hidden="true"
-      >
-        {decoPixels.map((pixel) => (
-          <div key={pixel.className} className={`absolute size-[68px] ${pixel.className}`} />
-        ))}
+      <div className="iv-deco" aria-hidden="true">
+        <InterviewDeco />
       </div>
-      <div className="relative z-[1] mx-auto flex max-w-[1232px] flex-col gap-12">
-        <header className="flex max-w-[760px] flex-col items-start gap-4">
+      <div className="relative z-[1] mx-auto flex max-w-[1232px] flex-col gap-16 max-[1023px]:gap-12 max-[767px]:gap-10">
+        <header className="rv flex max-w-[640px] flex-col items-start" style={delay(0)}>
           <InterviewMotif />
-          <p className="text-base font-bold tracking-[0.1em] text-bitmap-mid uppercase">
+          <p className="mt-4 text-base leading-5 font-bold tracking-[0.1em] text-bitmap-mid uppercase max-[767px]:text-sm max-[767px]:leading-[18px]">
             {careersInterview.eyebrow}
           </p>
           <h2
             id="iv-title"
-            className="text-[clamp(2rem,4vw,3rem)] leading-[1.08] font-bold tracking-[-0.02em] text-mist"
+            className="mt-4 text-[clamp(2rem,4.4vw,3rem)] leading-[1.06] font-bold tracking-[-0.02em] text-mist max-[1023px]:text-[clamp(2.25rem,5vw,2.5rem)] max-[767px]:text-[2rem] max-[767px]:leading-[1.14]"
           >
             {careersInterview.title.map((line) => (
               <span key={line} className="block">
@@ -47,37 +39,41 @@ export function CareersInterview() {
               </span>
             ))}
           </h2>
-          <p className="text-base leading-[1.4] text-mist">{careersInterview.lede}</p>
+          <p className="mt-5 max-w-[470px] text-base leading-[1.5] text-mist">
+            {careersInterview.lede}
+          </p>
         </header>
 
-        <div className="grid gap-8 min-[721px]:grid-cols-2 min-[1101px]:grid-cols-3">
-          {careersInterview.cards.map((card) => (
-            <CareersCard key={card.key}>
-              <div className="flex flex-col gap-4">
-                <CareersIconTile>
-                  <CareersStrokeIcon d={careersIcons[card.key]} />
-                </CareersIconTile>
-                <h3 className="text-[22px] leading-[1.28] font-bold tracking-[-0.01em] text-mist">
-                  {card.title}
-                </h3>
-                <p className="text-base leading-[1.4] text-mist/75">{card.body}</p>
-              </div>
+        <div className="grid grid-cols-1 gap-x-8 gap-y-12 min-[768px]:grid-cols-2 min-[1024px]:grid-cols-3 max-[767px]:gap-y-5">
+          {careersInterview.cards.map((card, index) => (
+            <CareersCard key={card.key} className="rv flex flex-col" hover="lift" style={delay(index + 1)}>
+              <CareersIconTile>
+                <CareersStrokeIcon d={careersIcons[card.key]} />
+              </CareersIconTile>
+              <h3 className="mt-5 mb-3 text-xl leading-[1.3] font-bold tracking-[-0.01em] text-mist">
+                {card.title}
+              </h3>
+              <p className="text-base leading-[1.5] text-mist/75 transition-colors duration-[180ms] group-hover:text-mist/90">
+                {card.body}
+              </p>
             </CareersCard>
           ))}
         </div>
 
-        <CareersCard>
-          <div className="flex flex-col items-start justify-between gap-8 min-[881px]:flex-row min-[881px]:items-center">
-            <div className="flex max-w-[820px] flex-col items-start gap-4">
+        <CareersCard className="rv" hover="none" style={delay(7)}>
+          <div className="flex flex-col items-start justify-between gap-10 min-[768px]:flex-row min-[768px]:items-center max-[767px]:gap-5">
+            <div className="flex max-w-[860px] items-start gap-5">
               <CareersIconTile>
                 <CareersStrokeIcon d={careersIcons.atom} />
               </CareersIconTile>
-              <h3 className="text-[clamp(1.5rem,3vw,1.75rem)] leading-[1.28] font-bold tracking-[-0.02em] text-mist">
-                {careersInterview.cta.title}
-              </h3>
-              <p className="text-base leading-[1.4] tracking-[0.02em] text-mist/80">
-                {careersInterview.cta.body}
-              </p>
+              <div className="flex flex-col gap-2">
+                <h3 className="text-xl leading-[1.3] font-bold tracking-[-0.01em] text-mist">
+                  {careersInterview.cta.title}
+                </h3>
+                <p className="text-base leading-[1.5] text-mist/75">
+                  {careersInterview.cta.body}
+                </p>
+              </div>
             </div>
             <CareersMailLink href={careersInterview.cta.href}>
               {careersInterview.cta.label}
@@ -86,7 +82,7 @@ export function CareersInterview() {
           </div>
         </CareersCard>
       </div>
-    </section>
+    </InView>
   );
 }
 
@@ -109,6 +105,20 @@ function InterviewMotif() {
         d="M23.9976 16.0008C23.9976 7.16442 22.2068 0 19.998 0C17.7892 0 15.9968 7.16442 15.9968 16.0008H23.9976Z"
         fill="#D1D100"
       />
+    </svg>
+  );
+}
+
+function InterviewDeco() {
+  return (
+    <svg width="409" height="204" viewBox="0 0 409 204" fill="none" aria-hidden="true">
+      <rect opacity="0.3" x="0" y="0" width="68" height="68" fill="#D1D100" />
+      <rect opacity="0.3" x="205" y="0" width="68" height="68" fill="#D1D100" />
+      <rect opacity="0.3" x="341" y="0" width="68" height="68" fill="#D1D100" />
+      <rect opacity="0.3" x="68" y="68" width="68" height="69" fill="#E3E270" />
+      <rect opacity="0.3" x="137" y="68" width="68" height="68" fill="#D1D100" />
+      <rect opacity="0.3" x="273" y="68" width="68" height="68" fill="#D1D100" />
+      <rect opacity="0.3" x="341" y="136" width="68" height="68" fill="#D1D100" />
     </svg>
   );
 }

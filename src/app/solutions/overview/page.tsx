@@ -1,6 +1,7 @@
 import { JsonLd } from "@/components/json-ld";
 import { SolutionsHero } from "@/components/solutions-hero";
 import { SolutionsIndustries } from "@/components/solutions-industries";
+import { SolutionsOverviewFx } from "@/components/solutions-overview-fx";
 import { createPageMetadata } from "@/lib/metadata";
 import { solutionsHero, solutionsMeta } from "@/lib/solutions";
 import { solutionsGraph } from "@/lib/structured-data";
@@ -18,6 +19,7 @@ export default function SolutionsOverviewPage() {
       <JsonLd data={solutionsGraph()} />
       <SolutionsHero />
       <SolutionsIndustries />
+      <SolutionsOverviewFx />
     </>
   );
 }

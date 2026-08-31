@@ -1,6 +1,8 @@
 import { CtaArrow } from "@/components/cta-arrow";
 import { GetStartedLink } from "@/components/get-started-link";
+import { InView } from "@/components/in-view";
 import { financialProducts } from "@/lib/financial";
+import type { CSSProperties } from "react";
 
 type ProductsContent = {
   eyebrow: string;
@@ -30,7 +32,12 @@ export function FinancialProducts({
     >
       <div className="tulip-grid" aria-hidden="true" />
       <div className="relative z-[1]">
-        <div className="mb-12 max-w-[780px] max-[880px]:mb-10">
+        <InView
+          mark="rv-in"
+          threshold={0.2}
+          rootMargin="0px"
+          className="pr-rv mb-12 max-w-[780px] max-[880px]:mb-10"
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={glyph}
@@ -51,13 +58,18 @@ export function FinancialProducts({
           <p className="max-w-[784px] text-base leading-[1.4] text-mist/80">
             {content.sub}
           </p>
-        </div>
+        </InView>
 
         <div className="mx-auto grid grid-cols-1 gap-8 max-[720px]:max-w-[460px] min-[721px]:grid-cols-2 min-[721px]:gap-7 min-[1101px]:grid-cols-3 min-[1101px]:gap-10">
-          {content.cards.map((card) => (
-            <article
+          {content.cards.map((card, index) => (
+            <InView
               key={card.href}
-              className="fs-pr-card group relative flex min-h-[348px] flex-col overflow-hidden rounded-3xl border border-bitmap-highlight/40 p-8 transition-[transform,border-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-1 hover:border-bitmap-highlight/70 hover:shadow-[0_20px_44px_rgba(0,0,0,0.4),0_0_28px_rgba(217,229,51,0.1)] max-[720px]:min-h-0"
+              as="article"
+              mark="rv-in"
+              threshold={0.2}
+              rootMargin="0px"
+              className="fs-pr-card pr-rv pr-stagger group relative flex min-h-[348px] flex-col overflow-hidden rounded-3xl border border-bitmap-highlight/40 p-8 transition-[transform,border-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-1 hover:border-bitmap-highlight/70 hover:shadow-[0_20px_44px_rgba(0,0,0,0.4),0_0_28px_rgba(217,229,51,0.1)] max-[720px]:min-h-0"
+              style={{ "--i": index } as CSSProperties}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -83,7 +95,7 @@ export function FinancialProducts({
                 Learn More
                 <CtaArrow />
               </GetStartedLink>
-            </article>
+            </InView>
           ))}
         </div>
       </div>

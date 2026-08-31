@@ -13,7 +13,7 @@ type Values = Record<FieldName, string>;
 type Errors = Partial<Record<"name" | "email", string>>;
 
 const fieldClass =
-  "w-full rounded-lg border border-[#212c25] bg-[#05140a] px-4 text-base text-mist outline-none placeholder:text-mist/35 focus:border-sunflower/50 aria-invalid:border-[#e8a090]";
+  "w-full rounded-lg border border-[#212c25] bg-[#05140a] px-4 py-3.5 text-base text-mist outline-none placeholder:text-mist/42 transition-[border-color,box-shadow] duration-[180ms] ease-out hover:border-[#3b4a3e] focus-visible:border-bitmap-highlight focus-visible:shadow-[0_0_0_3px_rgba(227,226,112,0.25)] aria-invalid:border-[#e98b7d]";
 
 export function ContactForm() {
   const [values, setValues] = useState<Values>({
@@ -79,34 +79,37 @@ export function ContactForm() {
   }
 
   return (
-    <div className="surface-grain rounded-2xl border border-sunflower/32 bg-[#002810] p-8 min-[721px]:p-12">
-      <h2 className="text-[clamp(1.5rem,2.4vw,1.75rem)] leading-[1.2] font-bold tracking-[-0.02em] text-mist">
+    <div className="ct-form-card rounded-2xl border border-sunflower/32 p-[clamp(1.75rem,3.4vw,3rem)]">
+      <h2 className="mb-7 text-[clamp(1.5rem,2.6vw,1.75rem)] leading-[1.28] font-bold tracking-[-0.01em] text-mist">
         {contactForm.title}
       </h2>
       {status === "success" ? (
-        <div className="mt-8 flex max-w-[640px] flex-col items-start gap-4" role="status">
+        <div className="flex max-w-[520px] flex-col items-start gap-3.5" role="status">
           <span
             className="grid size-12 place-items-center rounded-full bg-sunflower"
             aria-hidden="true"
           >
             <SuccessCheck />
           </span>
-          <h3 className="text-[clamp(1.25rem,2vw,1.5rem)] leading-[1.25] font-bold tracking-[-0.02em] text-mist">
+          <h3 className="text-[22px] leading-[1.25] font-bold tracking-[-0.01em] text-mist">
             {contactForm.successTitle}
           </h3>
           <p className="text-base leading-[1.5] text-mist/75">{contactForm.successBody}</p>
           <GetStartedLink
             href="/"
             variant="secondary"
-            className="mt-2 rounded-xl px-6"
+            className="mt-1.5 rounded-xl px-6"
           >
             {contactForm.successCta}
           </GetStartedLink>
         </div>
       ) : (
-        <form className="mt-8 flex flex-col gap-5" noValidate onSubmit={onSubmit}>
+        <form className="flex flex-col gap-5" noValidate onSubmit={onSubmit}>
           {status === "error" ? (
-            <p className="text-sm leading-5 text-[#e8a090]" role="alert">
+            <p
+              className="rounded-lg border border-[#e98b7d]/40 bg-[#e98b7d]/12 px-4 py-3.5 text-sm leading-[1.45] text-[#f0a99e]"
+              role="alert"
+            >
               {contactForm.error}
             </p>
           ) : null}
@@ -134,7 +137,7 @@ export function ContactForm() {
             onChange={onChange}
           />
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-mist" htmlFor="ct-message">
+            <label className="text-sm leading-none font-medium text-mist" htmlFor="ct-message">
               {contactForm.fields.message.label}
             </label>
             <textarea
@@ -144,13 +147,13 @@ export function ContactForm() {
               placeholder={contactForm.fields.message.placeholder}
               value={values.message}
               onChange={onChange}
-              className={`${fieldClass} min-h-[173px] py-3.5`}
+              className={`${fieldClass} min-h-[162px] resize-y`}
             />
           </div>
           <button
             type="submit"
             disabled={status === "submitting"}
-            className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-mist px-6 text-base font-semibold text-forest transition-colors hover:bg-sunflower disabled:opacity-70 sm:w-auto"
+            className="mt-1 inline-flex h-12 w-full items-center justify-center self-start rounded-xl bg-mist px-6 text-base font-semibold text-forest transition-[transform,box-shadow] duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-safe:hover:scale-[1.04] motion-safe:hover:shadow-[0_0_28px_rgba(227,226,112,0.4)] disabled:cursor-default disabled:opacity-60 disabled:hover:scale-100 disabled:hover:shadow-none sm:w-auto"
           >
             {status === "submitting" ? contactForm.submitting : contactForm.submit}
           </button>
@@ -187,10 +190,10 @@ function Field({
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-sm font-medium text-mist" htmlFor={id}>
+      <label className="text-sm leading-none font-medium text-mist" htmlFor={id}>
         {label}
         {required ? (
-          <span className="text-sunflower" aria-hidden="true">
+          <span className="ml-0.5 text-sunflower" aria-hidden="true">
             *
           </span>
         ) : null}
@@ -207,10 +210,10 @@ function Field({
         aria-describedby={error ? errorId : undefined}
         value={value}
         onChange={onChange}
-        className={`${fieldClass} h-[53px]`}
+        className={fieldClass}
       />
       {error ? (
-        <p className="text-sm leading-5 text-[#e8a090]" id={errorId}>
+        <p className="text-[13px] leading-[1.4] text-[#f0a99e]" id={errorId}>
           {error}
         </p>
       ) : null}

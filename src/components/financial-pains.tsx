@@ -1,4 +1,6 @@
+import { InView } from "@/components/in-view";
 import { financialPains, type FinancialPainIcon } from "@/lib/financial";
+import type { CSSProperties } from "react";
 
 type PainCard = {
   title: string;
@@ -16,20 +18,20 @@ type PainsContent = {
 };
 
 const decoPixels = [
-  { className: "top-0 right-[340px] bg-sunflower" },
-  { className: "top-0 right-[136px] bg-sunflower" },
-  { className: "top-0 right-0 bg-sunflower" },
-  { className: "top-[68px] right-[272px] bg-bitmap-highlight" },
-  { className: "top-[68px] right-[204px] bg-sunflower" },
-  { className: "top-[68px] right-[68px] bg-sunflower" },
-  { className: "top-[136px] right-0 bg-sunflower" },
-  { className: "bottom-[272px] left-[68px] bg-bitmap-highlight" },
-  { className: "bottom-[204px] left-[68px] bg-sunflower" },
-  { className: "bottom-[340px] left-0 bg-sunflower" },
-  { className: "bottom-[136px] left-0 bg-sunflower" },
-  { className: "bottom-[68px] left-[68px] bg-sunflower" },
-  { className: "bottom-0 left-[136px] bg-sunflower" },
-  { className: "bottom-0 left-0 bg-sunflower" },
+  { className: "top-0 right-[340px] bg-sunflower", parallax: "-0.08" },
+  { className: "top-0 right-[136px] bg-sunflower", parallax: "-0.08" },
+  { className: "top-0 right-0 bg-sunflower", parallax: "-0.08" },
+  { className: "top-[68px] right-[272px] bg-bitmap-highlight", parallax: "-0.08" },
+  { className: "top-[68px] right-[204px] bg-sunflower", parallax: "-0.08" },
+  { className: "top-[68px] right-[68px] bg-sunflower", parallax: "-0.08" },
+  { className: "top-[136px] right-0 bg-sunflower", parallax: "-0.08" },
+  { className: "bottom-[272px] left-[68px] bg-bitmap-highlight", parallax: "0.09" },
+  { className: "bottom-[204px] left-[68px] bg-sunflower", parallax: "-0.10" },
+  { className: "bottom-[340px] left-0 bg-sunflower", parallax: "0.11" },
+  { className: "bottom-[136px] left-0 bg-sunflower", parallax: "-0.09" },
+  { className: "bottom-[68px] left-[68px] bg-sunflower", parallax: "0.10" },
+  { className: "bottom-0 left-[136px] bg-sunflower", parallax: "-0.12" },
+  { className: "bottom-0 left-0 bg-sunflower", parallax: "0.08" },
 ] as const;
 
 const iconPaths: Record<FinancialPainIcon, string> = {
@@ -50,21 +52,31 @@ export function FinancialPains({
   glyph?: string;
 }) {
   return (
-    <section
+    <InView
+      as="section"
+      threshold={0.08}
+      rootMargin="0px"
+      data-fp=""
       className="relative overflow-hidden px-[clamp(1.5rem,7.25vw,6.5rem)] py-[clamp(4.5rem,8vw,7.5rem)] max-[1100px]:px-[clamp(1.5rem,5vw,3.5rem)] max-[1100px]:py-[clamp(4rem,6vw,6rem)]"
       aria-labelledby="fp-title"
     >
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+      <div className="fp-deco pointer-events-none absolute inset-0" aria-hidden="true">
         {decoPixels.map((pixel) => (
           <div
             key={pixel.className}
-            className={`absolute size-[68px] opacity-30 max-[560px]:size-[42px] ${pixel.className}`}
+            data-parallax={pixel.parallax}
+            className={`fp-sq absolute size-[68px] opacity-30 max-[560px]:size-[42px] ${pixel.className}`}
           />
         ))}
       </div>
 
       <div className="relative z-[1] mx-auto max-w-[1232px]">
-        <div className="mb-[clamp(3rem,5vw,4.5rem)] max-w-[620px]">
+        <InView
+          mark="rv-in"
+          threshold={0.2}
+          rootMargin="0px"
+          className="fp-rv mb-[clamp(3rem,5vw,4.5rem)] max-w-[620px]"
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={glyph}
@@ -86,24 +98,29 @@ export function FinancialPains({
           <p className="max-w-[470px] text-base leading-[1.5] tracking-[0.01em] text-[#e2e5c0]/72">
             {content.sub}
           </p>
-        </div>
+        </InView>
 
         <div className="grid grid-cols-1 gap-5 min-[561px]:grid-cols-2 min-[561px]:gap-8 min-[1101px]:grid-cols-4 min-[1101px]:gap-[clamp(1.25rem,2vw,2rem)]">
-          {content.cards.map((card) => (
-            <article
+          {content.cards.map((card, index) => (
+            <InView
               key={card.title}
-              className="surface-grain group relative overflow-hidden rounded-2xl border border-white/8 bg-[#19321e] px-7 pt-7 pb-8 shadow-[inset_0_1px_rgba(255,255,255,0.05)] transition-[transform,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-safe:hover:-translate-y-1.5 hover:border-[#d3de3c]/35 hover:shadow-[0_24px_50px_rgba(0,0,0,0.4),0_0_30px_rgba(217,229,51,0.12),inset_0_1px_rgba(255,255,255,0.08)]"
+              as="article"
+              mark="rv-in"
+              threshold={0.2}
+              rootMargin="0px"
+              className="fp-rv fp-stagger surface-grain group relative overflow-hidden rounded-2xl border border-white/8 bg-[#19321e] px-7 pt-7 pb-8 shadow-[inset_0_1px_rgba(255,255,255,0.05)] transition-[transform,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-safe:hover:-translate-y-1.5 hover:border-[#d3de3c]/35 hover:shadow-[0_24px_50px_rgba(0,0,0,0.4),0_0_30px_rgba(217,229,51,0.12),inset_0_1px_rgba(255,255,255,0.08)]"
+              style={{ "--i": index } as CSSProperties}
             >
               <PainIcon d={card.iconPath ?? iconPaths[card.icon!]} />
               <h3 className="mt-3 mb-3 text-[21px] leading-[1.24] font-semibold tracking-[-0.01em] text-mist">
                 {card.title}
               </h3>
               <p className="text-[15px] leading-[1.6] text-[#e2e5c0]/70">{card.body}</p>
-            </article>
+            </InView>
           ))}
         </div>
       </div>
-    </section>
+    </InView>
   );
 }
 

@@ -1,57 +1,135 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { insightsHow } from "@/lib/insights";
 
+const PLAY_MS = 6200;
+
+const DROP_PACKETS = [
+  { delay: "2s", x: "-6px" },
+  { delay: "2.09s", x: "5px" },
+  { delay: "2.2s", x: "-2px" },
+  { delay: "2.31s", x: "8px" },
+  { delay: "2.4s", x: "-8px" },
+  { delay: "2.52s", x: "2px" },
+] as const;
+
+const OUT_PACKETS = ["4.95s", "5.07s", "5.2s"] as const;
+
 export function InsightsFlow() {
+  const wrapRef = useRef<HTMLDivElement>(null);
   const [play, setPlay] = useState(0);
+  const [armed, setArmed] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    const node = wrapRef.current;
+    if (!node) {
+      return;
+    }
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setPlaying(true);
+      setDone(true);
+      return;
+    }
+
+    setArmed(true);
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setPlaying(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.28, rootMargin: "0px 0px -8% 0px" },
+    );
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!playing || !armed) {
+      return;
+    }
+
+    setDone(false);
+    const timer = window.setTimeout(() => setDone(true), PLAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [armed, play, playing]);
+
+  function replay() {
+    setDone(false);
+    setPlaying(false);
+    setPlay((value) => value + 1);
+    window.setTimeout(() => setPlaying(true), 40);
+  }
+
+  const flowClass = [
+    "hiw insights-flow mx-auto w-full max-w-[1232px]",
+    armed && "js-armed",
+    playing && "is-playing",
+    done && "is-done",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <div className="mt-14">
-      <div key={play} className="insights-flow mx-auto w-full max-w-[1232px]">
-        <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-stretch lg:gap-4">
-          <FlowGroup label={insightsHow.infra} icon="stack" wide>
-            <FlowCard icon="layers" label={insightsHow.apps} delay="0.05s" />
-            <FlowArrow />
-            <FlowCard icon="cube" label={insightsHow.collector} delay="0.18s" />
+    <div ref={wrapRef} className="mt-14">
+      <div key={play} className={flowClass}>
+        <div className="hiw-top flex flex-col items-stretch gap-4 lg:flex-row lg:items-stretch lg:gap-4">
+          <FlowGroup label={insightsHow.infra} icon="stack" variant="infra">
+            <FlowCard icon="layers" label={insightsHow.apps} hiw="app" />
+            <FlowArrow className="hiw-arrow--1" />
+            <FlowCard icon="cube" label={insightsHow.collector} hiw="otel" />
           </FlowGroup>
-          <FlowArrow className="hidden self-center lg:flex" />
-          <FlowGroup label={insightsHow.destinations} icon="send">
-            <FlowCard icon="chart" label={insightsHow.backends} delay="0.32s" />
+          <FlowArrow className="hiw-arrow--2 hidden self-center lg:flex" />
+          <FlowGroup label={insightsHow.destinations} icon="send" variant="dest">
+            <FlowCard icon="chart" label={insightsHow.backends} hiw="backends" />
           </FlowGroup>
         </div>
 
-        <div className="mt-6 flex flex-col items-center">
-          <p className="insights-flow-item text-[11px] font-bold tracking-[0.16em] text-bitmap-mid uppercase" style={{ animationDelay: "0.4s" }}>
+        <div className="hiw-bridge relative mt-6 flex flex-col items-center">
+          {DROP_PACKETS.map((packet) => (
+            <span
+              key={packet.delay}
+              className="hiw-pk"
+              style={{ "--pk-d": packet.delay, "--pk-x": packet.x } as CSSProperties}
+              aria-hidden="true"
+            />
+          ))}
+          <p className="hiw-bridge-label text-[11px] font-bold tracking-[0.16em] text-bitmap-mid uppercase">
             {insightsHow.bridge}
           </p>
-          <span className="insights-flow-item my-2 text-bitmap-mid" style={{ animationDelay: "0.48s" }} aria-hidden="true">
+          <span className="hiw-arrow my-2 text-bitmap-mid" aria-hidden="true">
             <DownArrow />
           </span>
         </div>
 
-        <div
-          className="insights-flow-item rounded-[28px] border border-[#d9e533]/45 bg-[#07150c] p-4 shadow-[0_0_48px_rgba(217,229,51,0.08)] sm:p-6"
-          style={{ animationDelay: "0.56s" }}
-        >
+        <div className="hiw-engine relative rounded-[28px] border border-[#d9e533]/45 bg-[#07150c] p-4 shadow-[0_0_48px_rgba(217,229,51,0.08)] sm:p-6">
+          <span className="hiw-engine-frame pointer-events-none absolute inset-0 rounded-[28px]" aria-hidden="true" />
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-            <p className="flex items-center gap-2 text-[11px] font-bold tracking-[0.14em] text-bitmap-mid uppercase">
+            <p className="hiw-brand flex items-center gap-2 text-[11px] font-bold tracking-[0.14em] text-bitmap-mid uppercase">
               <PulseIcon />
               {insightsHow.engine}
             </p>
-            <span className="rounded-full border border-[#d9e533]/40 px-3 py-1 text-[10px] font-bold tracking-[0.08em] text-bitmap-highlight uppercase">
+            <span className="hiw-status rounded-full border border-[#d9e533]/40 px-3 py-1 text-[10px] font-bold tracking-[0.08em] text-bitmap-highlight uppercase">
               {insightsHow.status}
             </span>
           </div>
-          <div className="grid items-center gap-4 lg:grid-cols-[180px_auto_minmax(0,1fr)_auto_180px] lg:gap-6">
-            <FlowCard icon="cube" label={insightsHow.ingestion} engine />
-            <FlowArrow className="hidden justify-self-center lg:flex" />
-            <div>
-              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <div className="hiw-engine-grid grid items-center gap-4 lg:grid-cols-[180px_auto_minmax(0,1fr)_auto_180px] lg:gap-6">
+            <FlowCard icon="cube" label={insightsHow.ingestion} hiw="ingestion" engine />
+            <FlowArrow className="hiw-arrow--3 hidden justify-self-center lg:flex" />
+            <div className="hiw-stack">
+              <span className="hiw-scan" aria-hidden="true" />
+              <div className="hiw-stack-head mb-3 flex flex-wrap items-center justify-between gap-2">
                 <p className="text-[11px] font-bold tracking-[0.12em] text-bitmap-mid uppercase">
                   {insightsHow.rulesLabel}
                 </p>
-                <p className="text-[11px] font-bold tracking-[0.12em] text-bitmap-highlight uppercase">
+                <p className="hiw-repair text-[11px] font-bold tracking-[0.12em] text-bitmap-highlight uppercase">
                   {insightsHow.repairing}
                 </p>
               </div>
@@ -59,20 +137,34 @@ export function InsightsFlow() {
                 {insightsHow.rules.map((rule, index) => (
                   <li
                     key={rule}
-                    className="insights-flow-item flex items-center gap-3 rounded-full border border-[#d9e533]/18 bg-[#0d2414] px-4 py-2.5 text-[13.5px] text-mist"
-                    style={{ animationDelay: `${0.7 + index * 0.08}s` }}
+                    className={`hiw-chip flex items-center gap-3 rounded-full border border-[#d9e533]/18 bg-[#0d2414] px-4 py-2.5 text-[13.5px] text-mist ${
+                      index < 4 ? "hiw-chip--repair" : ""
+                    }`}
+                    style={{ "--chip-i": index } as CSSProperties}
                   >
                     <ShieldIcon />
                     {rule}
                   </li>
                 ))}
+                <li
+                  className="hiw-chip hiw-chip--muted flex items-center justify-center rounded-full px-4 py-2.5 text-[12px] text-mist/55"
+                  style={{ "--chip-i": insightsHow.rules.length } as CSSProperties}
+                >
+                  {insightsHow.moreRules}
+                </li>
               </ul>
-              <p className="mt-3 text-center text-[12px] text-mist/55">
-                {insightsHow.moreRules}
-              </p>
             </div>
-            <FlowArrow className="hidden justify-self-center lg:flex" />
-            <FlowCard icon="bulb" label={insightsHow.insights} engine />
+            <FlowArrow className="hiw-arrow--4 hidden justify-self-center lg:flex" />
+            <FlowCard icon="bulb" label={insightsHow.insights} hiw="insights" engine />
+            {OUT_PACKETS.map((delay) => (
+              <span
+                key={delay}
+                className="hiw-pk hiw-pk--out"
+                style={{ "--pk-d": delay } as CSSProperties}
+                aria-hidden="true"
+              />
+            ))}
+            <span className="hiw-pk hiw-pk--out hiw-pk--idle" style={{ "--pk-d": "5.34s" } as CSSProperties} aria-hidden="true" />
           </div>
         </div>
       </div>
@@ -81,7 +173,7 @@ export function InsightsFlow() {
         <button
           type="button"
           className="text-sm font-semibold text-bitmap-highlight underline decoration-bitmap-highlight/40 underline-offset-4 hover:decoration-bitmap-highlight"
-          onClick={() => setPlay((value) => value + 1)}
+          onClick={replay}
         >
           {insightsHow.replay}
         </button>
@@ -97,22 +189,21 @@ function FlowGroup({
   label,
   icon,
   children,
-  wide = false,
+  variant,
 }: {
   label: string;
   icon: "stack" | "send";
   children: ReactNode;
-  wide?: boolean;
+  variant: "infra" | "dest";
 }) {
   return (
     <div
-      className={`insights-flow-item relative flex min-h-[230px] items-center justify-center rounded-[20px] px-6 pt-14 pb-6 ${
-        wide ? "flex-1" : "w-full lg:w-[240px] lg:shrink-0"
+      className={`hiw-group relative flex min-h-[230px] items-center justify-center rounded-[20px] px-6 pt-14 pb-6 ${
+        variant === "infra" ? "hiw-infra flex-1" : "hiw-dest w-full lg:w-[240px] lg:shrink-0"
       }`}
-      style={{ animationDelay: "0.08s" }}
     >
       <span
-        className="pointer-events-none absolute inset-0 rounded-[20px] border-[1.5px] border-dashed border-[#34520b]/80"
+        className="hiw-group-frame pointer-events-none absolute inset-0 rounded-[20px] border-[1.5px] border-dashed border-[#34520b]/80"
         aria-hidden="true"
       />
       <p className="absolute top-6 left-6 mb-0 flex items-center gap-2 text-[12px] font-bold tracking-[0.08em] text-bitmap-olive uppercase">
@@ -128,27 +219,27 @@ function FlowCard({
   icon,
   label,
   engine = false,
-  delay,
+  hiw,
 }: {
   icon: "layers" | "cube" | "chart" | "bulb";
   label: string;
   engine?: boolean;
-  delay?: string;
+  hiw: "app" | "otel" | "backends" | "ingestion" | "insights";
 }) {
   return (
     <div
-      className={`insights-flow-item flex h-[150px] w-[180px] flex-col items-center justify-center rounded-2xl border bg-[#0c2317] ${
-        engine ? "border-[#e3e270] shadow-[0_0_24px_rgba(227,226,112,0.12)]" : "border-[#34520b]/80"
+      data-hiw={hiw}
+      className={`hiw-card flex h-[150px] w-[180px] flex-col items-center justify-center rounded-2xl border bg-[#0c2317] ${
+        engine ? "hiw-card--engine border-[#e3e270] shadow-[0_0_24px_rgba(227,226,112,0.12)]" : "border-[#34520b]/80"
       }`}
-      style={delay ? { animationDelay: delay } : undefined}
     >
-      <span className="grid size-12 place-items-center rounded-xl border border-[#34520b]/80 bg-[#e3e270]/8 text-bitmap-highlight">
+      <span className="hiw-iconbox grid size-12 place-items-center rounded-xl border border-[#34520b]/80 bg-[#e3e270]/8 text-bitmap-highlight">
         {icon === "layers" ? <LayersIcon /> : null}
         {icon === "cube" ? <CubeIcon /> : null}
         {icon === "chart" ? <ChartIcon /> : null}
         {icon === "bulb" ? <BulbIcon /> : null}
       </span>
-      <span className={`mt-3 text-center text-sm font-medium ${engine ? "text-bitmap-highlight" : "text-mist"}`}>
+      <span className={`hiw-card-label mt-3 text-center text-sm font-medium ${engine ? "text-bitmap-highlight" : "text-mist"}`}>
         {label}
       </span>
     </div>
@@ -157,7 +248,7 @@ function FlowCard({
 
 function FlowArrow({ className = "" }: { className?: string }) {
   return (
-    <span className={`flex text-bitmap-mid ${className}`} aria-hidden="true">
+    <span className={`hiw-arrow flex text-bitmap-mid ${className}`} aria-hidden="true">
       <svg width="22" height="16" viewBox="0 0 22 16" fill="none">
         <path
           d="M1 8h18M13 2l7 6-7 6"
