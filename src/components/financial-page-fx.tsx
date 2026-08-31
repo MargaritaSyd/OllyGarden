@@ -14,8 +14,9 @@ export function FinancialPageFx() {
     if (!section) {
       return;
     }
+    const sectionEl = section;
 
-    const pixels = Array.from(section.querySelectorAll<HTMLElement>(".fp-sq"));
+    const pixels = Array.from(sectionEl.querySelectorAll<HTMLElement>(".fp-sq"));
     if (!pixels.length) {
       return;
     }
@@ -46,7 +47,7 @@ export function FinancialPageFx() {
     function paintParallax() {
       parallaxQueued = false;
       const viewH = window.innerHeight || 1;
-      const bounds = section.getBoundingClientRect();
+      const bounds = sectionEl.getBoundingClientRect();
       if (bounds.bottom < 0 || bounds.top > viewH) {
         return;
       }

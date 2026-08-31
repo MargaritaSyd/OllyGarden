@@ -15,7 +15,8 @@ export function SolutionsOverviewFx() {
     const cleanups: Array<() => void> = [];
 
     if (section && frames.length) {
-      const deco = Array.from(section.querySelectorAll<HTMLElement>(".sol-ipx"));
+      const host = section;
+      const deco = Array.from(host.querySelectorAll<HTMLElement>(".sol-ipx"));
       let queued = false;
 
       function paintParallax() {
@@ -35,7 +36,7 @@ export function SolutionsOverviewFx() {
           frame.style.transform = `translateY(${(-progress * 28).toFixed(1)}px)`;
         }
 
-        const sectionBounds = section.getBoundingClientRect();
+        const sectionBounds = host.getBoundingClientRect();
         if (sectionBounds.bottom > 0 && sectionBounds.top < viewH) {
           const progress =
             (sectionBounds.top + sectionBounds.height / 2 - viewH / 2) / viewH;
