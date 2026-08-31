@@ -1,10 +1,9 @@
 import { CtaArrow } from "@/components/cta-arrow";
-import { BlogMeta } from "@/components/blog-ui";
-import { formatBlogDate } from "@/lib/blog";
+import { WebinarVideoCard } from "@/components/webinar-video-card";
 import { communityWebinars } from "@/lib/community";
 
 export function CommunityWebinars() {
-  const { eyebrow, title, sub, cta, youtubeHref, videos, featured } = communityWebinars;
+  const { eyebrow, title, sub, cta, youtubeHref, videos } = communityWebinars;
 
   return (
     <section
@@ -42,57 +41,20 @@ export function CommunityWebinars() {
           aria-label="OllyGarden Webinars"
         >
           {videos.map((video) => (
-            <li key={video.href}>
-              <a
-                href={video.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex flex-col gap-6"
-                aria-label={`Watch “${video.title}” on YouTube (opens in a new tab)`}
-              >
-                <span className="block h-[250px] overflow-hidden rounded-2xl">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={video.image}
-                    alt={video.alt}
-                    width={384}
-                    height={250}
-                    loading="lazy"
-                    className="h-full w-full object-cover"
-                  />
-                </span>
-                <BlogMeta date={formatBlogDate(video.date, "long")} suffix="YouTube" />
-                <h3 className="text-2xl leading-[1.29] font-bold tracking-[-0.02em] text-mist">
-                  {video.title}
-                </h3>
-                <span className="inline-flex items-center gap-2 text-lg font-medium text-sunflower">
-                  <span className="underline underline-offset-2">Watch Now</span>
-                  <CtaArrow />
-                </span>
-              </a>
+            <li key={video.href} className="h-full">
+              <WebinarVideoCard
+                video={{
+                  date: video.date,
+                  title: video.title,
+                  href: video.href,
+                  image: video.image,
+                  alt: video.alt,
+                  venue: "YouTube",
+                }}
+              />
             </li>
           ))}
         </ul>
-
-        <article className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-sunflower/40 bg-[#00280e] p-6 min-[881px]:flex-row min-[881px]:items-center">
-          <div className="flex flex-col gap-2">
-            <p className="text-xs font-bold tracking-[0.1em] text-bitmap-mid uppercase">
-              {featured.eyebrow}
-            </p>
-            <h3 className="text-2xl font-bold tracking-[-0.02em] text-mist">{featured.title}</h3>
-            <BlogMeta date={featured.date} suffix={featured.suffix} />
-            <p className="text-base text-mist">{featured.description}</p>
-          </div>
-          <a
-            href={featured.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex h-12 w-full max-w-[340px] shrink-0 items-center justify-center rounded-2xl bg-mist px-[30px] text-base font-semibold text-forest transition-colors hover:bg-sunflower sm:w-auto"
-            aria-label={`${featured.cta}: ${featured.title} (opens in a new tab)`}
-          >
-            {featured.cta}
-          </a>
-        </article>
       </div>
     </section>
   );

@@ -1,3 +1,4 @@
+import { InView } from "@/components/in-view";
 import { MediaStep } from "@/components/media-step";
 import { MenuItemIcon } from "@/components/menu-icons";
 import { VideoFrame } from "@/components/video-frame";
@@ -7,7 +8,7 @@ export function HomeHow() {
   return (
     <section aria-labelledby="how-title">
       <div className="mx-auto w-full max-w-[1328px] px-6 py-24 sm:px-12 lg:pt-[140px] lg:pb-[150px]">
-        <div className="mx-auto max-w-[780px] text-center">
+        <InView className="how-head mx-auto max-w-[780px] text-center">
           <HowMark />
           <p className="mt-[18px] text-sm font-bold tracking-[0.14em] text-bitmap-mid uppercase">
             {homeHow.eyebrow}
@@ -26,30 +27,37 @@ export function HomeHow() {
           <p className="mx-auto mt-[22px] max-w-[620px] text-[16.5px] leading-[1.68] text-mist/75">
             {homeHow.sub}
           </p>
-        </div>
+        </InView>
 
-        <div className="mx-auto mt-[72px] mb-[120px] w-full max-w-[1232px]">
-          <VideoFrame src={homeHow.video.src} label={homeHow.video.label} />
-        </div>
+        <InView mark="rv-in" className="mx-auto mt-[72px] mb-[120px] w-full max-w-[1232px]">
+          <VideoFrame
+            className="how-video"
+            src={homeHow.video.src}
+            label={homeHow.video.label}
+          />
+        </InView>
 
-        <ol className="mx-auto flex max-w-[1232px] flex-col gap-[130px]">
+        <ol className="mx-auto flex max-w-[1232px] flex-col gap-14 md:gap-[72px] lg:gap-[130px]">
           {homeHow.steps.map((step) => (
             <li key={step.n}>
-              <MediaStep
-                n={step.n}
-                flip={step.flip}
-                icon={<MenuItemIcon name={step.icon} />}
-                label={step.label}
-                title={step.title}
-                body={step.body}
-                media={
-                  <VideoFrame
-                    variant="step"
-                    src={step.video.src}
-                    label={step.video.label}
-                  />
-                }
-              />
+              <InView mark="rv-in" className={step.flip ? "how-step-flip" : undefined}>
+                <MediaStep
+                  n={step.n}
+                  flip={step.flip}
+                  icon={<MenuItemIcon name={step.icon} />}
+                  label={step.label}
+                  title={step.title}
+                  body={step.body}
+                  media={
+                    <VideoFrame
+                      variant="step"
+                      className="how-visual"
+                      src={step.video.src}
+                      label={step.video.label}
+                    />
+                  }
+                />
+              </InView>
             </li>
           ))}
         </ol>

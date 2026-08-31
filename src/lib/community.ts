@@ -1,13 +1,13 @@
 import { blogVideos } from "@/lib/blog";
 
 export const communityMeta = {
-  title: "Community & Events — OllyGarden",
-  path: "/resources/community",
+  title: "Events — OllyGarden",
+  path: "/resources/events",
 } as const;
 
 export const communityHero = {
-  badge: "OllyGarden Community & Events",
-  title: "OllyGarden Events",
+  badge: "OllyGarden Events",
+  title: "Next Events",
   lede: "Where to find us next — conferences, meetups, and community days.",
 } as const;
 
@@ -48,21 +48,12 @@ export const communityEvents = [
 ] as const;
 
 export const communityWebinars = {
-  eyebrow: "Community Events",
+  eyebrow: "Webinars",
   title: "OllyGarden Webinars",
   sub: "Our live sessions and educational videos for you.",
   cta: "Check our YouTube",
   youtubeHref: "https://www.youtube.com/@OllyGardenInc",
   videos: blogVideos,
-  featured: {
-    eyebrow: "New event",
-    title: "Event Name",
-    date: "July 30, 2026",
-    suffix: "YouTube",
-    description: "[description of the event]",
-    cta: "Set a Reminder",
-    href: "https://www.youtube.com/@OllyGardenInc",
-  },
 } as const;
 
 export const communityJoin = {

@@ -66,31 +66,26 @@ export const companyPrinciples = {
       id: "a",
       title: "Efficiency",
       body: "We focus on making telemetry pipelines more efficient, reducing waste, and helping every signal serve a clear purpose.",
-      className: "min-[1101px]:top-[122px] min-[1101px]:left-[58px]",
     },
     {
       id: "b",
       title: "Community & Collaboration",
       body: "We believe in collaboration within our team and with the broader open-source, OpenTelemetry, and observability communities.",
-      className: "min-[1101px]:top-[84px] min-[1101px]:right-[43px] min-[1101px]:left-auto",
     },
     {
       id: "c",
       title: "Clarity & Transparency",
       body: "We believe in straightforward communication, open processes, and clear insights teams can understand and act on.",
-      className: "min-[1101px]:top-[453px] min-[1101px]:left-[86px]",
     },
     {
       id: "d",
       title: "Continuous Learning",
       body: "Observability and OpenTelemetry are always evolving. We are committed to learning, improving, and adapting to meet new challenges.",
-      className: "min-[1101px]:top-[473px] min-[1101px]:left-[720px]",
     },
     {
       id: "e",
       title: "Pragmatism & Actionability",
       body: "We focus on real-world telemetry problems and deliver practical, actionable solutions that make a measurable difference.",
-      className: "min-[1101px]:top-[365px] min-[1101px]:right-[58px] min-[1101px]:left-auto",
     },
   ],
 } as const;
@@ -182,6 +177,8 @@ export const companyTeam = {
   eyebrow: "Our Team",
   title: "The OllyGardeners",
   lede: "OllyGarden is powered by a dedicated team of engineers and strategists with deep roots in OpenTelemetry and a shared passion for efficient observability.",
+  tagline:
+    "Our growing team combines experience in software engineering, distributed systems, and OpenTelemetry.",
 } as const;
 
 export const companyOpenSource = {

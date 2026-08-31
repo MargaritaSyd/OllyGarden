@@ -1,18 +1,37 @@
 import Link from "next/link";
 import { CtaArrow } from "@/components/cta-arrow";
 
-export function BlogTags({ tags }: { tags: readonly string[] }) {
+export function BlogTags({
+  tags,
+  size = "sm",
+}: {
+  tags: readonly string[];
+  size?: "sm" | "md";
+}) {
+  const pill =
+    size === "md"
+      ? "h-7 px-3.5 text-[13px] leading-4"
+      : "h-[26px] px-3 text-[11px] leading-none";
+
   return (
-    <div className="flex flex-wrap gap-2">
+    <ul className={`flex flex-wrap ${size === "md" ? "gap-3" : "gap-2"}`}>
       {tags.map((tag) => (
-        <span
+        <li
           key={tag}
-          className="inline-flex h-[22px] items-center rounded-full border border-bitmap-mid bg-[rgba(91,114,53,0.2)] px-3 text-[11px] leading-none text-bitmap-highlight"
+          className={`inline-flex items-center rounded-full border border-bitmap-mid bg-[rgba(91,114,53,0.2)] text-bitmap-highlight ${pill}`}
         >
           {tag}
-        </span>
+        </li>
       ))}
-    </div>
+    </ul>
+  );
+}
+
+export function BlogEyebrow({ children }: { children: string }) {
+  return (
+    <p className="text-base font-bold tracking-[0.1em] text-bitmap-mid uppercase">
+      {children}
+    </p>
   );
 }
 
@@ -38,7 +57,7 @@ export function BlogReadLink({
   ariaLabel?: string;
 }) {
   const className =
-    "group inline-flex items-center gap-2 text-lg font-medium text-sunflower";
+    "group inline-flex h-8 shrink-0 items-center gap-2 text-lg font-medium tracking-[0.02em] text-sunflower";
   const inner = (
     <>
       <span className="underline underline-offset-2">{children}</span>

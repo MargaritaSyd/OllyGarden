@@ -42,7 +42,7 @@ export function WebinarsSessions() {
           aria-label="OllyGarden Webinars"
         >
           {videos.map((video) => (
-            <li key={video.href}>
+            <li key={video.href} className="h-full">
               <WebinarVideoCard
                 video={{
                   date: video.date,

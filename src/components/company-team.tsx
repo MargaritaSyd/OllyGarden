@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, type KeyboardEvent } from "react";
+import {
+  useLayoutEffect,
+  useState,
+  type KeyboardEvent,
+  type TransitionEvent,
+} from "react";
+import { InView } from "@/components/in-view";
 import {
   companyTeam,
   companyTeamMembers,
@@ -8,32 +14,114 @@ import {
   type CompanyMember,
 } from "@/lib/company";
 
-export function CompanyTeam() {
-  const [index, setIndex] = useState(0);
-  const count = companyTeamSlides.length;
+const count = companyTeamSlides.length;
+const loopSlides = [
+  companyTeamSlides[count - 1],
+  ...companyTeamSlides,
+  companyTeamSlides[0],
+];
 
-  function goTo(next: number) {
-    setIndex((next + count) % count);
+const rightPixels = [
+  { className: "top-0 left-0 bg-bitmap-shadow" },
+  { className: "top-0 left-[204px] bg-[#46600f]" },
+  { className: "top-[68px] left-[68px] bg-[#2c4108]" },
+  { className: "top-[68px] left-[136px] bg-[#46600f]" },
+  { className: "top-[68px] left-[272px] bg-bitmap-shadow" },
+  { className: "top-0 left-[340px] bg-bitmap-shadow" },
+  { className: "top-[136px] left-[340px] bg-[#46600f]" },
+] as const;
+
+const leftPixels = [
+  { className: "top-0 left-0 bg-[#46600f]" },
+  { className: "top-[68px] left-[68px] bg-bitmap-shadow" },
+  { className: "top-[136px] left-0 bg-[#46600f]" },
+  { className: "top-[136px] left-[68px] bg-[#2c4108]" },
+  { className: "top-[204px] left-[68px] bg-[#46600f]" },
+  { className: "top-[272px] left-0 bg-bitmap-shadow" },
+] as const;
+
+export function CompanyTeam() {
+  const [index, setIndex] = useState(1);
+  const [noAnim, setNoAnim] = useState(false);
+
+  const realIndex =
+    index === 0 ? count - 1 : index === count + 1 ? 0 : index - 1;
+
+  function goPrev() {
+    if (noAnim) return;
+    setIndex((current) => Math.max(0, current - 1));
+  }
+
+  function goNext() {
+    if (noAnim) return;
+    setIndex((current) => Math.min(count + 1, current + 1));
+  }
+
+  function goToReal(page: number) {
+    if (noAnim) return;
+    setIndex(page + 1);
   }
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key === "ArrowLeft") {
       event.preventDefault();
-      goTo(index - 1);
+      goPrev();
     }
     if (event.key === "ArrowRight") {
       event.preventDefault();
-      goTo(index + 1);
+      goNext();
     }
   }
 
+  function onTransitionEnd(event: TransitionEvent<HTMLDivElement>) {
+    if (event.target !== event.currentTarget) return;
+    if (event.propertyName !== "transform") return;
+    if (index !== 0 && index !== count + 1) return;
+    setNoAnim(true);
+    setIndex(index === 0 ? count : 1);
+  }
+
+  useLayoutEffect(() => {
+    if (!noAnim) return;
+    const frame = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setNoAnim(false);
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [noAnim]);
+
   return (
-    <section
-      className="relative overflow-hidden px-[clamp(1.5rem,7.25vw,6.5rem)] py-[clamp(4.5rem,8vw,6rem)] max-[880px]:px-6"
+    <InView
+      as="section"
+      className="relative overflow-hidden px-[clamp(1.5rem,7.25vw,6.5rem)] py-[clamp(3.5rem,6.7vw,6rem)] max-[767px]:px-6 max-[767px]:py-14"
       aria-labelledby="team-title"
     >
+      <div
+        className="tm-sq pointer-events-none absolute top-0 right-0 z-0 h-[204px] w-[408px] origin-top-right max-[767px]:scale-[0.6]"
+        aria-hidden="true"
+      >
+        {rightPixels.map((pixel) => (
+          <div
+            key={pixel.className}
+            className={`ipx absolute size-[68px] opacity-30 ${pixel.className}`}
+          />
+        ))}
+      </div>
+      <div
+        className="tm-sq pointer-events-none absolute top-[clamp(360px,34vw,470px)] left-0 z-0 h-[340px] w-[136px] max-[767px]:hidden"
+        aria-hidden="true"
+      >
+        {leftPixels.map((pixel) => (
+          <div
+            key={pixel.className}
+            className={`ipx absolute size-[68px] opacity-30 ${pixel.className}`}
+          />
+        ))}
+      </div>
+
       <div className="relative z-[1] mx-auto flex max-w-[1232px] flex-col gap-12">
-        <header className="flex max-w-[720px] flex-col items-start gap-4">
+        <header className="team-head flex flex-col items-start gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/company/ic-mission.svg"
@@ -47,15 +135,17 @@ export function CompanyTeam() {
           </p>
           <h2
             id="team-title"
-            className="text-[clamp(2rem,4vw,3rem)] leading-[1.08] font-bold tracking-[-0.02em] text-mist"
+            className="text-[clamp(2rem,3.34vw,3rem)] leading-[1.1] font-bold tracking-[-0.02em] text-mist"
           >
             {companyTeam.title}
           </h2>
-          <p className="text-base leading-[1.4] text-mist">{companyTeam.lede}</p>
+          <p className="mt-1 max-w-[474px] text-base leading-[1.4] tracking-[0.02em] text-mist">
+            {companyTeam.lede}
+          </p>
         </header>
 
         <div
-          className="overflow-hidden"
+          className="tm-viewport w-full [container-type:inline-size] focus-visible:rounded-3xl focus-visible:outline-2 focus-visible:outline-offset-6 focus-visible:outline-bitmap-highlight"
           role="group"
           aria-roledescription="carousel"
           aria-label="OllyGarden team members"
@@ -63,23 +153,45 @@ export function CompanyTeam() {
           onKeyDown={onKeyDown}
         >
           <div
-            className="flex w-full transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
-            style={{ transform: `translateX(-${index * 100}%)` }}
+            className={`flex w-max will-change-transform [--tm-gap:1.5rem] max-xl:[--tm-slide:100cqw] lg:[--tm-gap:2rem] xl:[--tm-gap:2.5rem] xl:[--tm-slide:1175px] motion-reduce:transition-none ${
+              noAnim
+                ? "transition-none"
+                : "transition-transform duration-[550ms] ease-[cubic-bezier(0.65,0,0.35,1)]"
+            }`}
+            style={{
+              transform: `translateX(calc(-1 * ${index} * (var(--tm-slide) + var(--tm-gap))))`,
+              gap: "var(--tm-gap)",
+            }}
+            onTransitionEnd={onTransitionEnd}
           >
-            {companyTeamSlides.map((slide, pageIndex) => {
+            {loopSlides.map((slide, pageIndex) => {
               const tall = companyTeamMembers[slide.tall];
               const stack = slide.stack.map((id) => companyTeamMembers[id]);
+              const active = pageIndex === index;
               return (
                 <div
-                  key={slide.tall}
-                  className="grid w-full shrink-0 basis-full grid-cols-1 gap-10 min-[881px]:grid-cols-[minmax(0,454px)_minmax(0,1fr)]"
-                  aria-hidden={pageIndex !== index}
-                  {...(pageIndex !== index ? { inert: true } : {})}
+                  key={`${slide.tall}-${pageIndex}`}
+                  className={`flex w-[var(--tm-slide)] flex-none flex-col gap-6 transition-opacity duration-[400ms] lg:flex-row lg:gap-8 xl:gap-10 ${
+                    active ? "opacity-100" : "opacity-50"
+                  }`}
+                  aria-hidden={!active}
+                  {...(!active ? { inert: true } : {})}
                 >
-                  <MemberCard member={tall} size="tall" eager={pageIndex === 0} />
-                  <div className="flex flex-col gap-10">
+                  <div className="flex w-full lg:w-[40%] lg:flex-none xl:w-[454px]">
+                    <MemberCard
+                      member={tall}
+                      size="tall"
+                      eager={pageIndex <= 1}
+                    />
+                  </div>
+                  <div className="flex w-full flex-col gap-6 lg:flex-1 lg:gap-8 xl:w-[681px] xl:flex-none xl:gap-10">
                     {stack.map((member) => (
-                      <MemberCard key={member.name} member={member} size="med" />
+                      <MemberCard
+                        key={member.name}
+                        member={member}
+                        size="med"
+                        eager={pageIndex <= 1}
+                      />
                     ))}
                   </div>
                 </div>
@@ -88,11 +200,22 @@ export function CompanyTeam() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between" aria-label="Team pages">
-          <ArrowButton label="Previous team members" onClick={() => goTo(index - 1)} />
-          <div className="flex items-center gap-3" role="tablist" aria-label="Select team slide">
+        <div className="tm-tagline flex min-h-[54px] items-center justify-center overflow-hidden rounded-2xl border border-bitmap-highlight/40 bg-[rgba(0,40,14,0.6)] bg-[url('/images/texture-grain.png')] bg-repeat px-6 py-3 text-center text-base leading-[1.4] tracking-[0.02em] text-[#c9cb65] shadow-[inset_0_1px_rgba(255,255,255,0.05)] [background-size:328px_140px] max-[767px]:text-sm">
+          {companyTeam.tagline}
+        </div>
+
+        <div
+          className="tm-controls mt-2 grid grid-cols-[1fr_auto_1fr] items-center"
+          aria-label="Team pages"
+        >
+          <ArrowButton label="Previous team members" onClick={goPrev} />
+          <div
+            className="flex items-center gap-2.5"
+            role="tablist"
+            aria-label="Select team slide"
+          >
             {companyTeamSlides.map((slide, pageIndex) => {
-              const active = pageIndex === index;
+              const active = pageIndex === realIndex;
               return (
                 <button
                   key={slide.tall}
@@ -100,21 +223,26 @@ export function CompanyTeam() {
                   role="tab"
                   aria-label={`Go to slide ${pageIndex + 1} of ${count}`}
                   aria-selected={active}
-                  onClick={() => goTo(pageIndex)}
+                  onClick={() => goToReal(pageIndex)}
                   className={`h-2 rounded-full bg-[#d6d620] transition-[width,opacity] ${
-                    active ? "w-12 opacity-100" : "w-2 opacity-60"
+                    active ? "w-12 opacity-100" : "w-2 opacity-60 hover:opacity-100"
                   }`}
                 />
               );
             })}
           </div>
-          <ArrowButton label="Next team members" onClick={() => goTo(index + 1)} flipped />
+          <ArrowButton
+            label="Next team members"
+            onClick={goNext}
+            flipped
+            className="justify-self-end"
+          />
         </div>
         <p className="sr-only" aria-live="polite">
-          Page {index + 1} of {count}
+          Page {realIndex + 1} of {count}
         </p>
       </div>
-    </section>
+    </InView>
   );
 }
 
@@ -128,40 +256,74 @@ function MemberCard({
   eager?: boolean;
 }) {
   const tall = size === "tall";
+  const socials = (
+    <div className={`flex gap-3 ${tall ? "mt-auto" : "order-3 mt-1"}`}>
+      <SocialLink
+        href={member.linkedin}
+        label={`Open LinkedIn profile for ${member.name}`}
+        kind="linkedin"
+      />
+      {member.github ? (
+        <SocialLink
+          href={member.github}
+          label={`Open GitHub profile for ${member.name}`}
+          kind="github"
+        />
+      ) : null}
+    </div>
+  );
+
   return (
     <article
-      className={`flex flex-col rounded-3xl border border-bitmap-highlight/40 bg-[#0b2f16] p-8 ${
-        tall ? "min-[881px]:min-h-[678px]" : ""
+      className={`flex flex-1 flex-col rounded-3xl border border-bitmap-highlight/40 bg-[#0b2f16] bg-repeat p-8 [background-image:linear-gradient(rgba(1,30,12,0.5),rgba(1,30,12,0.5)),url('/images/texture-grain.png')] [background-size:auto,328px_140px] transition-[transform,box-shadow,border-color] duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-safe:hover:-translate-y-[3px] hover:border-bitmap-highlight/70 hover:shadow-[0_18px_40px_rgba(0,0,0,0.4),0_0_26px_rgba(214,214,32,0.14)] motion-reduce:hover:translate-y-0 max-[767px]:px-5 max-[767px]:py-6 ${
+        tall ? "xl:min-h-[678px]" : ""
       }`}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={member.img}
-        alt={`Portrait of ${member.name}`}
-        width={tall ? 158 : 118}
-        height={tall ? 158 : 118}
-        loading={eager ? "eager" : "lazy"}
-        className={`rounded-lg object-cover ${tall ? "size-[158px]" : "size-[118px]"}`}
-      />
-      <p className="mt-6 mb-2 text-base font-bold tracking-[0.1em] text-bitmap-mid uppercase">
-        {member.role}
-      </p>
-      <h3 className="mb-4 text-xl font-bold tracking-[-0.01em] text-mist">{member.name}</h3>
-      <p className="mb-6 text-base leading-6 text-mist/75">{member.bio}</p>
-      <div className="mt-auto flex gap-3">
-        <SocialLink
-          href={member.linkedin}
-          label={`Open LinkedIn profile for ${member.name}`}
-          kind="linkedin"
-        />
-        {member.github ? (
-          <SocialLink
-            href={member.github}
-            label={`Open GitHub profile for ${member.name}`}
-            kind="github"
+      {tall ? (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={member.img}
+            alt={`Portrait of ${member.name}`}
+            width={158}
+            height={158}
+            loading={eager ? "eager" : "lazy"}
+            className="mb-6 size-[158px] rounded-lg bg-[#1b2b1f] object-cover max-[767px]:size-[120px]"
           />
-        ) : null}
-      </div>
+          <p className="mb-2 text-base font-bold tracking-[0.1em] text-bitmap-mid uppercase">
+            {member.role}
+          </p>
+          <h3 className="mb-4 text-xl font-bold tracking-[-0.01em] text-mist">
+            {member.name}
+          </h3>
+          <p className="mb-6 text-base leading-[1.5] text-mist/75">{member.bio}</p>
+          {socials}
+        </>
+      ) : (
+        <>
+          <div className="mb-4 flex items-start gap-5 max-[767px]:gap-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={member.img}
+              alt={`Portrait of ${member.name}`}
+              width={118}
+              height={118}
+              loading={eager ? "eager" : "lazy"}
+              className="size-[118px] shrink-0 rounded-lg bg-[#1b2b1f] object-cover max-[767px]:size-24"
+            />
+            <div className="flex flex-col gap-2 pt-1">
+              <h3 className="order-1 text-xl font-bold tracking-[-0.01em] text-mist">
+                {member.name}
+              </h3>
+              <p className="order-2 text-base font-bold tracking-[0.1em] text-bitmap-mid uppercase">
+                {member.role}
+              </p>
+              {socials}
+            </div>
+          </div>
+          <p className="text-base leading-[1.5] text-mist/75">{member.bio}</p>
+        </>
+      )}
     </article>
   );
 }
@@ -181,7 +343,7 @@ function SocialLink({
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="grid size-12 place-items-center rounded-xl border border-white/50 bg-white/20 text-mist transition-colors hover:bg-white/30"
+      className="inline-flex size-12 items-center justify-center rounded-xl border border-white/50 bg-white/20 text-mist transition-[background,border-color,transform] duration-200 hover:-translate-y-px hover:border-white/70 hover:bg-white/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bitmap-highlight"
     >
       {kind === "linkedin" ? <LinkedInIcon /> : <GitHubIcon />}
     </a>
@@ -224,30 +386,32 @@ function ArrowButton({
   label,
   onClick,
   flipped = false,
+  className,
 }: {
   label: string;
   onClick: () => void;
   flipped?: boolean;
+  className?: string;
 }) {
   return (
     <button
       type="button"
       aria-label={label}
       onClick={onClick}
-      className="grid size-12 place-items-center rounded-full bg-olive text-mist transition-colors hover:bg-[#7a9210]"
+      className={`inline-flex size-12 items-center justify-center rounded-full bg-olive text-mist transition-[background,transform] duration-200 hover:bg-[#7f9511] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bitmap-highlight active:bg-[#5e7106] ${className ?? ""}`}
     >
       <svg
-        viewBox="0 0 48 48"
-        width="24"
-        height="24"
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
         fill="none"
         aria-hidden="true"
         className={flipped ? "-scale-x-100" : undefined}
       >
         <path
-          d="M23.9987 12.334L12.332 24.0007L23.9987 35.6673M12.332 24.0007H35.6654"
-          stroke="currentColor"
-          strokeWidth="3.33333"
+          d="M15 5l-7 7 7 7"
+          stroke="#FAF9F0"
+          strokeWidth="3.33"
           strokeLinecap="round"
           strokeLinejoin="round"
         />

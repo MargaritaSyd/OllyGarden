@@ -1,11 +1,12 @@
 import { ContentCard } from "@/components/content-card";
+import { InView } from "@/components/in-view";
 import { homeWhy, type WhyMotif } from "@/lib/home";
 
 export function HomeWhy() {
   return (
-    <section aria-labelledby="why-title" className="relative">
+    <InView as="section" aria-labelledby="why-title" className="relative">
       <div className="mx-auto grid w-full max-w-[1328px] items-center gap-12 px-6 py-24 sm:px-12 lg:grid-cols-[minmax(0,560px)_minmax(0,576px)] lg:gap-24 lg:py-[140px]">
-        <div>
+        <div className="why-copy">
           <SunMark />
           <p className="mt-7 text-sm font-bold tracking-[0.14em] text-bitmap-mid uppercase">
             {homeWhy.eyebrow}
@@ -16,26 +17,31 @@ export function HomeWhy() {
           >
             {homeWhy.title}
           </h2>
-          <div className="mt-7 space-y-[18px] text-[16.5px] leading-[1.68] text-mist/75">
-            {homeWhy.paragraphs.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
-          </div>
+          {homeWhy.paragraphs.map((paragraph, index) => (
+            <p
+              key={paragraph}
+              className={`text-[16.5px] leading-[1.68] text-mist/75 ${
+                index === 0 ? "mt-7" : "mt-[18px]"
+              }`}
+            >
+              {paragraph}
+            </p>
+          ))}
         </div>
 
         <ul className="flex flex-col gap-4">
           {homeWhy.cards.map((card) => (
-            <li key={card.title}>
+            <InView as="li" mark="rv-in" key={card.title} className="why-card-wrap">
               <ContentCard
                 title={card.title}
                 subtitle={card.body}
                 image={<CardMotif motif={card.motif} />}
               />
-            </li>
+            </InView>
           ))}
         </ul>
       </div>
-    </section>
+    </InView>
   );
 }
 

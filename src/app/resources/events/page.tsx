@@ -1,11 +1,10 @@
 import { CommunityEvents } from "@/components/community-events";
-import { CommunityJoin } from "@/components/community-join";
 import { CommunityWebinars } from "@/components/community-webinars";
 import { JsonLd } from "@/components/json-ld";
 import { SiteCta } from "@/components/site-cta";
 import { communityHero, communityMeta } from "@/lib/community";
 import { createPageMetadata } from "@/lib/metadata";
-import { resourcesCommunityGraph } from "@/lib/structured-data";
+import { resourcesEventsGraph } from "@/lib/structured-data";
 
 export const metadata = createPageMetadata({
   title: communityMeta.title,
@@ -14,13 +13,12 @@ export const metadata = createPageMetadata({
   absoluteTitle: true,
 });
 
-export default function CommunityPage() {
+export default function EventsPage() {
   return (
     <>
-      <JsonLd data={resourcesCommunityGraph()} />
+      <JsonLd data={resourcesEventsGraph()} />
       <CommunityEvents />
       <CommunityWebinars />
-      <CommunityJoin />
       <SiteCta />
     </>
   );

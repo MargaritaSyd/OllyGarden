@@ -1,4 +1,4 @@
-import { CtaArrow } from "@/components/cta-arrow";
+import { ResourceCard, ResourceCardPoster } from "@/components/resource-card";
 import { communityEvents, communityHero } from "@/lib/community";
 
 export function CommunityEvents() {
@@ -25,56 +25,29 @@ export function CommunityEvents() {
           </p>
         </header>
 
-        <ul className="grid grid-cols-1 gap-10 max-[720px]:mx-auto max-[720px]:max-w-[400px] min-[721px]:grid-cols-2 min-[1101px]:grid-cols-3">
+        <ul
+          className="grid grid-cols-1 gap-10 max-[720px]:mx-auto max-[720px]:max-w-[400px] min-[721px]:grid-cols-2 min-[1101px]:grid-cols-3"
+          aria-label="Next Events"
+        >
           {communityEvents.map((event) => (
-            <li key={event.href}>
-              <a
+            <li key={event.href} className="h-full">
+              <ResourceCard
                 href={event.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex flex-col gap-4 text-mist"
-                aria-label={`${event.title}, ${event.date} in ${event.place} — register (opens in a new tab)`}
-              >
-                <span className="flex h-[381px] flex-col rounded-2xl border border-sunflower/40 bg-[#00260d] p-6">
-                  <span className="flex items-start justify-between gap-3">
-                    <span className="text-[13px] font-bold tracking-[0.02em]">
-                      {event.host}
-                    </span>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src="/brand/logo-group.svg"
-                      alt=""
-                      width={110}
-                      height={17}
-                      className="mt-0.5 h-[17px] w-auto"
-                    />
-                  </span>
-                  <span className="mt-auto flex flex-col gap-1">
-                    <span className="text-[15px] font-medium text-sunflower">
-                      OllyGarden at
-                    </span>
-                    <span className="text-[clamp(1.25rem,1.7vw,1.675rem)] leading-[1.48] font-bold tracking-[0.01em] text-mist uppercase">
-                      {event.posterTitle}
-                    </span>
-                    <span className="text-[13px] leading-[1.5] font-medium text-[#cdcdcd]">
-                      {event.note}
-                    </span>
-                  </span>
-                </span>
-                <span className="flex flex-wrap items-center gap-3 text-sm text-mist/60">
-                  <span>{event.date}</span>
-                  <span className="h-3.5 w-px bg-mist/60" aria-hidden="true" />
-                  <span>{event.place}</span>
-                </span>
-                <h3 className="text-2xl leading-[1.29] font-bold tracking-[-0.02em]">
-                  {event.title}
-                </h3>
-                <p className="text-base leading-[1.2] text-[#cdcdcd]">{event.summary}</p>
-                <span className="inline-flex items-center gap-2 pt-2 text-lg font-medium tracking-[0.02em] text-sunflower">
-                  <span className="underline underline-offset-2">Register</span>
-                  <CtaArrow />
-                </span>
-              </a>
+                external
+                ariaLabel={`${event.title}, ${event.date} in ${event.place} — register (opens in a new tab)`}
+                media={
+                  <ResourceCardPoster
+                    host={event.host}
+                    posterTitle={event.posterTitle}
+                    note={event.note}
+                  />
+                }
+                date={event.date}
+                suffix={event.place}
+                title={event.title}
+                description={event.summary}
+                cta="Register"
+              />
             </li>
           ))}
         </ul>

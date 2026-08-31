@@ -10,7 +10,7 @@ import { resourcesBlogGraph } from "@/lib/structured-data";
 
 export const metadata = createPageMetadata({
   title: blogMeta.title,
-  description: blogHero.lede,
+  description: blogHero.title,
   path: blogMeta.path,
   absoluteTitle: true,
 });

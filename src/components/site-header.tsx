@@ -86,8 +86,8 @@ function SiteHeaderBar() {
         onMouseLeave={scheduleClose}
       >
         <div className="shrink-0 px-4 py-3 sm:px-5">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-3">
-            <BrandLogo className="h-5 md:h-7" height={28} />
+          <div className="flex items-center gap-2 sm:gap-3">
+            <BrandLogo className="h-5 shrink-0 md:h-7" height={28} />
 
             <nav aria-label="Primary" className="hidden flex-1 items-center justify-center lg:flex">
               <ul className="flex items-center gap-1">
@@ -114,26 +114,24 @@ function SiteHeaderBar() {
 
             <Link
               href="/get-started"
-              className="ml-auto inline-flex h-10 shrink-0 items-center whitespace-nowrap rounded-full bg-mist px-4 text-sm font-medium text-forest transition-colors hover:bg-sunflower"
+              className="ml-auto inline-flex h-9 shrink-0 items-center whitespace-nowrap rounded-full bg-mist px-3.5 text-sm font-medium text-forest transition-colors hover:bg-sunflower sm:h-10 sm:px-4"
             >
               Get Started
             </Link>
 
-            <div className="flex basis-full md:contents lg:hidden">
-              <button
-                type="button"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-mist/25 bg-forest/60 text-mist"
-                aria-expanded={mobileOpen}
-                aria-controls="mobile-nav"
-                onClick={() => {
-                  setMobileOpen((open) => !open);
-                  setOpenMenu(null);
-                }}
-              >
-                <span className="sr-only">{mobileOpen ? "Close menu" : "Open menu"}</span>
-                <MenuIcon open={mobileOpen} />
-              </button>
-            </div>
+            <button
+              type="button"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-mist/25 bg-forest/60 text-mist lg:hidden"
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-nav"
+              onClick={() => {
+                setMobileOpen((open) => !open);
+                setOpenMenu(null);
+              }}
+            >
+              <span className="sr-only">{mobileOpen ? "Close menu" : "Open menu"}</span>
+              <MenuIcon open={mobileOpen} />
+            </button>
           </div>
         </div>
 

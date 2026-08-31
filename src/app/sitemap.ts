@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { blogPostHref, blogPosts } from "@/lib/blog";
 import { getAbsoluteUrl } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -16,7 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
-      url: getAbsoluteUrl("/resources/community"),
+      url: getAbsoluteUrl("/resources/events"),
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.8,
@@ -99,7 +100,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.8,
     },
+    {
+      url: getAbsoluteUrl("/get-started"),
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
   ];
 
-  return staticRoutes;
+  const articles: MetadataRoute.Sitemap = blogPosts.map((post) => ({
+    url: getAbsoluteUrl(blogPostHref(post.slug)),
+    lastModified: new Date(post.date),
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
+  return [...staticRoutes, ...articles];
 }

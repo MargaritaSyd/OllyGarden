@@ -1,17 +1,23 @@
 import { ComingSoon } from "@/components/coming-soon";
-import { stubMetadata } from "@/lib/stub";
+import { getStartedMeta, getStartedPage } from "@/lib/get-started";
+import { createPageMetadata } from "@/lib/metadata";
 
-export const metadata = stubMetadata(
-  "Get Started",
-  "/get-started",
-  "Full get-started page coming soon.",
-);
+export const metadata = createPageMetadata({
+  title: getStartedMeta.title,
+  description: getStartedPage.description,
+  path: getStartedMeta.path,
+  absoluteTitle: true,
+});
 
 export default function GetStartedPage() {
   return (
     <ComingSoon
-      title="Get Started"
-      description="Full get-started page coming soon."
+      badge={getStartedPage.badge}
+      title={getStartedPage.title}
+      soon={getStartedPage.soon}
+      description={getStartedPage.description}
+      homeLabel={getStartedPage.homeLabel}
+      fillViewport
     />
   );
 }

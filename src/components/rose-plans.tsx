@@ -1,11 +1,12 @@
 import { GetStartedLink } from "@/components/get-started-link";
+import { InView } from "@/components/in-view";
 import { rosePlans } from "@/lib/rose";
 
 export function RosePlans() {
   return (
-    <section aria-labelledby="plans-title">
+    <InView as="section" aria-labelledby="plans-title">
       <div className="mx-auto w-full max-w-[1328px] px-5 py-[clamp(5.25rem,9vw,8.75rem)] sm:px-12">
-        <div className="mx-auto mb-[clamp(2.75rem,5vw,4rem)] max-w-[720px] text-center">
+        <div className="ov-stagger mx-auto mb-[clamp(2.75rem,5vw,4rem)] max-w-[720px] text-center">
           <PlansMark />
           <p className="mt-4 text-sm font-bold tracking-[0.14em] text-bitmap-mid uppercase">
             {rosePlans.eyebrow}
@@ -24,7 +25,7 @@ export function RosePlans() {
         <div className="grid gap-[clamp(1.75rem,3vw,2.75rem)] lg:grid-cols-2">
           <PlanCard plan={rosePlans.free} motif />
           <PlanCard plan={rosePlans.enterprise} darker />
-          <article className="surface-grain relative grid items-center gap-x-10 gap-y-[18px] overflow-hidden rounded-3xl border border-[#d9e533]/45 bg-[#19321e] p-[clamp(1.625rem,3.2vw,2.75rem)] lg:col-span-2 lg:grid-cols-[minmax(0,1fr)_auto]">
+          <article className="plan-os surface-grain relative grid items-center gap-x-10 gap-y-[18px] overflow-hidden rounded-3xl border border-[#d9e533]/45 bg-[#19321e] p-[clamp(1.625rem,3.2vw,2.75rem)] lg:col-span-2 lg:grid-cols-[minmax(0,1fr)_auto]">
             <div>
               <h3 className="text-[clamp(1.625rem,2.4vw,2rem)] font-semibold tracking-[-0.01em] text-mist">
                 {rosePlans.openSource.title}
@@ -51,7 +52,7 @@ export function RosePlans() {
           </article>
         </div>
       </div>
-    </section>
+    </InView>
   );
 }
 
@@ -66,8 +67,8 @@ function PlanCard({
 }) {
   return (
     <article
-      className={`surface-grain relative flex flex-col overflow-hidden rounded-3xl border p-[clamp(1.625rem,3.2vw,2.75rem)] ${
-        darker ? "border-white/8 bg-[#071008]" : "border-[#d9e533]/20 bg-[#19321e]"
+      className={`plan-card surface-grain relative flex flex-col overflow-hidden rounded-3xl border p-[clamp(1.625rem,3.2vw,2.75rem)] ${
+        darker ? "plan-ent border-white/8 bg-[#071008]" : "border-[#d9e533]/20 bg-[#19321e]"
       }`}
     >
       {motif ? <PlanPixels /> : null}

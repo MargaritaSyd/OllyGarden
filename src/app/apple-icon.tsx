@@ -2,12 +2,12 @@ import { ImageResponse } from "next/og";
 import { BrandIconMark } from "@/components/brand-icon-mark";
 
 export const size = {
-  width: 192,
-  height: 192,
+  width: 180,
+  height: 180,
 };
 
 export const contentType = "image/png";
 
-export default function Icon() {
+export default function AppleIcon() {
   return new ImageResponse(<BrandIconMark size={size.width} />, size);
 }

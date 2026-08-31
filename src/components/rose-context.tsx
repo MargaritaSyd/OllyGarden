@@ -1,18 +1,19 @@
+import { InView } from "@/components/in-view";
 import { RoseMascot } from "@/components/rose-mascot";
 import { roseContext } from "@/lib/rose";
 
 const nodePlace: Record<(typeof roseContext.nodes)[number]["id"], string> = {
-  tl: "top-[8%] left-[12%] max-md:left-[7%]",
-  tr: "top-[8%] right-[12%] max-md:right-[7%]",
-  bl: "bottom-[8%] left-[12%] max-md:left-[7%]",
-  br: "bottom-[8%] right-[12%] max-md:right-[7%]",
+  tl: "gn-tl top-[8%] left-[12%] max-md:left-[7%]",
+  tr: "gn-tr top-[8%] right-[12%] max-md:right-[7%]",
+  bl: "gn-bl bottom-[8%] left-[12%] max-md:left-[7%]",
+  br: "gn-br bottom-[8%] right-[12%] max-md:right-[7%]",
 };
 
 export function RoseContext() {
   return (
-    <section aria-labelledby="context-title">
+    <InView as="section" aria-labelledby="context-title">
       <div className="mx-auto grid w-full max-w-[1408px] items-center gap-[clamp(3rem,6vw,6rem)] px-5 py-[clamp(5.25rem,9vw,8.75rem)] sm:px-12 lg:grid-cols-[minmax(0,32.5rem)_minmax(0,1fr)]">
-        <div>
+        <div className="ov-stagger">
           <ContextMark />
           <p className="mt-4 text-sm font-bold tracking-[0.14em] text-bitmap-mid uppercase">
             {roseContext.eyebrow}
@@ -33,12 +34,12 @@ export function RoseContext() {
         </div>
 
         <div
-          className="relative aspect-[689/465] max-w-[689px] overflow-hidden rounded-[40px] border border-white/10 bg-[#0d1117]"
+          className="graph-panel relative aspect-[689/465] max-w-[689px] overflow-hidden rounded-[40px] border border-white/10 bg-[#0d1117]"
           role="img"
           aria-label="Rose connects the OllyGarden knowledge base, OTel specs, your codebase, and your organization"
         >
           <svg
-            className="pointer-events-none absolute inset-0 h-full w-full"
+            className="graph-curves pointer-events-none absolute inset-0 h-full w-full"
             viewBox="0 0 100 100"
             preserveAspectRatio="none"
             aria-hidden="true"
@@ -92,7 +93,7 @@ export function RoseContext() {
           {roseContext.nodes.map((node) => (
             <div
               key={node.id}
-              className={`absolute flex flex-col items-center gap-2.5 text-center ${nodePlace[node.id]}`}
+              className={`g-node absolute flex flex-col items-center gap-2.5 text-center ${nodePlace[node.id]}`}
             >
               <span className="flex size-[clamp(3.25rem,6vw,4rem)] items-center justify-center rounded-full border-2 border-[#8b949e]/40 bg-[#161b22]/70 text-bitmap-mid">
                 <NodeIcon id={node.id} />
@@ -106,7 +107,7 @@ export function RoseContext() {
             </div>
           ))}
 
-          <div className="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center">
+          <div className="g-center absolute top-1/2 left-1/2 flex items-center justify-center">
             <span className="rose-context-pulse absolute size-[clamp(5rem,10vw,6rem)] rounded-full bg-sunflower/20 blur-xl" />
             <span className="relative z-10 flex size-[clamp(4.25rem,8.4vw,5.25rem)] items-center justify-center rounded-full bg-[#0a0b0a] text-bitmap-mid drop-shadow-[0_0_20px_rgba(209,209,0,0.35)]">
               <RoseMascot className="h-[62%] w-[62%]" />
@@ -114,7 +115,7 @@ export function RoseContext() {
           </div>
         </div>
       </div>
-    </section>
+    </InView>
   );
 }
 

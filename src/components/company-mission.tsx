@@ -1,3 +1,4 @@
+import { InView } from "@/components/in-view";
 import { companyMission } from "@/lib/company";
 
 const decoPixels = [
@@ -12,18 +13,19 @@ const decoPixels = [
 
 export function CompanyMission() {
   return (
-    <section
+    <InView
+      as="section"
       className="relative overflow-hidden px-[clamp(1.5rem,7.25vw,6.5rem)] py-[clamp(4.5rem,8vw,6rem)] max-[880px]:px-6"
       aria-labelledby="mv-title"
     >
-      <div className="tulip-grid" aria-hidden="true" />
-      <div className="pointer-events-none absolute top-0 left-0 opacity-30" aria-hidden="true">
+      <div className="tulip-grid company-grid" aria-hidden="true" />
+      <div className="co-deco pointer-events-none absolute top-0 left-0" aria-hidden="true">
         {decoPixels.map((pixel) => (
-          <div key={pixel.className} className={`absolute size-[68px] ${pixel.className}`} />
+          <div key={pixel.className} className={`absolute size-[68px] opacity-30 ${pixel.className}`} />
         ))}
       </div>
       <div className="relative z-[1] mx-auto grid max-w-[1232px] items-center gap-10 min-[1101px]:grid-cols-[minmax(0,507px)_minmax(0,661px)] min-[1101px]:gap-16">
-        <div className="flex max-w-[507px] flex-col items-start gap-4">
+        <div className="ov-stagger flex max-w-[507px] flex-col items-start gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/company/ic-mission.svg"
@@ -45,13 +47,13 @@ export function CompanyMission() {
             {companyMission.lede}
           </p>
         </div>
-        <div className="flex flex-col gap-8">
+        <div className="mv-cards flex flex-col gap-8">
           {companyMission.cards.map((card) => (
             <article
               key={card.eyebrow}
-              className="flex flex-col gap-4 rounded-3xl border border-bitmap-highlight/40 bg-[#00280e] p-8"
+              className="mv-card flex flex-col gap-4 rounded-3xl border border-bitmap-highlight/40 p-8"
             >
-              <div className="grid size-12 place-items-center rounded-lg border border-bitmap-shadow/15 bg-bitmap-mid/20">
+              <div className="hw-tile grid size-12 place-items-center rounded-lg border border-bitmap-shadow/15 bg-bitmap-mid/20 shadow-[0_4px_12px_rgba(0,40,14,0.1)] transition-[transform,box-shadow] duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)]">
                 <FileSwapIcon />
               </div>
               <p className="text-sm font-bold tracking-[0.1em] text-bitmap-mid uppercase">
@@ -65,7 +67,7 @@ export function CompanyMission() {
           ))}
         </div>
       </div>
-    </section>
+    </InView>
   );
 }
 

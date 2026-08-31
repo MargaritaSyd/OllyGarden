@@ -1,3 +1,4 @@
+import { InView } from "@/components/in-view";
 import { companyOpenSource } from "@/lib/company";
 
 export function CompanyOpenSource() {
@@ -6,15 +7,16 @@ export function CompanyOpenSource() {
     " specification. We are spearheading this as an open, community-driven effort to standardize telemetry quality assessment, aiming for its eventual adoption within a neutral foundation like the CNCF or an OpenTelemetry SIG.";
 
   return (
-    <section
+    <InView
+      as="section"
       className="relative overflow-hidden px-[clamp(1.5rem,7.25vw,6.5rem)] py-[clamp(4.5rem,8vw,6rem)] max-[880px]:px-6"
       aria-labelledby="os-title"
     >
-      <div className="pointer-events-none absolute top-0 right-0 opacity-30" aria-hidden="true">
+      <div className="os-sq pointer-events-none absolute top-0 right-0" aria-hidden="true">
         <OpenSourceDeco />
       </div>
       <div className="relative z-[1] mx-auto flex max-w-[1232px] flex-col gap-12">
-        <header className="flex max-w-[720px] flex-col items-start gap-4">
+        <header className="os-head flex max-w-[720px] flex-col items-start gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brand/logo.svg" alt="" width={30} height={24} className="block h-6 w-[30px]" />
           <p className="text-base font-bold tracking-[0.1em] text-bitmap-mid uppercase">
@@ -29,7 +31,7 @@ export function CompanyOpenSource() {
           <p className="text-base leading-[1.4] text-mist">{companyOpenSource.lede}</p>
         </header>
 
-        <article className="flex flex-col items-start justify-between gap-8 rounded-2xl border border-sunflower/32 bg-[#002810] p-8 min-[881px]:flex-row min-[881px]:items-center">
+        <article className="os-card flex flex-col items-start justify-between gap-8 rounded-2xl border border-sunflower/32 bg-[#002810] p-8 min-[881px]:flex-row min-[881px]:items-center">
           <div className="max-w-[820px]">
             <h3 className="text-[clamp(1.5rem,3vw,2.25rem)] leading-[1.28] font-bold tracking-[-0.02em] text-mist">
               {companyOpenSource.cardTitle}
@@ -58,7 +60,7 @@ export function CompanyOpenSource() {
           </a>
         </article>
       </div>
-    </section>
+    </InView>
   );
 }
 
@@ -75,7 +77,14 @@ function GitHubMark() {
 
 function OpenSourceDeco() {
   return (
-    <svg width="458" height="262" viewBox="0 0 458.22 261.84" fill="none" aria-hidden="true">
+    <svg
+      className="opacity-30"
+      width="458"
+      height="262"
+      viewBox="0 0 458.22 261.84"
+      fill="none"
+      aria-hidden="true"
+    >
       <rect x="261.84" y="0" width="65.46" height="65.46" fill="#D1D100" />
       <rect x="327.3" y="0" width="65.46" height="65.46" fill="#D1D100" />
       <rect x="392.76" y="0" width="65.46" height="65.46" fill="#D1D100" />

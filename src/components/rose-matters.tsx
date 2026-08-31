@@ -1,3 +1,4 @@
+import { InView } from "@/components/in-view";
 import { roseMatters } from "@/lib/rose";
 
 const placeClass: Record<(typeof roseMatters.cards)[number]["place"], string> = {
@@ -14,11 +15,18 @@ const rotClass: Record<(typeof roseMatters.cards)[number]["place"], string> = {
   br: "lg:[--rose-rot:7deg]",
 };
 
+const delayClass: Record<(typeof roseMatters.cards)[number]["place"], string> = {
+  tl: "m-a",
+  tr: "m-c",
+  bl: "m-b",
+  br: "m-d",
+};
+
 export function RoseMatters() {
   return (
-    <section aria-labelledby="matters-title">
-      <div className="relative mx-auto flex min-h-0 w-full max-w-[1440px] items-center justify-center px-5 py-[clamp(5.625rem,10vw,9.375rem)] sm:px-12 lg:min-h-[560px]">
-        <div className="relative z-10 max-w-[620px] text-center">
+    <InView as="section" aria-labelledby="matters-title">
+      <div className="relative mx-auto flex min-h-0 w-full max-w-[1440px] flex-col items-center justify-center px-5 py-[clamp(5.625rem,10vw,9.375rem)] sm:px-12 lg:min-h-[560px]">
+        <div className="ov-stagger relative z-10 max-w-[620px] text-center">
           <p className="text-sm font-bold tracking-[0.14em] text-bitmap-mid uppercase">
             {roseMatters.eyebrow}
           </p>
@@ -37,12 +45,12 @@ export function RoseMatters() {
 
         <ul
           aria-label="Common instrumentation problems"
-          className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:pointer-events-none lg:absolute lg:inset-0 lg:mt-0 lg:block"
+          className="mt-12 grid w-full max-w-[620px] grid-cols-1 gap-5 lg:pointer-events-none lg:absolute lg:inset-0 lg:mt-0 lg:block lg:max-w-none"
         >
           {roseMatters.cards.map((card) => (
             <li
               key={card.title}
-              className={`lg:pointer-events-auto lg:absolute lg:w-[min(20rem,24vw)] ${placeClass[card.place]}`}
+              className={`m-card ${delayClass[card.place]} lg:pointer-events-auto lg:absolute lg:w-[min(20rem,24vw)] ${placeClass[card.place]}`}
             >
               <article
                 className={`rose-card-float surface-grain h-full rounded-2xl border border-[#d9e533]/22 bg-[#19321e] px-6 py-5 shadow-[0_18px_44px_rgba(0,0,0,0.35)] ${rotClass[card.place]}`}
@@ -54,6 +62,7 @@ export function RoseMatters() {
           ))}
         </ul>
       </div>
-    </section>
+    </InView>
   );
 }
+

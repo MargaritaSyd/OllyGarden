@@ -92,7 +92,7 @@ export const solutionLinks: NavLink[] = [
 ];
 
 export const resourceLinks: NavLink[] = [
-  { href: "/resources", label: "Docs", soon: true },
+  { href: "/resources/faq", label: "Docs" },
   { href: "/resources/blog", label: "Blog" },
   { href: "/contact", label: "Contact" },
 ];
@@ -109,16 +109,10 @@ const headerResourceWebinars: NavLink = {
   description: "Watch deep dives, demos, and conference talks.",
 };
 
-const headerResourceCommunity: NavLink = {
-  href: "/resources/community",
-  label: "Community & Events",
+const headerResourceEvents: NavLink = {
+  href: "/resources/events",
+  label: "Events",
   description: "Meet the team at talks, meetups, and conferences.",
-};
-
-const headerResourceKnowledge: NavLink = {
-  href: "/resources",
-  label: "OllyGarden Knowledge",
-  description: "Guides and references for every product.",
 };
 
 const headerResourcePress: NavLink = {
@@ -133,17 +127,10 @@ const headerResourceFaq: NavLink = {
   description: "Answers to the questions we hear most.",
 };
 
-export const headerResourceColumns = {
-  primary: [headerResourceBlog, headerResourceWebinars],
-  secondary: [headerResourceCommunity, headerResourceKnowledge],
-  tertiary: [headerResourcePress, headerResourceFaq],
-} as const;
-
 export const headerResourceLinks: NavLink[] = [
   headerResourceBlog,
   headerResourceWebinars,
-  headerResourceCommunity,
-  headerResourceKnowledge,
+  headerResourceEvents,
   headerResourcePress,
   headerResourceFaq,
 ];

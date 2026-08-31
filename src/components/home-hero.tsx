@@ -11,24 +11,28 @@ export function HomeHero() {
           alt=""
           width={32}
           height={32}
-          className="h-10 w-10"
+          className="ov-fade-up-slow h-10 w-10 [animation-delay:0.12s]"
         />
-        <p className="surface-grain relative inline-flex h-[26px] items-center rounded-full border border-mist/15 bg-forest px-4 text-[13px] font-medium tracking-[0.01em] text-bitmap-highlight">
+        <p className="ov-fade-up-slow surface-grain relative inline-flex h-[26px] items-center rounded-full border border-mist/15 bg-forest px-4 text-[13px] font-medium tracking-[0.01em] text-bitmap-highlight [animation-delay:0.28s]">
           <span className="inline-flex items-center gap-2">
             <BadgeChevrons />
             {homeHero.badge}
           </span>
         </p>
         <h1 className="text-[clamp(2.375rem,5vw,3.75rem)] leading-[1.12] font-bold tracking-[-0.02em] text-balance text-mist">
-          <span className="block">{homeHero.titleLead}</span>
-          <span className="block">
+          <span className="ov-blur-rise-slow block [animation-delay:0.48s]">
+            {homeHero.titleLead}
+          </span>
+          <span className="ov-blur-rise-slow block [animation-delay:0.72s]">
             with <span className="text-sunflower">{homeHero.titleAccent}</span>
           </span>
         </h1>
-        <p className="max-w-[780px] text-[17px] leading-[1.65] text-mist/80">
+        <p className="ov-fade-up-slow max-w-[780px] text-[17px] leading-[1.65] text-mist/80 [animation-delay:1.1s]">
           {homeHero.lede}
         </p>
-        <GetStartedLink />
+        <div className="ov-fade-up-slow [animation-delay:1.35s]">
+          <GetStartedLink />
+        </div>
       </div>
     </section>
   );

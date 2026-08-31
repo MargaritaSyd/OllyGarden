@@ -17,14 +17,15 @@ export function PageMotif() {
     pathname.startsWith("/solutions/financial-services") ||
     pathname.startsWith("/solutions/retail-ecommerce") ||
     pathname.startsWith("/solutions/enterprise-software") ||
-    pathname === "/resources/blog" ||
-    pathname === "/resources/community" ||
+    pathname.startsWith("/resources/blog") ||
+    pathname === "/resources/events" ||
     pathname === "/resources/press-releases" ||
     pathname === "/resources/webinars-conferences" ||
     pathname === "/resources/faq" ||
     pathname === "/company" ||
     pathname === "/contact" ||
-    pathname === "/careers"
+    pathname === "/careers" ||
+    pathname === "/get-started"
   ) {
     return null;
   }

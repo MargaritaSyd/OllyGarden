@@ -19,9 +19,6 @@ export function BlogHero() {
         >
           {blogHero.title}
         </h1>
-        <p className="ov-fade-up mt-5 max-w-[704px] text-base leading-[1.4] tracking-[0.02em] text-mist [animation-delay:0.7s]">
-          {blogHero.lede}
-        </p>
       </div>
     </section>
   );

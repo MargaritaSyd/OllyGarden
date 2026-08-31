@@ -1,5 +1,6 @@
 import { CtaArrow } from "@/components/cta-arrow";
 import { GetStartedLink } from "@/components/get-started-link";
+import { InView } from "@/components/in-view";
 import { MotifField } from "@/components/motif-field";
 import { homeCta } from "@/lib/home";
 
@@ -24,7 +25,7 @@ export function SiteCta({ content = homeCta }: { content?: SiteCtaContent }) {
   const stacked = Boolean(content.sub || secondary);
 
   return (
-    <section aria-labelledby="cta-title" className="relative pt-12">
+    <InView as="section" aria-labelledby="cta-title" className="relative pt-12">
       <div className="relative isolate flex min-h-[411px] flex-col items-center justify-center overflow-hidden bg-[#00280e] px-6 py-24 text-center sm:px-12 lg:px-[104px]">
         <MotifField
           kind="sides"
@@ -35,7 +36,7 @@ export function SiteCta({ content = homeCta }: { content?: SiteCtaContent }) {
         >
           <h2
             id="cta-title"
-            className="text-[clamp(2rem,4vw,3rem)] leading-[1.27] font-bold tracking-[-0.02em] text-balance text-mist"
+            className="cta-title text-[clamp(2rem,4vw,3rem)] leading-[1.27] font-bold tracking-[-0.02em] text-balance text-mist"
           >
             {titleLines.map((line) => (
               <span key={line} className="block">
@@ -44,12 +45,12 @@ export function SiteCta({ content = homeCta }: { content?: SiteCtaContent }) {
             ))}
           </h2>
           {content.sub ? (
-            <p className="max-w-[660px] text-base leading-[1.65] tracking-[0.01em] text-mist/80">
+            <p className="cta-sub max-w-[660px] text-base leading-[1.65] tracking-[0.01em] text-mist/80">
               {content.sub}
             </p>
           ) : null}
           <div
-            className={`flex w-full flex-col flex-wrap items-center justify-center gap-4 sm:flex-row ${
+            className={`cta-action flex w-full flex-col flex-wrap items-center justify-center gap-4 sm:flex-row ${
               stacked ? "" : "mt-10"
             }`}
           >
@@ -65,7 +66,7 @@ export function SiteCta({ content = homeCta }: { content?: SiteCtaContent }) {
           </div>
         </div>
       </div>
-    </section>
+    </InView>
   );
 }
 

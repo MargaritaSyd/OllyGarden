@@ -5,14 +5,12 @@ export const blogMeta = {
 
 export const blogHero = {
   badge: "Blog",
-  title: "OllyGarden News",
-  lede: "OpenTelemetry and observability insights from OllyGarden.",
+  title: "OpenTelemetry and Observability insights from OllyGarden",
 } as const;
 
 export const blogAll = {
-  eyebrow: "All Posts",
-  title: "Keep up to date with the news",
-  sub: "See all articles and posts from our telemetry experts.",
+  eyebrow: "All Blog Posts",
+  title: "See all articles from our telemetry experts",
 } as const;
 
 export const blogTrending = {
@@ -23,6 +21,14 @@ export const blogTrending = {
   ctaHref: "/resources",
 } as const;
 
+export const blogPostPage = {
+  back: "Back to Blog",
+  featuredEyebrow: "Other Posts",
+  featuredTitle: "Featured blog posts",
+  featuredSub: "Keep up to date with OllyGarden news and insights.",
+  featuredCta: "Check Blog",
+} as const;
+
 export const blogAuthor = "Juraci Paixão Kröhling";
 
 export type BlogPost = {
@@ -31,7 +37,6 @@ export type BlogPost = {
   excerpt: string;
   date: string;
   tags: readonly string[];
-  featuredTags?: readonly string[];
   image: string;
   ribbon?: "Latest Post" | "Featured";
 };
@@ -43,8 +48,7 @@ export const blogPosts: readonly BlogPost[] = [
     excerpt:
       "A wrong metric scrape interval inflates ingest, egress, and compute. Learn how to measure DPM and match intervals to the decisions each metric supports.",
     date: "2026-07-31",
-    tags: ["Metrics", "OpenTelemetry", "Observability"],
-    featuredTags: ["Metrics", "OpenTelemetry", "Observability", "Cost"],
+    tags: ["Metrics", "OpenTelemetry", "Observability", "Cost"],
     image: "/images/blog/the-scrape-interval-nobody-chose.png",
     ribbon: "Latest Post",
   },
@@ -280,6 +284,31 @@ export const blogVideos = [
 
 export function getBlogPost(slug: string) {
   return blogPosts.find((post) => post.slug === slug);
+}
+
+export function getAdjacentPosts(slug: string) {
+  const index = blogPosts.findIndex((post) => post.slug === slug);
+
+  if (index < 0) {
+    return { prev: undefined, next: undefined };
+  }
+
+  return {
+    prev: blogPosts[index - 1],
+    next: blogPosts[index + 1],
+  };
+}
+
+export function getRelatedPosts(slug: string, count = 3) {
+  return blogPosts.filter((post) => post.slug !== slug).slice(0, count);
+}
+
+export function blogCardTags(post: BlogPost) {
+  return post.tags.slice(0, 3);
+}
+
+export function blogCoverAlt(title: string) {
+  return `Cover illustration for “${title}”`;
 }
 
 export function blogPostHref(slug: string) {

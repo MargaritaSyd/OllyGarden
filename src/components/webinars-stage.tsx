@@ -76,7 +76,7 @@ export function WebinarsStage() {
                 inert={pageIndex !== index}
               >
                 {page.map((talk) => (
-                  <li key={talk.href}>
+                  <li key={talk.href} className="h-full">
                     <WebinarVideoCard video={talk} />
                   </li>
                 ))}

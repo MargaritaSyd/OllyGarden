@@ -6,7 +6,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { isPlainLeftClick } from "@/components/mega-menu";
 import {
   featuredResources,
-  headerResourceColumns,
+  headerResourceLinks,
   type FeaturedResource,
   type NavLink,
 } from "@/lib/nav";
@@ -20,51 +20,16 @@ export function ResourcesMegaMenu() {
       id="mega-resources"
       className="hidden border-t border-mist/10 px-5 py-6 lg:block"
     >
-      <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(240px,340px)] items-start gap-x-6">
+      <div className="grid grid-cols-[minmax(0,1fr)_minmax(240px,340px)] items-start gap-x-10">
         <div>
-          <p className="px-4 text-sm font-bold text-mist">Resources</p>
-          <ul className="mt-2 flex flex-col">
-            {headerResourceColumns.primary.map((item) => (
-              <li key={item.label}>
-                <ResourceMenuLink item={item} />
-              </li>
+          <p className="px-3 text-sm font-bold text-mist">Resources</p>
+          <div className="mt-5 grid grid-cols-3 gap-x-7 gap-y-2">
+            {headerResourceLinks.map((item) => (
+              <ResourceMenuLink key={item.label} item={item} />
             ))}
-          </ul>
-          <p className="mt-5 px-4 text-sm font-bold text-mist">Socials</p>
-          <ul className="mt-3 flex items-center gap-2 px-4">
-            <li>
-              <SocialIconLink href={siteConfig.social.linkedin} label="LinkedIn">
-                <LinkedInIcon />
-              </SocialIconLink>
-            </li>
-            <li>
-              <SocialIconLink href={siteConfig.social.github} label="GitHub">
-                <GitHubIcon />
-              </SocialIconLink>
-            </li>
-            <li>
-              <SocialIconLink href={siteConfig.social.youtube} label="YouTube">
-                <YouTubeIcon />
-              </SocialIconLink>
-            </li>
-          </ul>
+            <SocialsCell />
+          </div>
         </div>
-
-        <ul className="flex flex-col pt-7">
-          {headerResourceColumns.secondary.map((item) => (
-            <li key={item.label}>
-              <ResourceMenuLink item={item} />
-            </li>
-          ))}
-        </ul>
-
-        <ul className="flex flex-col pt-7">
-          {headerResourceColumns.tertiary.map((item) => (
-            <li key={item.label}>
-              <ResourceMenuLink item={item} />
-            </li>
-          ))}
-        </ul>
 
         <FeaturedResourceCarousel />
       </div>
@@ -80,7 +45,7 @@ function ResourceMenuLink({ item }: { item: NavLink }) {
   return (
     <Link
       href={item.href}
-      className={`group flex h-full w-full flex-col gap-1 rounded-xl px-4 py-3 text-left transition-colors hover:bg-mist/10 ${
+      className={`group grid h-full w-full grid-cols-[20px_minmax(0,1fr)] items-start gap-x-2.5 rounded-lg px-3 pb-3 pt-2.5 text-left transition-colors hover:bg-mist/10 ${
         active ? "bg-mist/10" : ""
       }`}
       onClick={(event) => {
@@ -91,15 +56,20 @@ function ResourceMenuLink({ item }: { item: NavLink }) {
         router.push(item.href);
       }}
     >
+      <span className="flex h-5 w-5 items-center justify-center text-sunflower">
+        <ResourceLinkIcon href={item.href} />
+      </span>
       <span
-        className={`text-base font-semibold ${
+        className={`text-[15px] font-semibold leading-snug ${
           active ? "text-sunflower" : "text-mist group-hover:text-sunflower"
         }`}
       >
         {item.label}
       </span>
       {item.description ? (
-        <span className="text-sm font-light text-mist/55">{item.description}</span>
+        <span className="col-start-2 mt-0.5 text-[13px] font-light leading-snug text-mist/55">
+          {item.description}
+        </span>
       ) : null}
     </Link>
   );
@@ -242,6 +212,36 @@ function FeaturedResourceSlide({
   );
 }
 
+function SocialsCell() {
+  return (
+    <div className="mt-2.5 grid grid-cols-[20px_minmax(0,1fr)] items-start gap-x-2.5 px-3">
+      <span className="flex h-5 w-5 items-center justify-center text-sunflower">
+        <MonitorIcon />
+      </span>
+      <div>
+        <p className="text-[15px] font-semibold text-mist">Socials</p>
+        <ul className="mt-2 flex items-center gap-3.5">
+          <li>
+            <SocialIconLink href={siteConfig.social.linkedin} label="OllyGarden on LinkedIn">
+              <LinkedInIcon />
+            </SocialIconLink>
+          </li>
+          <li>
+            <SocialIconLink href={siteConfig.social.github} label="OllyGarden on GitHub">
+              <GitHubIcon />
+            </SocialIconLink>
+          </li>
+          <li>
+            <SocialIconLink href={siteConfig.social.youtube} label="OllyGarden on YouTube">
+              <YouTubeIcon />
+            </SocialIconLink>
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 function SocialIconLink({
   href,
   label,
@@ -257,10 +257,105 @@ function SocialIconLink({
       aria-label={label}
       rel="noreferrer noopener"
       target="_blank"
-      className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-mist/10 text-mist transition-colors hover:bg-mist/15 hover:text-sunflower"
+      className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-lg border border-mist/10 bg-mist/[0.06] text-mist transition-colors hover:border-sunflower hover:bg-sunflower hover:text-forest"
     >
       {children}
     </a>
+  );
+}
+
+function ResourceLinkIcon({ href }: { href: string }) {
+  switch (href) {
+    case "/resources/blog":
+      return <NewspaperIcon />;
+    case "/resources/webinars-conferences":
+      return <VideoIcon />;
+    case "/resources/events":
+      return <CalendarIcon />;
+    case "/resources/press-releases":
+      return <MegaphoneIcon />;
+    case "/resources/faq":
+      return <HelpCircleIcon />;
+    default:
+      return null;
+  }
+}
+
+function StrokeIcon({ children }: { children: ReactNode }) {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {children}
+    </svg>
+  );
+}
+
+function NewspaperIcon() {
+  return (
+    <StrokeIcon>
+      <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" />
+      <path d="M18 14h-8" />
+      <path d="M15 18h-5" />
+      <path d="M10 6h8v4h-8V6Z" />
+    </StrokeIcon>
+  );
+}
+
+function VideoIcon() {
+  return (
+    <StrokeIcon>
+      <path d="m22 8-6 4 6 4V8Z" />
+      <rect x="2" y="6" width="14" height="12" rx="2" />
+    </StrokeIcon>
+  );
+}
+
+function CalendarIcon() {
+  return (
+    <StrokeIcon>
+      <path d="M8 2v4" />
+      <path d="M16 2v4" />
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <path d="M3 10h18" />
+    </StrokeIcon>
+  );
+}
+
+function MegaphoneIcon() {
+  return (
+    <StrokeIcon>
+      <path d="m3 11 18-5v12L3 14v-3z" />
+      <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" />
+    </StrokeIcon>
+  );
+}
+
+function HelpCircleIcon() {
+  return (
+    <StrokeIcon>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+      <path d="M12 17h.01" />
+    </StrokeIcon>
+  );
+}
+
+function MonitorIcon() {
+  return (
+    <StrokeIcon>
+      <rect x="2" y="3" width="20" height="14" rx="2" />
+      <path d="M8 21h8" />
+      <path d="M12 17v4" />
+    </StrokeIcon>
   );
 }
 

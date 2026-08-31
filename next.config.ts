@@ -16,8 +16,18 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: "/blog/:slug",
+        destination: "/resources/blog/:slug",
+        permanent: true,
+      },
+      {
         source: "/resources/webinars",
         destination: "/resources/webinars-conferences",
+        permanent: true,
+      },
+      {
+        source: "/resources/community",
+        destination: "/resources/events",
         permanent: true,
       },
     ];

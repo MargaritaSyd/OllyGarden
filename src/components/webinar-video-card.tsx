@@ -1,5 +1,4 @@
-import { CtaArrow } from "@/components/cta-arrow";
-import { BlogMeta } from "@/components/blog-ui";
+import { ResourceCard, ResourceCardImage } from "@/components/resource-card";
 import { formatBlogDate } from "@/lib/blog";
 
 export type WebinarCardVideo = {
@@ -13,32 +12,16 @@ export type WebinarCardVideo = {
 
 export function WebinarVideoCard({ video }: { video: WebinarCardVideo }) {
   return (
-    <a
+    <ResourceCard
       href={video.href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group flex flex-col gap-6"
-      aria-label={`Watch “${video.title}” on YouTube (opens in a new tab)`}
-    >
-      <span className="block aspect-video overflow-hidden rounded-2xl">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={video.image}
-          alt={video.alt}
-          width={384}
-          height={216}
-          loading="lazy"
-          className="h-full w-full object-cover"
-        />
-      </span>
-      <BlogMeta date={formatBlogDate(video.date, "long")} suffix={video.venue} />
-      <h3 className="line-clamp-3 text-2xl leading-[1.29] font-bold tracking-[-0.02em] text-mist">
-        {video.title}
-      </h3>
-      <span className="inline-flex items-center gap-2 text-lg font-medium text-sunflower">
-        <span className="underline underline-offset-2">Watch Now</span>
-        <CtaArrow />
-      </span>
-    </a>
+      external
+      ariaLabel={`Watch “${video.title}” on YouTube (opens in a new tab)`}
+      media={<ResourceCardImage src={video.image} alt={video.alt} />}
+      date={formatBlogDate(video.date, "long")}
+      suffix={video.venue}
+      title={video.title}
+      titleClassName="line-clamp-3"
+      cta="Watch Now"
+    />
   );
 }

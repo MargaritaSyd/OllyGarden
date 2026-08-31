@@ -12,7 +12,13 @@ import type {
   WebSite,
   WithContext,
 } from "schema-dts";
-import { blogHero, blogMeta } from "@/lib/blog";
+import {
+  blogAuthor,
+  blogHero,
+  blogMeta,
+  blogPostHref,
+  type BlogPost,
+} from "@/lib/blog";
 import { communityHero, communityMeta } from "@/lib/community";
 import { companyHero, companyMeta } from "@/lib/company";
 import { contactHero, contactMeta } from "@/lib/contact";
@@ -386,7 +392,7 @@ export function resourcesBlogGraph(): Graph {
     "@id": getAbsoluteUrl("/resources/blog#webpage"),
     url: getAbsoluteUrl("/resources/blog"),
     name: blogMeta.title,
-    description: blogHero.lede,
+    description: blogHero.title,
     inLanguage: siteConfig.language,
     isPartOf: { "@id": getAbsoluteUrl("/#website") },
     publisher: { "@id": getAbsoluteUrl("/#organization") },
@@ -416,11 +422,68 @@ export function resourcesBlogGraph(): Graph {
   };
 }
 
-export function resourcesCommunityGraph(): Graph {
+export function resourcesBlogPostGraph(post: BlogPost): Graph {
+  const path = blogPostHref(post.slug);
+  const url = getAbsoluteUrl(path);
+
+  const article: BlogPosting = {
+    "@type": "BlogPosting",
+    "@id": `${url}#article`,
+    url,
+    headline: post.title,
+    description: post.excerpt,
+    image: getAbsoluteUrl(post.image),
+    datePublished: post.date,
+    dateModified: post.date,
+    inLanguage: siteConfig.language,
+    author: {
+      "@type": "Person",
+      name: blogAuthor,
+    },
+    publisher: { "@id": getAbsoluteUrl("/#organization") },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": url,
+    },
+    keywords: post.tags.join(", "),
+    isPartOf: { "@id": getAbsoluteUrl("/resources/blog#webpage") },
+  };
+
+  const crumbs: BreadcrumbList = {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: getAbsoluteUrl("/"),
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Blog",
+        item: getAbsoluteUrl("/resources/blog"),
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: post.title,
+        item: url,
+      },
+    ],
+  };
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [organizationSchema(), websiteSchema(), article, crumbs],
+  };
+}
+
+export function resourcesEventsGraph(): Graph {
   const webPage: WebPage = {
     "@type": "WebPage",
-    "@id": getAbsoluteUrl("/resources/community#webpage"),
-    url: getAbsoluteUrl("/resources/community"),
+    "@id": getAbsoluteUrl("/resources/events#webpage"),
+    url: getAbsoluteUrl("/resources/events"),
     name: communityMeta.title,
     description: communityHero.lede,
     inLanguage: siteConfig.language,
@@ -440,8 +503,8 @@ export function resourcesCommunityGraph(): Graph {
       {
         "@type": "ListItem",
         position: 2,
-        name: "Community & Events",
-        item: getAbsoluteUrl("/resources/community"),
+        name: "Events",
+        item: getAbsoluteUrl("/resources/events"),
       },
     ],
   };

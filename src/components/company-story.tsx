@@ -1,12 +1,14 @@
+import { InView } from "@/components/in-view";
 import { companyStory } from "@/lib/company";
 
 export function CompanyStory() {
   return (
-    <section
+    <InView
+      as="section"
       className="relative overflow-hidden px-[clamp(1.5rem,7.25vw,6.5rem)] py-[clamp(4.5rem,8vw,6rem)] max-[880px]:px-6"
       aria-labelledby="hw-title"
     >
-      <div className="pointer-events-none absolute top-0 right-0 opacity-30" aria-hidden="true">
+      <div className="co-deco pointer-events-none absolute top-0 right-0" aria-hidden="true">
         <StoryDeco />
       </div>
       <div className="relative z-[1] mx-auto flex max-w-[1232px] flex-col gap-12">
@@ -33,11 +35,13 @@ export function CompanyStory() {
           </p>
         </header>
 
-        <div className="flex flex-col gap-10">
+        <div className="hw-cards flex flex-col gap-10">
           {companyStory.cards.map((card) => (
-            <article
+            <InView
+              as="article"
+              mark="rv-in"
               key={card.title}
-              className="flex flex-col gap-3 rounded-3xl border border-bitmap-highlight/40 bg-[#00280e] p-8"
+              className="hw-rv group flex flex-col gap-3 rounded-3xl border border-bitmap-highlight/40 bg-[#00280e] p-8 transition-[transform,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-safe:hover:-translate-y-[3px] hover:border-bitmap-highlight/55 hover:shadow-[0_18px_40px_rgba(0,0,0,0.35),0_0_24px_rgba(217,229,51,0.08)]"
             >
               <TileIcon icon={card.icon} />
               <h3 className="text-xl leading-[1.3] font-bold tracking-[-0.01em] text-mist">
@@ -51,17 +55,17 @@ export function CompanyStory() {
                   {paragraph}
                 </p>
               ))}
-            </article>
+            </InView>
           ))}
         </div>
       </div>
-    </section>
+    </InView>
   );
 }
 
 function TileIcon({ icon }: { icon: "wand" | "olly" }) {
   return (
-    <div className="grid size-12 place-items-center rounded-lg border border-bitmap-shadow/15 bg-bitmap-mid/20">
+    <div className="hw-tile grid size-12 place-items-center rounded-lg border border-bitmap-shadow/15 bg-bitmap-mid/20 shadow-[0_4px_12px_rgba(0,40,14,0.1)] transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.03]">
       {icon === "olly" ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src="/brand/logo.svg" alt="" width={30} height={25} className="h-[25px] w-[30px]" />
@@ -82,7 +86,14 @@ function TileIcon({ icon }: { icon: "wand" | "olly" }) {
 
 function StoryDeco() {
   return (
-    <svg width="272" height="409" viewBox="0 0 272 409" fill="none" aria-hidden="true">
+    <svg
+      className="hw-deco"
+      width="272"
+      height="409"
+      viewBox="0 0 272 409"
+      fill="none"
+      aria-hidden="true"
+    >
       <rect width="68" height="68" fill="#9CA703" />
       <rect x="68" width="68" height="68" fill="#D1D100" />
       <rect x="136" y="68" width="68" height="68" fill="#D1D100" />

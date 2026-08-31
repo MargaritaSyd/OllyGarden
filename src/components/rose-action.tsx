@@ -1,11 +1,12 @@
+import { InView } from "@/components/in-view";
 import { VideoFrame } from "@/components/video-frame";
 import { roseAction } from "@/lib/rose";
 
 export function RoseAction() {
   return (
-    <section aria-labelledby="action-title">
+    <InView as="section" aria-labelledby="action-title">
       <div className="mx-auto w-full max-w-[1328px] px-5 py-[clamp(5.25rem,9vw,8.75rem)] sm:px-12">
-        <div className="mb-[clamp(2.5rem,4.5vw,4rem)] max-w-[640px]">
+        <div className="ov-stagger mb-[clamp(2.5rem,4.5vw,4rem)] max-w-[640px]">
           <ActionMark />
           <p className="mt-4 text-sm font-bold tracking-[0.14em] text-bitmap-mid uppercase">
             {roseAction.eyebrow}
@@ -21,11 +22,12 @@ export function RoseAction() {
           </p>
         </div>
         <VideoFrame
+          className="action-video"
           src={roseAction.video.src}
           label={roseAction.video.label}
         />
       </div>
-    </section>
+    </InView>
   );
 }
 

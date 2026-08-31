@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Space_Grotesk } from "next/font/google";
 import { PageMotif } from "@/components/page-motif";
+import { SiteChrome } from "@/components/site-chrome";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { rootMetadata } from "@/lib/metadata";
@@ -31,9 +32,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="relative isolate flex min-h-full flex-col bg-forest font-sans text-mist">
         <PageMotif />
-        <SiteHeader />
-        <main className="flex-1">{children}</main>
-        <SiteFooter />
+        <SiteChrome header={<SiteHeader />} footer={<SiteFooter />}>
+          {children}
+        </SiteChrome>
       </body>
     </html>
   );

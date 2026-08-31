@@ -4,6 +4,7 @@ import { useState, type KeyboardEvent } from "react";
 import { BlogMeta, BlogReadLink, BlogTags, PetalMark } from "@/components/blog-ui";
 import {
   blogAuthor,
+  blogCoverAlt,
   blogPostHref,
   featuredBlogPosts,
   formatBlogDate,
@@ -69,7 +70,7 @@ export function BlogFeatured() {
                       date={formatBlogDate(post.date, "long")}
                       suffix={`Author: ${blogAuthor}`}
                     />
-                    <BlogTags tags={post.featuredTags ?? post.tags} />
+                    <BlogTags tags={post.tags} />
                     <BlogReadLink href={blogPostHref(post.slug)}>Read Article</BlogReadLink>
                   </div>
                 </article>
@@ -114,7 +115,7 @@ function FeaturedMedia({ post, priority }: { post: BlogPost; priority: boolean }
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={post.image}
-        alt={`Cover illustration for “${post.title}”`}
+        alt={blogCoverAlt(post.title)}
         width={624}
         height={492}
         fetchPriority={priority ? "high" : undefined}

@@ -1,17 +1,16 @@
-import { getAllPosts } from "@/lib/posts";
+import { blogPostHref, blogPosts } from "@/lib/blog";
 import { getAbsoluteUrl, siteConfig } from "@/lib/site";
 
 export async function GET() {
-  const posts = getAllPosts();
-  const items = posts
+  const items = blogPosts
     .map((post) => {
-      const url = getAbsoluteUrl(`/blog/${post.slug}`);
+      const url = getAbsoluteUrl(blogPostHref(post.slug));
       return `    <item>
       <title>${escapeXml(post.title)}</title>
       <link>${url}</link>
       <guid>${url}</guid>
       <pubDate>${new Date(post.date).toUTCString()}</pubDate>
-      <description>${escapeXml(post.description)}</description>
+      <description>${escapeXml(post.excerpt)}</description>
     </item>`;
     })
     .join("\n");

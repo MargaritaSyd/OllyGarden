@@ -1,3 +1,4 @@
+import { InView } from "@/components/in-view";
 import { homeVoices } from "@/lib/home";
 
 export function HomeVoices() {
@@ -6,9 +7,9 @@ export function HomeVoices() {
   const wide = quotes.filter((quote) => quote.wide);
 
   return (
-    <section aria-labelledby="voices-title">
+    <InView as="section" aria-labelledby="voices-title">
       <div className="mx-auto w-full max-w-[1328px] px-6 py-24 sm:px-12 lg:pt-[116px] lg:pb-[108px]">
-        <div className="mb-[70px] text-center">
+        <div className="voices-head mb-[70px] text-center">
           <TulipMark />
           <h2
             id="voices-title"
@@ -23,14 +24,18 @@ export function HomeVoices() {
 
         <div className="grid gap-9 md:grid-cols-3 md:gap-x-[39px] md:gap-y-9">
           {lead.map((quote) => (
-            <VoiceCard key={quote.name} quote={quote} />
+            <InView key={quote.name} mark="rv-in">
+              <VoiceCard quote={quote} />
+            </InView>
           ))}
           {wide.map((quote) => (
-            <VoiceCard key={quote.name} quote={quote} wide />
+            <InView key={quote.name} mark="rv-in" className="md:col-span-3">
+              <VoiceCard quote={quote} wide />
+            </InView>
           ))}
         </div>
       </div>
-    </section>
+    </InView>
   );
 }
 
@@ -45,8 +50,8 @@ function VoiceCard({
     <article
       className={
         wide
-          ? "overflow-hidden bg-[#011407] md:col-span-3 md:grid md:grid-cols-[minmax(16rem,24.75rem)_minmax(0,1fr)] md:items-center"
-          : "flex flex-col overflow-hidden bg-[#011407]"
+          ? "voice-card overflow-hidden bg-[#011407] md:grid md:grid-cols-[minmax(16rem,24.75rem)_minmax(0,1fr)] md:items-center"
+          : "voice-card flex flex-col overflow-hidden bg-[#011407]"
       }
     >
       <div className="grid grid-cols-[84px_minmax(0,1fr)] grid-rows-[52px_52px]">
