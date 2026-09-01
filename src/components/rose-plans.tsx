@@ -25,7 +25,7 @@ export function RosePlans() {
         <div className="grid gap-[clamp(1.75rem,3vw,2.75rem)] lg:grid-cols-2">
           <PlanCard plan={rosePlans.free} motif />
           <PlanCard plan={rosePlans.enterprise} darker />
-          <article className="plan-os surface-grain relative grid items-center gap-x-10 gap-y-[18px] overflow-hidden rounded-3xl border border-[#d9e533]/45 bg-[#19321e] p-[clamp(1.625rem,3.2vw,2.75rem)] lg:col-span-2 lg:grid-cols-[minmax(0,1fr)_auto]">
+          <article className="plan-os relative grid items-center gap-x-10 gap-y-[18px] overflow-hidden rounded-3xl border border-[#d9e533]/45 p-[clamp(1.625rem,3.2vw,2.75rem)] lg:col-span-2 lg:grid-cols-[minmax(0,1fr)_auto]">
             <div>
               <h3 className="text-[clamp(1.625rem,2.4vw,2rem)] font-semibold tracking-[-0.01em] text-mist">
                 {rosePlans.openSource.title}
@@ -67,8 +67,8 @@ function PlanCard({
 }) {
   return (
     <article
-      className={`plan-card surface-grain relative flex flex-col overflow-hidden rounded-3xl border p-[clamp(1.625rem,3.2vw,2.75rem)] ${
-        darker ? "plan-ent border-white/8 bg-[#071008]" : "border-[#d9e533]/20 bg-[#19321e]"
+      className={`plan-card relative flex flex-col overflow-hidden rounded-3xl border p-[clamp(1.625rem,3.2vw,2.75rem)] ${
+        darker ? "plan-ent border-white/8" : "plan-free border-[#d9e533]/20"
       }`}
     >
       {motif ? <PlanPixels /> : null}
@@ -110,7 +110,7 @@ function CheckIcon() {
 function PlanPixels() {
   return (
     <span
-      className="plan-pixels pointer-events-none absolute top-[6%] right-0 opacity-90"
+      className="plan-pixels pointer-events-none absolute top-[6%] right-0 z-0 opacity-90"
       aria-hidden="true"
     >
       <svg width="120" height="150" viewBox="0 0 120 150" fill="none">

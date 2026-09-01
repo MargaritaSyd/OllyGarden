@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { blogPostHref, blogPosts } from "@/lib/blog";
+import { pressReleaseHref, pressReleases } from "@/lib/press";
 import { getAbsoluteUrl } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -115,5 +116,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticRoutes, ...articles];
+  const press: MetadataRoute.Sitemap = pressReleases.map((release) => ({
+    url: getAbsoluteUrl(pressReleaseHref(release.slug)),
+    lastModified: new Date(release.date),
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
+  return [...staticRoutes, ...articles, ...press];
 }

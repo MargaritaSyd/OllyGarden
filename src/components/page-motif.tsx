@@ -19,7 +19,7 @@ export function PageMotif() {
     pathname.startsWith("/solutions/enterprise-software") ||
     pathname.startsWith("/resources/blog") ||
     pathname === "/resources/events" ||
-    pathname === "/resources/press-releases" ||
+    pathname.startsWith("/resources/press-releases") ||
     pathname === "/resources/webinars-conferences" ||
     pathname === "/resources/faq" ||
     pathname === "/company" ||

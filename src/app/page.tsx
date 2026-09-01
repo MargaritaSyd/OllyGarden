@@ -1,6 +1,7 @@
 import { HomeBlog } from "@/components/home-blog";
 import { HomeHero } from "@/components/home-hero";
 import { HomeHow } from "@/components/home-how";
+import { HomeSecurity } from "@/components/home-security";
 import { HomeVoices } from "@/components/home-voices";
 import { HomeWhy } from "@/components/home-why";
 import { JsonLd } from "@/components/json-ld";
@@ -21,6 +22,7 @@ export default function Home() {
     <>
       <JsonLd data={homeGraph()} />
       <HomeHero />
+      <HomeSecurity />
       <HomeWhy />
       <HomeVoices />
       <HomeHow />

@@ -6,6 +6,7 @@ import type {
   ContactPage,
   FAQPage,
   Graph,
+  NewsArticle,
   Organization,
   SoftwareApplication,
   WebPage,
@@ -24,7 +25,12 @@ import { companyHero, companyMeta } from "@/lib/company";
 import { contactHero, contactMeta } from "@/lib/contact";
 import { careersHero, careersMeta } from "@/lib/careers";
 import { faqHero, faqMeta, faqSections } from "@/lib/faq";
-import { pressHero, pressMeta } from "@/lib/press";
+import {
+  pressHero,
+  pressMeta,
+  pressReleaseHref,
+  type PressRelease,
+} from "@/lib/press";
 import { webinarsHero, webinarsMeta } from "@/lib/webinars";
 import { enterpriseHero, enterpriseMeta } from "@/lib/enterprise";
 import { financialHero, financialMeta } from "@/lib/financial";
@@ -548,6 +554,61 @@ export function resourcesPressGraph(): Graph {
   return {
     "@context": "https://schema.org",
     "@graph": [organizationSchema(), websiteSchema(), webPage, crumbs],
+  };
+}
+
+export function resourcesPressReleaseGraph(release: PressRelease): Graph {
+  const path = pressReleaseHref(release.slug);
+  const url = getAbsoluteUrl(path);
+
+  const article: NewsArticle = {
+    "@type": "NewsArticle",
+    "@id": `${url}#article`,
+    url,
+    headline: release.title,
+    description: release.dek,
+    datePublished: release.date,
+    dateModified: release.date,
+    inLanguage: siteConfig.language,
+    author: {
+      "@type": "Organization",
+      name: siteConfig.name,
+    },
+    publisher: { "@id": getAbsoluteUrl("/#organization") },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": url,
+    },
+    isPartOf: { "@id": getAbsoluteUrl("/resources/press-releases#webpage") },
+  };
+
+  const crumbs: BreadcrumbList = {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: getAbsoluteUrl("/"),
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Press Releases",
+        item: getAbsoluteUrl("/resources/press-releases"),
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: release.title,
+        item: url,
+      },
+    ],
+  };
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [organizationSchema(), websiteSchema(), article, crumbs],
   };
 }
 

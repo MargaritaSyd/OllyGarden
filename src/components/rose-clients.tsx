@@ -1,18 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useState,
+  type KeyboardEvent,
+  type TransitionEvent,
+} from "react";
 import { InView } from "@/components/in-view";
 import { roseClients } from "@/lib/rose";
 
-const CAROUSEL_INTERVAL_MS = 7000;
+const CAROUSEL_INTERVAL_MS = 6000;
 
 export function RoseClients() {
-  const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const [reduceMotion, setReduceMotion] = useState(false);
   const quotes = roseClients.quotes;
-  const current = quotes[index];
   const count = quotes.length;
+  const loopSlides =
+    count > 1 ? [quotes[count - 1], ...quotes, quotes[0]] : [...quotes];
+
+  const [index, setIndex] = useState(count > 1 ? 1 : 0);
+  const [noAnim, setNoAnim] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const [timerKey, setTimerKey] = useState(0);
+
+  const realIndex =
+    count < 2
+      ? 0
+      : index === 0
+        ? count - 1
+        : index === count + 1
+          ? 0
+          : index - 1;
+  const current = quotes[realIndex];
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -23,29 +42,85 @@ export function RoseClients() {
   }, []);
 
   useEffect(() => {
-    if (paused || reduceMotion || count < 2) {
+    if (reduceMotion || count < 2) {
       return;
     }
 
     const timer = window.setInterval(() => {
-      setIndex((currentIndex) => (currentIndex + 1) % count);
+      setIndex((currentIndex) =>
+        currentIndex >= count + 1 ? currentIndex : currentIndex + 1,
+      );
     }, CAROUSEL_INTERVAL_MS);
 
     return () => window.clearInterval(timer);
-  }, [index, paused, reduceMotion, count]);
+  }, [reduceMotion, count, timerKey]);
+
+  useLayoutEffect(() => {
+    if (!noAnim) {
+      return;
+    }
+
+    const id = window.setTimeout(() => setNoAnim(false), 20);
+    return () => window.clearTimeout(id);
+  }, [noAnim]);
 
   if (!current) {
     return null;
   }
 
-  const go = (next: number) => {
-    setIndex((next + count) % count);
-  };
+  function goPrev() {
+    if (count < 2) {
+      return;
+    }
+    setIndex((currentIndex) => Math.max(0, currentIndex - 1));
+    setTimerKey((key) => key + 1);
+  }
+
+  function goNext() {
+    if (count < 2) {
+      return;
+    }
+    setIndex((currentIndex) => Math.min(count + 1, currentIndex + 1));
+    setTimerKey((key) => key + 1);
+  }
+
+  function goToReal(page: number) {
+    if (count < 2) {
+      return;
+    }
+    setIndex(page + 1);
+    setTimerKey((key) => key + 1);
+  }
+
+  function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      goPrev();
+    }
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      goNext();
+    }
+  }
+
+  function onTransitionEnd(event: TransitionEvent<HTMLDivElement>) {
+    if (event.target !== event.currentTarget) {
+      return;
+    }
+    if (event.propertyName !== "transform") {
+      return;
+    }
+    if (index !== 0 && index !== count + 1) {
+      return;
+    }
+    setNoAnim(true);
+    setIndex(index === 0 ? count : 1);
+  }
 
   return (
     <InView as="section" aria-labelledby="client-title">
       <div className="mx-auto w-full max-w-[1328px] px-5 py-[clamp(4.75rem,8vw,7.25rem)] sm:px-12">
-        <div className="ov-stagger mb-[clamp(2.5rem,5vw,4rem)]">
+        <div className="client-head ov-stagger mb-[clamp(2.5rem,5vw,4rem)]">
           <TulipMark />
           <h2
             id="client-title"
@@ -59,77 +134,96 @@ export function RoseClients() {
           role="group"
           aria-roledescription="carousel"
           aria-label="Client testimonials"
-          onMouseEnter={() => setPaused(true)}
-          onMouseLeave={() => setPaused(false)}
-          onFocusCapture={() => setPaused(true)}
-          onBlurCapture={(event) => {
-            if (!event.currentTarget.contains(event.relatedTarget)) {
-              setPaused(false);
-            }
-          }}
+          tabIndex={0}
+          onKeyDown={onKeyDown}
         >
-          <figure className="grid bg-[#011407] md:grid-cols-[minmax(15rem,24.875rem)_minmax(0,1fr)]">
-            <div className="client-photo relative z-10 flex h-fit max-w-[400px] flex-col self-start overflow-visible md:max-w-none">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={current.image}
-                alt={current.imageAlt}
-                width={398}
-                height={352}
-                className="aspect-[199/176] h-auto w-full shrink-0 object-cover"
-              />
-              <p className="w-[66%] min-w-[12.5rem] bg-olive px-[22px] py-3.5 text-[15px] font-semibold whitespace-nowrap text-white">
-                {current.name}
-              </p>
-              <p className="w-full bg-sunflower px-[22px] py-3.5 text-[14.5px] font-semibold text-[#394813] max-md:whitespace-normal md:w-[calc(100%+6.25rem)] md:whitespace-nowrap">
-                {current.role}
-              </p>
+          <div className="overflow-hidden">
+            <div
+              className={`client-track ${noAnim || reduceMotion ? "is-snap" : ""}`}
+              style={{ transform: `translateX(-${index * 100}%)` }}
+              onTransitionEnd={onTransitionEnd}
+            >
+              {loopSlides.map((quote, slideIndex) => {
+                const active = slideIndex === index;
+                return (
+                  <figure
+                    key={`${quote.name}-${slideIndex}`}
+                    className="client-slide grid w-full bg-[#011407] md:grid-cols-[minmax(15rem,24.875rem)_minmax(0,1fr)]"
+                    aria-hidden={!active}
+                    {...(!active ? { inert: true } : {})}
+                  >
+                    <div className="client-photo relative z-10 flex h-fit max-w-[400px] flex-col self-start overflow-visible md:max-w-none">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={quote.image}
+                        alt={quote.imageAlt}
+                        width={398}
+                        height={352}
+                        loading={slideIndex <= 1 ? "eager" : "lazy"}
+                        decoding="async"
+                        className="aspect-[199/176] h-auto w-full shrink-0 object-cover"
+                      />
+                      <p className="w-[66%] min-w-[12.5rem] bg-olive px-[22px] py-3.5 text-[15px] font-semibold whitespace-nowrap text-white">
+                        {quote.name}
+                      </p>
+                      <p className="w-full bg-sunflower px-[22px] py-3.5 text-[14.5px] font-semibold text-[#394813] max-md:whitespace-normal md:w-[calc(100%+6.25rem)] md:whitespace-nowrap">
+                        {quote.role}
+                      </p>
+                    </div>
+                    <blockquote className="client-quote px-[clamp(1.75rem,4.5vw,4rem)] py-[clamp(1.75rem,3.4vw,2.875rem)]">
+                      <QuoteMark />
+                      <div className="mt-5 max-w-[62ch] space-y-4 text-[clamp(1rem,1.35vw,1.156rem)] leading-[1.5] text-mist">
+                        {quote.paragraphs.map((paragraph) => (
+                          <p key={paragraph}>{paragraph}</p>
+                        ))}
+                      </div>
+                      <figcaption className="sr-only">
+                        {quote.name}, {quote.role}
+                      </figcaption>
+                    </blockquote>
+                  </figure>
+                );
+              })}
             </div>
-            <blockquote className="client-quote px-[clamp(1.75rem,4.5vw,4rem)] py-[clamp(1.75rem,3.4vw,2.875rem)]">
-              <QuoteMark />
-              <div className="mt-5 max-w-[62ch] space-y-4 text-[clamp(1rem,1.35vw,1.156rem)] leading-[1.5] text-mist">
-                {current.paragraphs.map((paragraph) => (
-                  <p key={paragraph}>{paragraph}</p>
-                ))}
-              </div>
-              <figcaption className="sr-only">
-                {current.name}, {current.role}
-              </figcaption>
-            </blockquote>
-          </figure>
+          </div>
 
           <div className="mt-[clamp(1.75rem,3vw,2.5rem)] flex items-center justify-between">
             <button
               type="button"
-              className="grid size-12 place-items-center rounded-full bg-olive text-mist transition-transform hover:scale-[1.02] hover:bg-[#7f9410]"
+              className="grid size-12 place-items-center rounded-full bg-olive text-mist transition-[background,transform] duration-150 hover:scale-[1.02] hover:bg-[#7f9410] active:scale-[0.98] active:bg-[#5e7006]"
               aria-label="Previous testimonial"
-              onClick={() => go(index - 1)}
+              onClick={goPrev}
             >
               <ArrowIcon />
             </button>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3" role="group" aria-label="Choose testimonial">
               {quotes.map((quote, quoteIndex) => (
                 <button
                   key={quote.name}
                   type="button"
                   aria-label={`Show testimonial ${quoteIndex + 1} of ${quotes.length}: ${quote.name}`}
-                  aria-current={quoteIndex === index ? "true" : undefined}
-                  className={`h-2 rounded-full bg-sunflower transition-[width,opacity] ${
-                    quoteIndex === index ? "w-12 opacity-100" : "w-2 opacity-60 hover:opacity-100"
+                  aria-current={quoteIndex === realIndex ? "true" : undefined}
+                  className={`h-2 rounded-full bg-sunflower transition-[width,opacity,transform] duration-300 ${
+                    quoteIndex === realIndex
+                      ? "w-12 opacity-100"
+                      : "w-2 opacity-60 hover:scale-110 hover:opacity-100"
                   }`}
-                  onClick={() => setIndex(quoteIndex)}
+                  onClick={() => goToReal(quoteIndex)}
                 />
               ))}
             </div>
             <button
               type="button"
-              className="grid size-12 place-items-center rounded-full bg-olive text-mist transition-transform hover:scale-[1.02] hover:bg-[#7f9410]"
+              className="grid size-12 place-items-center rounded-full bg-olive text-mist transition-[background,transform] duration-150 hover:scale-[1.02] hover:bg-[#7f9410] active:scale-[0.98] active:bg-[#5e7006]"
               aria-label="Next testimonial"
-              onClick={() => go(index + 1)}
+              onClick={goNext}
             >
               <ArrowIcon className="-scale-x-100" />
             </button>
           </div>
+          <p className="sr-only" aria-live="polite">
+            Testimonial {realIndex + 1} of {count}: {current.name}, {current.role}
+          </p>
         </div>
       </div>
     </InView>

@@ -5,6 +5,14 @@ export const homeHero = {
   lede: "OllyGarden helps teams find and fix bad telemetry before it reaches any observability backend, giving engineers and AI agents data they can rely on — from pull request to production.",
 } as const;
 
+export const homeSecurity = {
+  eyebrow: "We take security seriously",
+  title: "Security you can trust",
+  body: "OllyGarden has completed a SOC 2® Type II examination.",
+  badgeAlt: "AICPA SOC badge",
+  badgeSrc: "/images/soc-badge.png",
+} as const;
+
 export const homeWhy = {
   eyebrow: "Why Telemetry Quality Matters",
   title: "Bad telemetry makes observability harder to trust",
