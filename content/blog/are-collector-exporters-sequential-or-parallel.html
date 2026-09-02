@@ -1,0 +1,77 @@
+<p>You have configured multiple exporters in a single OpenTelemetry Collector pipeline: one for your production observability backend, and perhaps another for a local debugging tool or a data archive. It is tempting to assume the Collector broadcasts telemetry to all of them simultaneously.</p>
+<p>The reality is more nuanced. The Collector calls exporters <em>sequentially</em>, in the order they appear in the pipeline. But the sending queue normally hides that from you, so in practice it behaves <em>as if</em> it were parallel. The interesting question is what happens when that illusion is put under pressure, and the answer changed at some point, which is why a lot of the advice you will find online is now wrong.</p>
+<h2>The fan-out mechanism</h2>
+<p>The component responsible for delivering data to multiple exporters within a single pipeline is the fan-out consumer. It iterates over the configured exporters in the order they appear in your configuration.</p>
+<p>Consider this pipeline:</p>
+<pre><code class="hljs language-yaml"><span class="hljs-attr">receivers:</span>
+  <span class="hljs-attr">otlp:</span>
+    <span class="hljs-attr">protocols:</span>
+      <span class="hljs-attr">grpc:</span>
+        <span class="hljs-attr">endpoint:</span> <span class="hljs-number">0.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span><span class="hljs-string">:4317</span>
+
+<span class="hljs-attr">exporters:</span>
+  <span class="hljs-attr">otlp/prod:</span>
+    <span class="hljs-attr">endpoint:</span> <span class="hljs-string">&#x27;api.vendor.com:4317&#x27;</span>
+  <span class="hljs-attr">otlp/archive:</span>
+    <span class="hljs-attr">endpoint:</span> <span class="hljs-string">&#x27;archive.internal:4317&#x27;</span>
+
+<span class="hljs-attr">service:</span>
+  <span class="hljs-attr">pipelines:</span>
+    <span class="hljs-attr">traces:</span>
+      <span class="hljs-attr">receivers:</span> [<span class="hljs-string">otlp</span>]
+      <span class="hljs-attr">exporters:</span> [<span class="hljs-string">otlp/prod</span>, <span class="hljs-string">otlp/archive</span>]
+</code></pre><p>When the Collector processes a batch of traces, the fan-out consumer performs a simple loop: it calls <code>ConsumeTraces</code> on <code>otlp/prod</code>, waits for that call to return, then calls <code>ConsumeTraces</code> on <code>otlp/archive</code>. The hand-off is inherently sequential.</p>
+<p>There is one detail worth knowing for correctness: the fan-out consumer accumulates errors rather than aborting on the first one. If an exporter returns an error, the loop records it and still proceeds to the next exporter. A hard failure in <code>otlp/prod</code> does not, by itself, prevent <code>otlp/archive</code> from receiving its copy.</p>
+<h2>The role of queues</h2>
+<p>If the execution is sequential, does <code>otlp/archive</code> have to wait for <code>otlp/prod</code> to complete a network request across the internet?</p>
+<p>No. The OTLP exporter (like most core exporters) is built on the <code>exporterhelper</code> package, which enables a <strong>sending queue by default</strong>. That queue changes what <code>ConsumeTraces</code> actually does.</p>
+<p>With the queue enabled, <code>ConsumeTraces</code> does not send anything over the network. It enqueues the data into an in-memory buffer and returns almost immediately. Each exporter has its own pool of background consumers, ten by default, that drain its queue and handle network transmission independently.</p>
+<p>So the real flow is:</p>
+<ol>
+<li>The fan-out consumer enqueues the batch on <code>otlp/prod</code>&#39;s queue and returns immediately.</li>
+<li>It enqueues the batch on <code>otlp/archive</code>&#39;s queue and returns immediately.</li>
+<li>Background consumers for each exporter pick up the data and transmit it over the network in parallel.</li>
+</ol>
+<p>On the happy path, the system behaves <em>as if</em> it were parallel, even though the initial hand-off is strictly sequential. Two exporters with full queues drain concurrently; one slow backend does not make the other wait for its network round-trip.</p>
+<h2>What happens when a queue fills up</h2>
+<p>The decoupling holds only while there is room in the queue. The important question, and the one that trips people up, is what the Collector does when a queue is <em>full</em>.</p>
+<p>This is governed by a single setting, <code>sending_queue.block_on_overflow</code>, and <strong>its default is <code>false</code></strong>:</p>
+<pre><code class="hljs language-yaml"><span class="hljs-attr">exporters:</span>
+  <span class="hljs-attr">otlp:</span>
+    <span class="hljs-attr">sending_queue:</span>
+      <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>
+      <span class="hljs-attr">queue_size:</span> <span class="hljs-number">1000</span> <span class="hljs-comment"># default; measured in requests</span>
+      <span class="hljs-attr">block_on_overflow:</span> <span class="hljs-literal">false</span> <span class="hljs-comment"># default</span>
+</code></pre><p>With <code>block_on_overflow: false</code>, enqueuing onto a full queue <strong>returns a retryable error immediately</strong> instead of waiting. It does not block the caller. So if <code>otlp/prod</code> is unhealthy and its queue is saturated, here is what happens on the next batch:</p>
+<ol>
+<li>The push to <code>otlp/prod</code> fails fast with a &quot;queue is full&quot; error. The fan-out consumer records it.</li>
+<li>The loop moves on and enqueues the batch on <code>otlp/archive</code>, which is healthy and has room.</li>
+<li><code>otlp/archive</code> keeps receiving data normally.</li>
+</ol>
+<p>In other words, <strong>by default, latency is isolated</strong>. A slow or stalled backend cannot hold the fan-out loop hostage, because the hand-off to its queue never blocks; it just fails fast for the data it cannot accept.</p>
+<p>There is a cost, of course: the data that could not be enqueued for <code>otlp/prod</code> is rejected back up the pipeline. Note that this is <em>not</em> the same as <code>retry_on_failure</code>, which only applies to network send failures <em>after</em> a batch has been dequeued. An enqueue failure is returned to whoever called the pipeline. For the OTLP receiver, that means a gRPC error goes back to the upstream client, which can decide to retry. The default trades durability for isolation: when a destination is overwhelmed, you shed its load rather than letting it stall everything else.</p>
+<h2>Opting into backpressure</h2>
+<p>If you would rather not drop data, you can flip the behavior:</p>
+<pre><code class="hljs language-yaml"><span class="hljs-attr">exporters:</span>
+  <span class="hljs-attr">otlp:</span>
+    <span class="hljs-attr">sending_queue:</span>
+      <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>
+      <span class="hljs-attr">block_on_overflow:</span> <span class="hljs-literal">true</span>
+</code></pre><p>With <code>block_on_overflow: true</code>, enqueuing onto a full queue <strong>blocks until space frees up</strong>. This is genuine backpressure, and it is exactly the head-of-line-blocking scenario people warn about, except now it is something you opted into:</p>
+<ol>
+<li>The push to the full <code>otlp/prod</code> queue blocks, waiting for space.</li>
+<li>The fan-out consumer is stuck on the first exporter.</li>
+<li>The call to <code>otlp/archive</code> is delayed for as long as <code>otlp/prod</code> stays saturated.</li>
+</ol>
+<p>Worse, that backpressure propagates upstream. A blocked enqueue means the receiver cannot return, so it stops reading from the network, which stalls <em>every</em> exporter in the pipeline and every producer feeding it. With this setting, a single slow vendor really can degrade delivery to your local archive.</p>
+<p>This is the right choice when losing data is unacceptable and you would rather slow everything down than drop anything. It is the wrong choice when you have a critical, healthy destination that must not be held hostage by a struggling one. The point is that it is now a deliberate decision, not a hidden default.</p>
+<h2>A note on why the old advice says the opposite</h2>
+<p>If you have read that &quot;the Collector applies backpressure by default&quot; or that &quot;a full queue blocks the pipeline,&quot; that advice was not wrong when it was written. Earlier Collector releases used a bounded in-memory queue that <strong>blocked the caller when full</strong>: blocking was the default behavior, with no knob to turn it off short of disabling the queue entirely.</p>
+<p>The queue implementation was later reworked (the <code>queuebatch</code> refactor in <code>exporterhelper</code>), and the default flipped to non-blocking, with <code>block_on_overflow</code> added as the explicit opt-in. The version number on the binary did not announce this in a way most readers noticed, so a lot of still-circulating guidance describes behavior that is no longer the default. When you read advice about Collector queue behavior, check which era it was written for, and better yet, check the behavior of the exact build you ship.</p>
+<h2>Recommendations</h2>
+<p><strong>1. Keep sending queues enabled.</strong> They are on by default in the OTLP exporter, and they are what gives you the as-if-parallel behavior. Disabling the queue forces the fan-out consumer to wait for the actual network request, which guarantees that your slowest exporter dictates the throughput of the entire pipeline.</p>
+<p><strong>2. Decide your overflow policy on purpose.</strong> The default (<code>block_on_overflow: false</code>) isolates latency by shedding load from an overwhelmed destination. Setting <code>block_on_overflow: true</code> protects against data loss but couples the fate of every exporter (and the receiver) to your slowest backend. Pick the one that matches what you are optimizing for; do not inherit it by accident.</p>
+<p><strong>3. Monitor your queues.</strong> Watch <code>otelcol_exporter_queue_size</code> against <code>otelcol_exporter_queue_capacity</code>. A queue that constantly hovers near capacity is a bottleneck. Pair it with <code>otelcol_exporter_enqueue_failed_spans</code> (and the metric/log equivalents): under the default policy, that is where shed data shows up, silently, unless you are looking.</p>
+<p><strong>4. For true isolation, use separate Collector instances.</strong> Splitting destinations into separate pipelines within one Collector helps, but remember the receiver caveat: if you have set <code>block_on_overflow: true</code> on any pipeline, a stalled enqueue there can stop the shared receiver from reading the network, which affects every pipeline. Hard isolation between a critical destination and a flaky one is most reliably achieved with separate Collector processes.</p>
+<h2>Summary</h2>
+<p>The OpenTelemetry Collector calls exporters sequentially, and the <code>sending_queue</code> is what turns that sequential hand-off into effectively parallel delivery. By default, a full queue fails fast (<code>block_on_overflow: false</code>), so one slow backend isolates its own latency at the cost of shedding its own data. Backpressure and head-of-line blocking are real, but they are the opt-in behavior (<code>block_on_overflow: true</code>), not the default they once were. Keep your queues enabled, choose your overflow policy deliberately, and monitor queue size and enqueue failures so you know which trade-off you are actually living with.</p>

@@ -1,0 +1,115 @@
+<p>In our <a href="/resources/blog/purposeful-instrumentation">Purposeful Instrumentation</a> blog post, we laid the groundwork for a more disciplined approach to observability. We argued that the goal isn&#39;t to merely amass data, but to <strong>cultivate high-quality telemetry signals</strong> – focusing on quality over quantity. The aim is to transform our experience during high-pressure incidents from frantically searching through a &quot;dense thicket of irrelevant data&quot; to confidently navigating a &quot;well-lit path to the root cause.&quot;</p>
+<p>Many of us have experienced the pitfalls of the &quot;instrument everything&quot; mantra. While well-intentioned, it often leads to an &quot;overgrown jungle of telemetry data,&quot; where critical signals are drowned out by noise. Purposeful instrumentation, in contrast, encourages us to strategically gather the <em>right</em> data. This isn&#39;t just about digital decluttering; it yields tangible benefits: <strong>reduced noise, faster troubleshooting, and improved clarity and maintainability</strong> in our systems.</p>
+<p>This post moves from philosophy to practice. We&#39;ll dive into concrete examples and techniques, showcasing how to apply purposeful instrumentation in real-world scenarios—from initial telemetry design to ongoing pipeline adjustments and even code-level optimizations.</p>
+<h2><strong>Designing Telemetry with NASA&#39;s Rigor</strong></h2>
+<p>When we think about systems operating under the most severe limitations, spacecraft telemetry, particularly from missions like NASA&#39;s Mars rovers, offers <a href="https://www-robotics.jpl.nasa.gov/media/documents/Flight_Software_Case_Study_Spacecraft_Telemetry.pdf">profound inspiration</a>. The extreme constraints of space exploration—limited bandwidth, power, and processing capabilities—force engineers to meticulously justify and optimize every single bit of data transmitted. For observability engineers on Earth, even without such stark limitations, these practices offer invaluable lessons in <strong>cultivating efficiency</strong>.</p>
+<p>Here are some key takeaways:</p>
+<ul>
+<li><p><strong>Data Type Optimization</strong>: Spacecraft systems often convert 64-bit floating-point numbers to 32-bit or even 16-bit integers. Sometimes, scaled integers (like centi-degrees Celsius) are used to preserve essential precision while drastically reducing data volume. For our enterprise systems, this prompts a critical question: Do we <em>really</em> need microsecond precision for every timer, or would seconds suffice for certain metrics, thereby reducing storage and processing overhead?</p>
+</li>
+<li><p><strong>Bit Packing and Enumerated Types</strong>: To save space, boolean flags and enumerated values with a limited set of states are often packed into smaller integer types on spacecraft. For example, 15 distinct safety checks might be encoded into a single 16-bit integer. This principle is directly applicable to software telemetry, particularly in how we design attributes to <strong>reduce cardinality</strong> and data volume. Instead of verbose string representations for statuses, can an enumerated integer suffice?</p>
+</li>
+<li><p><strong>Configurable Data Collection</strong>: Spacecraft aren&#39;t static in their data collection. They possess &quot;knobs&quot; that allow operators to increase data verbosity for anomaly investigations, switching between &quot;Brief records&quot; for nominal operations and &quot;Verbose records&quot; when digging deeper. This mirrors the need in our systems for dynamic control over telemetry, perhaps adjusting log levels or sampling rates based on operational context rather than maintaining a constant, high-volume stream.</p>
+</li>
+<li><p><strong>Summary Data and Compression</strong>: Reporting small, high-level summary data packets independently from detailed diagnostic data products allows for quick operational decision-making. If summaries are nominal, large, detailed data products might even be discarded to save precious bandwidth. Lossless compression is also a standard practice, always balancing the CPU cost of compression/decompression against bandwidth savings.</p>
+</li>
+<li><p><strong>The &quot;Very Small Products&quot; Problem</strong>: Interestingly, generating a multitude of tiny data products can be inefficient, consuming storage slots and impacting system performance, as was observed with the Mars 2020 rover&#39;s packetizer. This highlights the importance of <strong>batching and aggregation</strong> not just for network efficiency but also for processing and storage optimization within our telemetry pipelines. The OpenTelemetry Collector’s batch processor is a prime example of applying this principle.</p>
+</li>
+</ul>
+<p>These extreme examples from NASA underscore a fundamental discipline: diligently asking, &quot;What data do I <em>really</em> need?&quot; and &quot;What is the cost versus the value?&quot; This scrutiny is crucial for building sustainable and effective telemetry strategies, ensuring we&#39;re not just collecting data, but harvesting actionable insights.</p>
+<h2><strong>Tuning Automatic Instrumentation for Precision with OpenTelemetry</strong></h2>
+<p>OpenTelemetry&#39;s <a href="https://opentelemetry.io/docs/zero-code/">auto-instrumentation</a> agents are a massive boon, offering broad telemetry coverage for popular libraries and frameworks with minimal upfront effort. It’s tempting to see this as &quot;zero code, zero thought.&quot; However, this convenience doesn&#39;t absolve us from the need for <strong>purposeful configuration</strong>. Blindly enabling instrumentation for every conceivable library can quickly lead back to that &quot;overgrown jungle of telemetry data,&quot; swamping your systems with noise and incurring unnecessary costs.</p>
+<ul>
+<li><p><strong>Review Default Configurations</strong>: Auto-instrumentation defaults are often tuned for maximum coverage, which might not align with your specific observability goals or the critical paths of your application. As <a href="https://youtu.be/QzStkLbA7Qk">Elena Kovalenko of Delivery Hero noted</a>, unconfigured auto-instrumentation can generate extremely high cardinality and massive data volumes, potentially overloading collectors and backend systems. It’s vital to treat the default settings as a starting point, not a final destination.</p>
+</li>
+<li><p><strong>Selectively Disable Unnecessary Instrumentation</strong>: Most OpenTelemetry auto-instrumentation agents allow for fine-grained control, enabling you to disable instrumentation for components that are irrelevant to your critical diagnostic paths or those known to produce excessive, low-value data.</p>
+<ul>
+<li><strong>Concrete Example: Suppressing JDBC Telemetry</strong>: If your primary diagnostic focus is at the service interaction level, the verbose telemetry generated by JDBC instrumentation (tracing every database call) might be more noise than signal. With the OpenTelemetry Java agent, for instance, you can easily <a href="https://opentelemetry.io/docs/zero-code/java/agent/disable/">disable this by setting</a> the environment variable <code>OTEL_INSTRUMENTATION_JDBC_ENABLED=false</code>. This targeted <strong>pruning</strong> ensures that resources aren&#39;t wasted collecting, processing, and storing data that doesn&#39;t contribute significantly to your understanding of system health.</li>
+</ul>
+</li>
+</ul>
+<p>Auto-instrumentation plants the seeds of visibility; purposeful configuration helps you cultivate the desired crop, ensuring a healthy yield of actionable insights rather than a field of weeds.</p>
+<h2><strong>Optimizing Data Flow with the OpenTelemetry Collector: Pipeline Adjustments</strong></h2>
+<p>The OpenTelemetry Collector is more than just a telemetry forwarder; it&#39;s a powerful, vendor-agnostic control plane. It’s a great place to implement purposeful telemetry strategies by filtering, sampling, enriching, and transforming data <em>before</em> it even reaches your observability backends. Let&#39;s look at how sophisticated organizations are leveraging the Collector.</p>
+<h3><strong>eBay&#39;s Journey: Scaling Distributed Tracing with Cost Optimization</strong></h3>
+<p><a href="https://youtu.be/qq8hTct8zm4?si=t5pnl-tyV9-WQ6VP">Handling telemetry at eBay&#39;s scale</a>—ingesting 6.5 million spans per second—necessitates highly judicious instrumentation and aggressive optimization. They faced challenges with broken call chains due to context propagation issues and the difficulty of applying uniform sampling across APIs with vastly different traffic volumes.</p>
+<p>Their approach to sampling evolved:</p>
+<ol>
+<li><p><strong>Initial Strategy</strong>: They started with head sampling at the client (e.g., 2% of requests) combined with parent-based sampling to ensure entire traces were captured if any part was sampled.</p>
+</li>
+<li><p><strong>Adding Tail Sampling</strong>: After that, they employed a tail-sampling strategy to retain &quot;interesting&quot; traces—those with errors, high latency, or specific critical attributes—along with a baseline 1% of successful traces, storing these for 14 days. This allowed them to focus retention on the most valuable diagnostic data.</p>
+</li>
+<li><p><strong>Evolving Tail Sampling with OTel Collector</strong>: Recognizing the significant memory and complexity challenges of performing in-memory tail sampling within the OpenTelemetry Collector for long-duration traces or requests spanning multiple clusters, eBay pivoted. They now leverage <strong>exemplars from metrics</strong> to identify traces of interest. These traces are then copied from a raw trace table to a sampled table after a 10-15 minute delay. This innovative, storage-based tail sampling approach demonstrates a mature balance between comprehensive diagnostic capability and cost control.</p>
+</li>
+</ol>
+<h3><strong>TomTom&#39;s Centralized Control: Enforcing Governance and Flexibility</strong></h3>
+<p><a href="https://engineering.tomtom.com/opentelemetry-simpifying-observability/">TomTom implemented</a> a <strong>centralized OpenTelemetry Collector Service</strong> that acts as a gateway between their internal applications and various SaaS observability platforms. This central hub provides several advantages:</p>
+<ul>
+<li><p><strong>Governance and Standardization</strong>: It allows them to enforce authentication, manage general configurations like batching and encryption consistently, and, crucially, handle <strong>data enrichment and manipulation</strong> centrally.</p>
+</li>
+<li><p><strong>Filtering and PII Redaction</strong>: They use the filterprocessor to drop noisy or irrelevant logs (e.g., from specific Kubernetes namespaces). For sensitive data, a combination of the transformprocessor and attributesprocessor is used to redact Personally Identifiable Information (PII) before telemetry leaves their trust boundary.</p>
+</li>
+<li><p><strong>Telemetry Enrichment</strong>: Data is enriched with valuable metadata, such as an &quot;owner&quot; label, which provides better context during troubleshooting and improves accountability.</p>
+</li>
+<li><p><strong>Strategic Benefits</strong>: This centralized model offers flexibility in switching telemetry backends, enforces data governance policies, and has proven critical for cost control and maintaining data quality at an enterprise scale.</p>
+</li>
+</ul>
+<p>These real-world examples illustrate the power of the OpenTelemetry Collector as a central point for <strong>cultivating telemetry quality</strong>.</p>
+<h2><strong>Crafting Intentional Manual Instrumentation: OllyGarden’s Example</strong></h2>
+<p>While auto-instrumentation provides breadth, manual instrumentation offers depth and precision. But even here, more isn&#39;t always better. A common pitfall is &quot;over-spanning&quot;: creating an excessive number of highly granular spans for minor, sequential internal operations within a single logical unit of work. This can obscure the true flow of a request, add unnecessary overhead, and make traces harder to interpret—akin to &quot;wandering aimlessly in the woods&quot; instead of following a clear path. For example, a single logical <code>onTraces</code> operation might be fragmented into several child spans for <code>processResourceSpans</code>, cluttering the trace view and inflating span counts unnecessarily.</p>
+<p><img src="https://ollygarden.com/blog-images/concrete-applications-of-purposeful-instrumentation/image-1.png" alt=""></p>
+<p>Here’s the original Go code we wrote and landed in production:</p>
+<pre><code class="hljs language-go">	ctx, span := telemetry.Tracer().Start(ctx, <span class="hljs-string">&quot;tendril.processResourceSpans&quot;</span>)
+	<span class="hljs-keyword">defer</span> span.End()
+
+	<span class="hljs-comment">// Extract service information from resource</span>
+	svcName := getResourceString(rs.Resource(), attrServiceName)
+	span.SetAttributes(attribute.String(<span class="hljs-string">&quot;service.name&quot;</span>, svcName))
+
+	svcVersion := getResourceString(rs.Resource(), attrServiceVersion)
+	span.SetAttributes(attribute.String(<span class="hljs-string">&quot;service.version&quot;</span>, svcVersion))
+
+	svcEnv := getResourceString(rs.Resource(), attrEnvironmentName)
+	span.SetAttributes(attribute.String(<span class="hljs-string">&quot;deployment.environment.name&quot;</span>, svcEnv))
+</code></pre><p><strong>The Purposeful Solution: Leveraging Span Events</strong></p>
+<p>Instead of creating distinct child spans for every micro-step, it&#39;s often far more effective to <strong>consolidate these internal milestones as span events within a single, overarching span</strong> that represents the larger logical operation. This aligns with the core principle of choosing the &quot;most effective signal type for your defined purpose.&quot; Logs provide detailed context for discrete occurrences, metrics track aggregatable trends, and traces show flow; span events offer a way to add rich, contextual markers to a span without creating new ones.</p>
+<p><img src="https://ollygarden.com/blog-images/concrete-applications-of-purposeful-instrumentation/image-2.png" alt=""></p>
+<p>And here’s the code after the fine-tuning:</p>
+<pre><code class="hljs language-go">	span := trace.SpanFromContext(ctx)
+
+	<span class="hljs-comment">// Extract service information from resource</span>
+	svcName := getResourceString(rs.Resource(), attrServiceName)
+	svcVersion := getResourceString(rs.Resource(), attrServiceVersion)
+	svcEnv := getResourceString(rs.Resource(), attrEnvironmentName)
+
+	span.AddEvent(<span class="hljs-string">&quot;processing resource spans for service&quot;</span>, trace.WithAttributes(
+		attribute.String(<span class="hljs-string">&quot;service.name&quot;</span>, svcName),
+		attribute.String(<span class="hljs-string">&quot;service.version&quot;</span>, svcVersion),
+		attribute.String(<span class="hljs-string">&quot;deployment.environment.name&quot;</span>, svcEnv),
+	))
+</code></pre><p><strong>Benefits of Using Span Events Over Excessive Child Spans:</strong></p>
+<ul>
+<li><p><strong>Clearer Trace Representation</strong>: A single span with well-defined events provides a <strong>cleaner, more focused view</strong> of a component&#39;s internal workings within the context of the larger trace. This gives a &quot;well-lit path&quot; to understanding that component&#39;s behavior.</p>
+</li>
+<li><p><strong>Reduced Overhead and Cost</strong>: Span events are generally lighter-weight than full spans. This translates to <strong>reduced data volume</strong> and consequently <strong>lower processing and storage costs</strong> in your observability backend.</p>
+</li>
+<li><p><strong>Enhanced Context</strong>: Events, with their associated attributes, allow you to capture crucial details (e.g., input size, processing duration for a specific sub-task, success/failure flags) at precise points within the operation, without fragmenting the trace into many tiny pieces.</p>
+</li>
+</ul>
+<h2><strong>Conclusion: Towards Insightful and Economical Observability</strong></h2>
+<p>Moving from indiscriminate data collection to <strong>purposeful software telemetry</strong> is more than an engineering exercise; it&#39;s a strategic imperative. It ensures that our substantial investments in observability deliver tangible business value—faster incident resolution, optimized performance, and controlled costs—rather than just overwhelming data lakes.</p>
+<p>This journey of <strong>continuous cultivation</strong> is not a one-off task. It requires ongoing review, governance, and a feedback loop where insights from incidents, performance anomalies, and cost reports are fed back into your instrumentation design and data pipeline policies. As your systems evolve, so too must your telemetry strategy.</p>
+<p>The guiding questions we discussed in our previous post remain your most valuable tools:</p>
+<ul>
+<li><p>&quot;What question are we trying to answer with this data?&quot;</p>
+</li>
+<li><p>&quot;What data do we <em>truly</em> need, and at what precision?&quot;</p>
+</li>
+<li><p>&quot;Why <em>this specific signal type</em> (metric, log, trace, event)?&quot;</p>
+</li>
+<li><p>&quot;How will this data actually be <em>used</em> and by whom?&quot;</p>
+</li>
+<li><p>&quot;And critically, what is its ongoing <em>cost versus its value</em>?&quot;</p>
+</li>
+</ul>
+<p>By consistently applying this critical lens, engineering teams can cultivate an observability practice that is not only powerful and insightful but also sustainable and economically sound. This deliberate, adaptive, and insight-driven approach is the future of effective software observability. OllyGarden is committed to being a neutral and valuable partner in this ecosystem, helping you analyze, optimize, and manage your OpenTelemetry pipelines to harvest the richest insights efficiently.</p>

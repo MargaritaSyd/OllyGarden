@@ -3,8 +3,6 @@ export const careersMeta = {
   path: "/careers",
 } as const;
 
-export const careersEmail = "careers@olly.garden";
-
 export const careersHero = {
   badge: "OllyGarden Careers",
   title: ["Join Our Team"],
@@ -22,7 +20,6 @@ export const careersJoin = {
     title: "Don’t see a matching position?",
     body: "We’re always interested in connecting with talented people who care about observability, OpenTelemetry, and building better telemetry for engineering teams. If that sounds like you, send us an open application.",
     cta: "Submit Open Application",
-    href: `mailto:${careersEmail}?subject=${encodeURIComponent("Open Application")}`,
   },
   empty: {
     title: "No open positions at this time",
@@ -70,8 +67,43 @@ export const careersInterview = {
     title: "In Short: Show Us How You Work",
     body: "Our interview process is an opportunity to understand how you think, build, learn, and collaborate. We want to see your code, your process, your passion, and the perspective you would bring to OllyGarden.",
     label: "Submit Application",
-    href: `mailto:${careersEmail}?subject=${encodeURIComponent("Application")}`,
   },
+} as const;
+
+export const careersApplyForm = {
+  title: "Submit an application",
+  close: "Close",
+  fields: {
+    fullName: {
+      label: "Full name",
+      placeholder: "Ada Lovelace",
+    },
+    email: {
+      label: "Email",
+      placeholder: "ada@observability.dev",
+    },
+    linkedin: {
+      label: "LinkedIn",
+      placeholder: "https://www.linkedin.com/in/you",
+    },
+    github: {
+      label: "GitHub",
+      placeholder: "https://github.com/you",
+    },
+  },
+  errors: {
+    fullName: "Please enter your full name.",
+    emailRequired: "Please enter your email.",
+    emailInvalid: "Please enter a valid email address.",
+  },
+  submit: "Submit Application",
+  submitting: "Sending…",
+  successTitle: "Thanks — we received your application.",
+  successBody:
+    "A member of our team will get back to you if there’s a fit. In the meantime, feel free to keep exploring.",
+  successCta: "Close",
+  error:
+    "Something went wrong sending your application. Please try again — your details are still here.",
 } as const;
 
 export const careersWhy = {

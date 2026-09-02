@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
-import { CtaArrow } from "@/components/cta-arrow";
-import { CareersCard, CareersMailLink } from "@/components/careers-card";
+import { CareersApplyCta } from "@/components/careers-apply-cta";
+import { CareersCard } from "@/components/careers-card";
 import { InView } from "@/components/in-view";
 import { careersJoin } from "@/lib/careers";
 
@@ -51,10 +51,7 @@ export function CareersJoin() {
                   {careersJoin.openApp.body}
                 </p>
               </div>
-              <CareersMailLink href={careersJoin.openApp.href}>
-                {careersJoin.openApp.cta}
-                <CtaArrow />
-              </CareersMailLink>
+              <CareersApplyCta label={careersJoin.openApp.cta} />
             </div>
           </CareersCard>
           <CareersCard

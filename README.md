@@ -11,6 +11,7 @@ The three-stage plan lives in [`doc/roadmap.md`](doc/roadmap.md).
 - TypeScript
 - Tailwind CSS 4
 - ESLint with Core Web Vitals rules
+- Supabase (`@supabase/supabase-js`) for `/contact` and `/careers` form submits
 
 ## Getting started
 
@@ -23,6 +24,8 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000).
 
 Set `NEXT_PUBLIC_SITE_URL` to the production origin before deploying. That value drives canonical URLs, Open Graph tags, the sitemap, robots.txt, JSON-LD, and the RSS feed.
+
+Form submits need `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Leave `NEXT_PUBLIC_SUPABASE_SEND_EMAIL` as `false` until you want Edge Function emails. Details: [`doc/supabase.md`](doc/supabase.md).
 
 ## Scripts
 
@@ -52,3 +55,4 @@ Every public page should export a unique `title` and `description`, set a canoni
 
 - [`doc/roadmap.md`](doc/roadmap.md) — stages, routes, tokens, and open questions
 - [`doc/layout.md`](doc/layout.md) — breakpoints, header chrome, grain
+- [`doc/supabase.md`](doc/supabase.md) — contact and careers → Supabase

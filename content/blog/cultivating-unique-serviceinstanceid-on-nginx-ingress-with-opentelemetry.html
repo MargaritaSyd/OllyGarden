@@ -1,0 +1,68 @@
+<p>A task to set a unique <code>service.instance.id</code> on NGINX Ingress Controller using the OpenTelemetry should be simple, right? But as it turned out, the ingress controller doesn&#39;t expose all of NGINX’s OTel knobs out of the box, so I had to roll my own tweak garden.</p>
+<h2>Why should I care?</h2>
+<p>Without unique instance IDs, your tracing data looks like a tangled tangleweed—hard to trace, difficult to debug, and completely undermines what we’re trying to do with observability.</p>
+<h2>The solution</h2>
+<h3>Part 1 - Nginx Ingress Controller - Helm Chart</h3>
+<p>To get <code>POD_UID</code> injected into each trace, here’s the minimal yet powerful config snippet I landed on:</p>
+<ul>
+<li>Set the POD_UID environment variable, once NGINX Ingress Controller set by default only the POD_NAME and POD_NAMESPACE.</li>
+</ul>
+<pre><code class="hljs language-yaml"><span class="hljs-attr">extraEnvs:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">POD_UID</span>
+    <span class="hljs-attr">valueFrom:</span>
+      <span class="hljs-attr">fieldRef:</span>
+         <span class="hljs-attr">fieldPath:</span> <span class="hljs-string">metadata.uid</span>
+</code></pre><ul>
+<li>Set the POD_UID as span-attribute for instance.</li>
+</ul>
+<pre><code class="hljs language-yaml"><span class="hljs-attr">controller:</span>
+  <span class="hljs-attr">config:</span>
+    <span class="hljs-attr">main-snippet:</span> <span class="hljs-string">|
+      env POD_UID;
+</span>    <span class="hljs-attr">server-snippet:</span> <span class="hljs-string">|
+      set $pod_uid &quot;unknown&quot;;
+      access_by_lua_block {
+        ngx.var.pod_uid = os.getenv(&quot;POD_UID&quot;) or &quot;unknown&quot;
+      }
+      opentelemetry_attribute service.instance.id $pod_uid;</span>
+</code></pre><h3>Part 2 - OpenTelemetry Collector Config</h3>
+<ul>
+<li>Configure the <a href="https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/transformprocessor">transform</a> processor to set the resource-attribute.</li>
+</ul>
+<pre><code class="hljs language-yaml">    <span class="hljs-attr">processors:</span>
+      <span class="hljs-attr">transform:</span>
+        <span class="hljs-attr">error_mode:</span> <span class="hljs-string">ignore</span>
+        <span class="hljs-attr">trace_statements:</span>
+          <span class="hljs-bullet">-</span> <span class="hljs-string">set(resource.attributes[&quot;service.instance.id&quot;],</span> <span class="hljs-string">span.attributes[&quot;service.instance.id&quot;])</span>
+          <span class="hljs-bullet">-</span> <span class="hljs-string">delete_key(span.attributes,</span> <span class="hljs-string">&quot;service.instance.id&quot;</span><span class="hljs-string">)</span>
+</code></pre><h3>How it works:</h3>
+<ul>
+<li>Explicitly exposes the <code>POD_UID</code> environment variables so NGINX can see them.</li>
+<li>Initializes a default <code>$pod_uid</code>—my fail-safe in case the env var goes missing.</li>
+<li>Uses Lua to pull in the real <code>POD_UID</code>.</li>
+<li>Finally, sets the OpenTelemetry attribute <code>service.instance.id</code> to match the actual UID.</li>
+<li>Through OpenTelemetry Collector capture the <code>service.instance.id</code> from span-attributes and set it on resource-attributes.</li>
+</ul>
+<h3>Benefits to your telemetry:</h3>
+<table>
+<thead>
+<tr>
+<th>Without unique <code>service.instance.id</code></th>
+<th>With unique <code>service.instance.id</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Pods share the same instance ID, causing confusion in telemetry.</td>
+<td>Each pod is individually identifiable.</td>
+</tr>
+<tr>
+<td>Difficult to isolate errors and debug effectively.</td>
+<td>Allows precise tracing to individual pods.</td>
+</tr>
+<tr>
+<td>Limited visibility into pod-specific issues.</td>
+<td>Enables accurate root-cause analysis.</td>
+</tr>
+</tbody></table>
+<h3>Final result</h3>
+<p>By implementing this solution, each NGINX ingress pod is clearly distinguishable in tracing data. This improves observability significantly by providing accurate, pod-specific telemetry, facilitating precise troubleshooting and diagnostics.</p>

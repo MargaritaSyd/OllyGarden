@@ -185,7 +185,7 @@ Reusable templates: page hero, bento/cards, how-it-works, pricing, FAQ, CTA band
 **Goal:** parity with the preview **and** better crawlability than the SPA.
 
 1. **Blog:** port **all posts** from the preview (`/resources/blog` + slugs), RSS, per-article OG. Replace any starter list (e.g. `src/lib/posts.ts`). Use **one** blog listing layout — pick the preview’s, styled with Figma brand (ignore the three Figma listing variants unless product reopens that).
-2. **`/contact` and `/get-started`:** forms (client validation; submit via API route, Formspree, or another destination TBD). Keep `/get-started` as a stub until product supplies a real flow.
+2. **`/contact` and `/careers`:** client validation; insert into Supabase (`contact_submissions` / `job_applications`), then optional Edge Functions for email. See [`supabase.md`](supabase.md). Keep `/get-started` as a stub until product supplies a real flow.
 3. **`/resources`:** Docs hub stub or external docs URL — match preview.
 4. **Legal** only if copy exists; otherwise leave footer hashes.
 5. **Motion:** only what is needed for preview parity (card hover, mega-menu, voices in-view). Hero canvas / heavy parallax only if product still wants it after visual QA against Figma brand. Do not add Figma-unspecified motion.

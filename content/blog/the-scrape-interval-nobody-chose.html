@@ -1,0 +1,58 @@
+<p>Ask an engineering team why their metrics arrive every 10 seconds and the answer is usually silence. Nobody decided that. A Helm chart shipped with a default, an agent came preconfigured, and nobody ever touched the receiver&#39;s <code>collection_interval</code>. That unexamined number now multiplies across every metric series, every pod, and every month of the observability bill.</p>
+<p>The unit that matters here is datapoints per minute (DPM). A series scraped every 10 seconds produces 6 datapoints per minute, or 8,640 per day. That is the quantity an organization buys, whether its platform prices it directly or hides it inside ingest volume. Across the organizations sending telemetry through our pipelines, wrong scrape intervals, and the closely related habit of emitting metrics nobody can act on, are the single most common source of wasted metric spend. The waste is not subtle. In the measurements below, roughly two-thirds of one organization&#39;s metric stream repeated unchanged values throughout the capture.</p>
+<h2>The visible cost: the bill</h2>
+<p>Most metric platforms charge in one of two ways: per ingested datapoint, often per million datapoints, or per active time series. A wrong interval inflates the first directly. Scraping at 10 seconds instead of 60 costs six times as much for a metric whose value changes once an hour. The second model is inflated by the sibling problem: emitting series that should not exist at all, such as state metrics that expand one enum into a dozen always-zero series per container.</p>
+<p>Both models respond to the same fix, applied at the source. Stop emitting the series that carry no signal, and slow down the ones that change rarely. This is a configuration change, not an engineering project. Receivers expose <code>collection_interval</code>, SDKs expose export intervals, and the OpenTelemetry Collector&#39;s <code>intervalprocessor</code> can thin what cannot be changed at the origin.</p>
+<h2>The hidden costs: egress and compute</h2>
+<p>The bill is the visible part. Even on platforms that do not charge per datapoint, wrong intervals cost money in two places that rarely appear in an observability business case.</p>
+<p>The first is network egress. Metrics leave the cluster, cross a network boundary, and land at a backend. Every cloud provider meters that traffic. In the experiment below, one organization&#39;s metric stream produced 12.4 GB of compressed egress per day. After source-side fixes, it produced 5.2 GB. That difference is paid whether or not the vendor charges for ingest.</p>
+<p>The second is compute at the origin. Every datapoint is produced, serialized, compressed, and shipped by CPUs inside the organization&#39;s pods, on nodes it pays for. Collectors that forward six times more datapoints than necessary need more memory and CPU, and they compete for those resources with the workloads they observe. This cost responds to cleanup immediately. At a large bank we work with, dropping health-check noise at the source cut the inbound volume of its central collector deployment by 70 to 75%. The deployment itself went from 25 replicas at 7 GB of memory each to 10 replicas at 3 to 5 GB. The observability pipeline had been consuming a mid-sized cluster&#39;s worth of compute to move data nobody wanted.</p>
+<h2>The other ditch: intervals too long to alert on</h2>
+<p>Interval choice has two failure modes, and the second one is worse than a large bill. If a metric feeds an alert that evaluates every minute, but the metric arrives every five minutes, the alert fires late or flaps on stale data. We see this less often than over-scraping, but it is the reason the answer to &quot;what interval should I use&quot; is not &quot;as slow as possible.&quot; The interval is a decision per metric family: fast enough for the alerts and dashboards that consume it, and no faster. A request-latency histogram powering a critical service-level objective may deserve a short interval. A filesystem-capacity gauge may not.</p>
+<p>A rule of thumb makes this concrete: aim for five samples within the alerting period, enough to establish a trend instead of reacting to a blip. If the objective is reacting within one minute of a service becoming slow, the metric behind that alert needs five datapoints per minute, which means a 12-second interval. For a highly critical endpoint, that cadence is justified, and the organization pays for it knowingly. For a slow-moving target like disk usage, one datapoint per minute limits the sampling-related detection delay to roughly one minute. Whether that is safe depends on the worst-case fill rate: an alert at 80% is early enough only if the disk cannot plausibly consume the remaining 20% before the team can respond.</p>
+<h2>Fixing at the source: two field cases</h2>
+<p>An integration platform company we work with had a metric stream dominated by synthetic state metrics: Kubernetes status enums expanded into one series per possible state per container, <code>*_info</code> metrics that exist only to carry labels, and network-error counters flat at zero. The synthetic group alone was 12.5 to 14% of all metric datapoints. Series whose value never changed during our measurement window accounted for 65 to 75% of the stream. A flat sample alone does not prove that a metric is safe to remove, because it may matter during an incident outside the capture window. Before disabling a metric at the receiver or dropping it in the collector, review the alerts and dashboards that use it and confirm its purpose with the owning team. If nobody can establish whether it will matter later, reduce its scrape frequency instead of deleting it. This organization had already replaced the component responsible once, but the replacement reintroduced the same pattern under different metric names. Volume problems recur unless the review does too.</p>
+<p>At a large bank, the leverage was concentration. A single Prometheus federation endpoint accounted for 28.8% of the organization&#39;s entire metric volume, including 74,000 series of one HAProxy counter family. One <code>scrape_interval</code> line in one configuration file governed almost a third of what the organization paid for metrics. The same sample held a 929-series metric family scraped every 30 seconds whose value changed on 0.2% of observed scrapes. When the biggest offenders are this concentrated, stretching a handful of intervals moves the whole bill.</p>
+<h2>What one real payload shows</h2>
+<p>Claims like these deserve a measurement, so we ran one. We took a capture of a financial services company&#39;s metric stream from a non-production environment, roughly 90 minutes and 66 million datapoints, and analyzed every series for scrape cadence and information content. Two findings stood out. First, 0.9% of the series, emitted every 2 to 5 seconds by an internal framework&#39;s stats sender, carried 20.6% of the entire volume. The dominant family was a counter that never advanced, emitted 20 times per minute. Second, 65% of all datapoints belonged to series whose value did not change once across the full capture.</p>
+<p>We then replayed a five-minute steady-state window of that capture through a live OpenTelemetry Collector into a byte-counting sink, twice. The first run was the stream as captured. For the second run, we modeled a source-side cleanup: we dropped the series that never changed across the full capture, and thinned the fast-scraping, rarely changing series to a 60-second interval. The collector configuration was identical in both runs, so the difference on the wire is attributable entirely to the modeled source-side fix. This experiment measures the volume opportunity; it does not establish that every flat series is safe to remove from production without the alert, dashboard, and ownership review described above.</p>
+<table>
+<thead>
+<tr>
+<th>Measure (5-minute window)</th>
+<th align="right">Before</th>
+<th align="right">After</th>
+<th align="right">Reduction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Datapoints</td>
+<td align="right">2,944,901</td>
+<td align="right">985,860</td>
+<td align="right">66%</td>
+</tr>
+<tr>
+<td>Datapoints per minute</td>
+<td align="right">588,980</td>
+<td align="right">197,172</td>
+<td align="right">66%</td>
+</tr>
+<tr>
+<td>Bytes on the wire, compressed</td>
+<td align="right">42.9 MB</td>
+<td align="right">17.9 MB</td>
+<td align="right">58%</td>
+</tr>
+<tr>
+<td>Projected daily egress</td>
+<td align="right">12.4 GB</td>
+<td align="right">5.2 GB</td>
+<td align="right">58%</td>
+</tr>
+</tbody></table>
+<p>On a platform that prices per datapoint, this stream drops from 25.4 billion to 8.5 billion datapoints per month, and the egress savings apply regardless of vendor. Bytes fall less than datapoints because the surviving data still carries its resource metadata and compression already exploits repetition. The wire is the conservative measure, and it still halved.</p>
+<p>Worth repeating: this is a non-production environment. This organization pays for two-thirds of its metric stream to repeat unchanged values throughout the capture, before a single customer transaction is involved.</p>
+<h2>When not to touch the interval</h2>
+<p>Not every high-DPM metric is waste. Histograms almost always change between scrapes, so the thinning above excluded them. Counters that advance steadily carry signal at any interval. The question for them is whether anyone consumes the resolution. Any metric feeding a fast-evaluating alert needs an interval comfortably shorter than the alert window. The test is not only &quot;does this change often?&quot; It is also &quot;does anything downstream need it this often?&quot; Apply fixes series by series, with the consumers in view.</p>
+<h2>Make the interval a decision</h2>
+<p>Scrape intervals are one of the few budget lines an engineering organization can cut by two-thirds without losing capability, once it confirms which resolution its alerts and dashboards actually need. The work is measurable in advance. A few queries over a sample of the metric stream will show what fraction of the datapoints never changes and which series dominate the volume. Measure before the next renewal, review the consumers and owners, fix at the source, and make the interval something the organization chose instead of something it inherited.</p>

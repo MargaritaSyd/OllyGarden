@@ -1,0 +1,324 @@
+<p>When your collector configuration grows beyond a few hundred lines, you start feeling the friction. Pull request reviews become exercises in scrolling. Testing a single processor change means deploying an entire pipeline. Environment-specific variations creep in through copy-paste, and suddenly you have three nearly-identical YAML files that drift apart over time. The monolithic collector configuration that worked well during initial deployment becomes a liability at scale.</p>
+<p>The OpenTelemetry Collector provides configuration providers that enable modular configurations, but the documentation tends to focus on individual features rather than composition patterns. This post examines practical strategies for decomposing collector configurations into maintainable, testable units.</p>
+<h2>The monolith problem</h2>
+<p>Consider a typical production collector configuration. It starts innocently enough: OTLP receiver, batch processor, OTLP exporter. Then you add Kubernetes metadata enrichment, tail sampling for traces, filtering for noisy health check spans, resource detection for cloud provider attributes, and suddenly you have a 500-line YAML file that handles traces, metrics, and logs across multiple pipelines.</p>
+<p>The problems compound in predictable ways. When someone submits a pull request to modify the tail sampling policy, the reviewer must mentally parse the entire configuration to understand context. When a team wants to test a new transform processor statement, they cannot easily isolate that piece from the rest of the pipeline. When you deploy to staging versus production, environment-specific values get mixed with structural configuration, making it difficult to identify what actually differs between deployments.</p>
+<p>The collector&#39;s configuration merging behavior and provider system offer a path forward, but the patterns for using them effectively are not immediately obvious from the documentation.</p>
+<h2>Configuration providers and merging</h2>
+<p>The collector supports multiple configuration sources through providers. The most commonly used are the file provider (<code>file:</code>), environment provider (<code>env:</code>), HTTP provider (<code>http://</code>, <code>https://</code>), and YAML provider (<code>yaml:</code>). Each provider resolves a URI to configuration content, and the collector merges configurations from multiple sources in the order specified.</p>
+<pre><code class="hljs language-bash">otelcol --config file:base.yaml --config file:overrides.yaml
+</code></pre><p>When the collector receives multiple configuration sources, it performs a deep merge. Keys from later sources override keys from earlier sources at each level of the hierarchy. This merge behavior is the foundation for decomposition: you can split configuration by concern and let the merge operation assemble the final result.</p>
+<p>The environment provider substitutes environment variable values within configuration files using <code>${env:VAR_NAME}</code> or the shorthand <code>${VAR_NAME}</code> syntax.</p>
+<p>The file provider supports recursive inclusion through the <code>${file:path}</code> syntax within configuration files. This enables configuration fragments to reference other fragments, building up complex configurations from smaller pieces.</p>
+<h2>Decomposition strategies</h2>
+<p>Three primary patterns emerge for organizing collector configurations: splitting by component type, splitting by signal pipeline, and layering environment-specific overlays. Each serves different organizational needs, and they can be combined.</p>
+<h3>Splitting by component type</h3>
+<p>The first pattern separates receivers, processors, and exporters into distinct files. This works well when teams own different parts of the telemetry pipeline. The platform team might own receiver configurations, while the observability team owns processor logic, and the SRE team manages exporter destinations.</p>
+<pre><code>collector/
+  <span class="hljs-keyword">base</span>.yaml           <span class="hljs-meta"># service section, extensions</span>
+  receivers.yaml      <span class="hljs-meta"># all receiver definitions</span>
+  processors.yaml     <span class="hljs-meta"># all processor definitions</span>
+  exporters.yaml      <span class="hljs-meta"># all exporter definitions</span>
+</code></pre><p>The base configuration defines the service section and references components by name:</p>
+<pre><code class="hljs language-yaml"><span class="hljs-comment"># base.yaml</span>
+<span class="hljs-attr">extensions:</span>
+  <span class="hljs-attr">health_check:</span>
+    <span class="hljs-attr">endpoint:</span> <span class="hljs-number">0.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span><span class="hljs-string">:13133</span>
+
+<span class="hljs-attr">service:</span>
+  <span class="hljs-attr">extensions:</span> [<span class="hljs-string">health_check</span>]
+  <span class="hljs-attr">pipelines:</span>
+    <span class="hljs-attr">traces:</span>
+      <span class="hljs-attr">receivers:</span> [<span class="hljs-string">otlp</span>]
+      <span class="hljs-attr">processors:</span> [<span class="hljs-string">memory_limiter</span>, <span class="hljs-string">k8sattributes</span>, <span class="hljs-string">batch</span>]
+      <span class="hljs-attr">exporters:</span> [<span class="hljs-string">otlp</span>]
+    <span class="hljs-attr">metrics:</span>
+      <span class="hljs-attr">receivers:</span> [<span class="hljs-string">otlp</span>, <span class="hljs-string">prometheus</span>]
+      <span class="hljs-attr">processors:</span> [<span class="hljs-string">memory_limiter</span>, <span class="hljs-string">batch</span>]
+      <span class="hljs-attr">exporters:</span> [<span class="hljs-string">otlp</span>]
+</code></pre><p>Component files define the actual configurations:</p>
+<pre><code class="hljs language-yaml"><span class="hljs-comment"># receivers.yaml</span>
+<span class="hljs-attr">receivers:</span>
+  <span class="hljs-attr">otlp:</span>
+    <span class="hljs-attr">protocols:</span>
+      <span class="hljs-attr">grpc:</span>
+        <span class="hljs-attr">endpoint:</span> <span class="hljs-number">0.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span><span class="hljs-string">:4317</span>
+      <span class="hljs-attr">http:</span>
+        <span class="hljs-attr">endpoint:</span> <span class="hljs-number">0.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span><span class="hljs-string">:4318</span>
+  <span class="hljs-attr">prometheus:</span>
+    <span class="hljs-attr">config:</span>
+      <span class="hljs-attr">scrape_configs:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">job_name:</span> <span class="hljs-string">kubernetes-pods</span>
+          <span class="hljs-attr">kubernetes_sd_configs:</span>
+            <span class="hljs-bullet">-</span> <span class="hljs-attr">role:</span> <span class="hljs-string">pod</span>
+</code></pre><pre><code class="hljs language-yaml"><span class="hljs-comment"># processors.yaml</span>
+<span class="hljs-attr">processors:</span>
+  <span class="hljs-attr">memory_limiter:</span>
+    <span class="hljs-attr">check_interval:</span> <span class="hljs-string">1s</span>
+    <span class="hljs-attr">limit_mib:</span> <span class="hljs-string">${env:MEMORY_LIMIT_MIB:-512}</span>
+    <span class="hljs-attr">spike_limit_mib:</span> <span class="hljs-string">${env:SPIKE_LIMIT_MIB:-128}</span>
+
+  <span class="hljs-attr">k8sattributes:</span>
+    <span class="hljs-attr">auth_type:</span> <span class="hljs-string">serviceAccount</span>
+    <span class="hljs-attr">extract:</span>
+      <span class="hljs-attr">metadata:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">k8s.namespace.name</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">k8s.pod.name</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">k8s.deployment.name</span>
+
+  <span class="hljs-attr">batch:</span>
+    <span class="hljs-attr">timeout:</span> <span class="hljs-string">1s</span>
+    <span class="hljs-attr">send_batch_size:</span> <span class="hljs-number">1024</span>
+</code></pre><p>The collector assembles these with multiple <code>--config</code> flags:</p>
+<pre><code class="hljs language-bash">otelcol --config file:base.yaml \
+        --config file:receivers.yaml \
+        --config file:processors.yaml \
+        --config file:exporters.yaml
+</code></pre><p>This pattern makes pull requests smaller and more focused. A change to the batch processor configuration only touches <code>processors.yaml</code>, and reviewers can evaluate it in isolation.</p>
+<h3>Splitting by signal pipeline</h3>
+<p>When different teams own different telemetry signals, splitting by pipeline makes more sense. The traces team iterates on sampling policies while the metrics team focuses on aggregation rules. Each signal gets its own configuration file containing receivers, processors, and exporters relevant to that signal.</p>
+<pre><code>collector/
+  <span class="hljs-keyword">common</span>.yaml         <span class="hljs-meta"># shared extensions, telemetry settings</span>
+  traces.yaml         <span class="hljs-meta"># trace pipeline: receivers, processors, exporters, service.pipelines.traces</span>
+  metrics.yaml        <span class="hljs-meta"># metrics pipeline: receivers, processors, exporters, service.pipelines.metrics</span>
+  logs.yaml           <span class="hljs-meta"># logs pipeline: receivers, processors, exporters, service.pipelines.logs</span>
+</code></pre><p>The common file contains shared infrastructure:</p>
+<pre><code class="hljs language-yaml"><span class="hljs-comment"># common.yaml</span>
+<span class="hljs-attr">extensions:</span>
+  <span class="hljs-attr">health_check:</span>
+    <span class="hljs-attr">endpoint:</span> <span class="hljs-number">0.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span><span class="hljs-string">:13133</span>
+  <span class="hljs-attr">pprof:</span>
+    <span class="hljs-attr">endpoint:</span> <span class="hljs-string">localhost:1777</span>
+
+<span class="hljs-attr">processors:</span>
+  <span class="hljs-attr">memory_limiter:</span>
+    <span class="hljs-attr">check_interval:</span> <span class="hljs-string">1s</span>
+    <span class="hljs-attr">limit_mib:</span> <span class="hljs-string">${env:MEMORY_LIMIT_MIB:-512}</span>
+
+<span class="hljs-attr">service:</span>
+  <span class="hljs-attr">extensions:</span> [<span class="hljs-string">health_check</span>, <span class="hljs-string">pprof</span>]
+  <span class="hljs-attr">telemetry:</span>
+    <span class="hljs-attr">logs:</span>
+      <span class="hljs-attr">level:</span> <span class="hljs-string">${env:LOG_LEVEL:-info}</span>
+      <span class="hljs-attr">encoding:</span> <span class="hljs-string">json</span>
+    <span class="hljs-attr">metrics:</span>
+      <span class="hljs-attr">level:</span> <span class="hljs-string">detailed</span>
+      <span class="hljs-attr">readers:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">pull:</span>
+            <span class="hljs-attr">exporter:</span>
+              <span class="hljs-attr">prometheus:</span>
+                <span class="hljs-attr">host:</span> <span class="hljs-number">0.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span>
+                <span class="hljs-attr">port:</span> <span class="hljs-number">8888</span>
+</code></pre><p>Each signal file is self-contained for its domain:</p>
+<pre><code class="hljs language-yaml"><span class="hljs-comment"># traces.yaml</span>
+<span class="hljs-attr">receivers:</span>
+  <span class="hljs-attr">otlp:</span>
+    <span class="hljs-attr">protocols:</span>
+      <span class="hljs-attr">grpc:</span>
+        <span class="hljs-attr">endpoint:</span> <span class="hljs-number">0.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span><span class="hljs-string">:4317</span>
+
+<span class="hljs-attr">processors:</span>
+  <span class="hljs-attr">tail_sampling:</span>
+    <span class="hljs-attr">decision_wait:</span> <span class="hljs-string">30s</span>
+    <span class="hljs-attr">num_traces:</span> <span class="hljs-number">50000</span>
+    <span class="hljs-attr">policies:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">errors</span>
+        <span class="hljs-attr">type:</span> <span class="hljs-string">status_code</span>
+        <span class="hljs-attr">status_code:</span>
+          <span class="hljs-attr">status_codes:</span> [<span class="hljs-string">ERROR</span>]
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">slow-requests</span>
+        <span class="hljs-attr">type:</span> <span class="hljs-string">latency</span>
+        <span class="hljs-attr">latency:</span>
+          <span class="hljs-attr">threshold_ms:</span> <span class="hljs-number">2000</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">baseline</span>
+        <span class="hljs-attr">type:</span> <span class="hljs-string">probabilistic</span>
+        <span class="hljs-attr">probabilistic:</span>
+          <span class="hljs-attr">sampling_percentage:</span> <span class="hljs-number">5</span>
+
+  <span class="hljs-attr">batch:</span>
+    <span class="hljs-attr">timeout:</span> <span class="hljs-string">1s</span>
+    <span class="hljs-attr">send_batch_size:</span> <span class="hljs-number">512</span>
+
+<span class="hljs-attr">exporters:</span>
+  <span class="hljs-attr">otlp:</span>
+    <span class="hljs-attr">endpoint:</span> <span class="hljs-string">${env:TRACES_BACKEND_ENDPOINT}</span>
+    <span class="hljs-attr">tls:</span>
+      <span class="hljs-attr">insecure:</span> <span class="hljs-literal">false</span>
+
+<span class="hljs-attr">service:</span>
+  <span class="hljs-attr">pipelines:</span>
+    <span class="hljs-attr">traces:</span>
+      <span class="hljs-attr">receivers:</span> [<span class="hljs-string">otlp</span>]
+      <span class="hljs-attr">processors:</span> [<span class="hljs-string">memory_limiter</span>, <span class="hljs-string">tail_sampling</span>, <span class="hljs-string">batch</span>]
+      <span class="hljs-attr">exporters:</span> [<span class="hljs-string">otlp</span>]
+</code></pre><p>The merge operation combines the <code>service.pipelines</code> sections from each file, resulting in a complete configuration with all three signal pipelines.</p>
+<h3>Environment-specific overlays</h3>
+<p>Production, staging, and development environments differ in endpoints, resource limits, and sometimes pipeline structure. The overlay pattern uses a shared base with environment-specific files that override particular values.</p>
+<pre><code>collector/
+  base<span class="hljs-selector-class">.yaml</span>
+  env/
+    production<span class="hljs-selector-class">.yaml</span>
+    staging<span class="hljs-selector-class">.yaml</span>
+    development.yaml
+</code></pre><p>The base file defines the complete structure with placeholders or defaults:</p>
+<pre><code class="hljs language-yaml"><span class="hljs-comment"># base.yaml</span>
+<span class="hljs-attr">receivers:</span>
+  <span class="hljs-attr">otlp:</span>
+    <span class="hljs-attr">protocols:</span>
+      <span class="hljs-attr">grpc:</span>
+        <span class="hljs-attr">endpoint:</span> <span class="hljs-number">0.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span><span class="hljs-string">:4317</span>
+
+<span class="hljs-attr">processors:</span>
+  <span class="hljs-attr">memory_limiter:</span>
+    <span class="hljs-attr">check_interval:</span> <span class="hljs-string">1s</span>
+    <span class="hljs-attr">limit_mib:</span> <span class="hljs-number">512</span>
+    <span class="hljs-attr">spike_limit_mib:</span> <span class="hljs-number">128</span>
+  <span class="hljs-attr">batch:</span>
+    <span class="hljs-attr">timeout:</span> <span class="hljs-string">1s</span>
+    <span class="hljs-attr">send_batch_size:</span> <span class="hljs-number">1024</span>
+
+<span class="hljs-attr">exporters:</span>
+  <span class="hljs-attr">otlp:</span>
+    <span class="hljs-attr">endpoint:</span> <span class="hljs-string">localhost:4317</span>
+    <span class="hljs-attr">tls:</span>
+      <span class="hljs-attr">insecure:</span> <span class="hljs-literal">true</span>
+
+<span class="hljs-attr">service:</span>
+  <span class="hljs-attr">pipelines:</span>
+    <span class="hljs-attr">traces:</span>
+      <span class="hljs-attr">receivers:</span> [<span class="hljs-string">otlp</span>]
+      <span class="hljs-attr">processors:</span> [<span class="hljs-string">memory_limiter</span>, <span class="hljs-string">batch</span>]
+      <span class="hljs-attr">exporters:</span> [<span class="hljs-string">otlp</span>]
+</code></pre><p>Environment files override specific values:</p>
+<pre><code class="hljs language-yaml"><span class="hljs-comment"># env/production.yaml</span>
+<span class="hljs-attr">processors:</span>
+  <span class="hljs-attr">memory_limiter:</span>
+    <span class="hljs-attr">limit_mib:</span> <span class="hljs-number">2048</span>
+    <span class="hljs-attr">spike_limit_mib:</span> <span class="hljs-number">512</span>
+
+<span class="hljs-attr">exporters:</span>
+  <span class="hljs-attr">otlp:</span>
+    <span class="hljs-attr">endpoint:</span> <span class="hljs-string">${env:BACKEND_ENDPOINT}</span>
+    <span class="hljs-attr">tls:</span>
+      <span class="hljs-attr">insecure:</span> <span class="hljs-literal">false</span>
+      <span class="hljs-attr">ca_file:</span> <span class="hljs-string">/etc/ssl/certs/ca-bundle.crt</span>
+    <span class="hljs-attr">retry_on_failure:</span>
+      <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>
+      <span class="hljs-attr">max_elapsed_time:</span> <span class="hljs-string">300s</span>
+    <span class="hljs-attr">sending_queue:</span>
+      <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>
+      <span class="hljs-attr">num_consumers:</span> <span class="hljs-number">10</span>
+      <span class="hljs-attr">queue_size:</span> <span class="hljs-number">5000</span>
+
+<span class="hljs-attr">service:</span>
+  <span class="hljs-attr">telemetry:</span>
+    <span class="hljs-attr">logs:</span>
+      <span class="hljs-attr">level:</span> <span class="hljs-string">info</span>
+      <span class="hljs-attr">encoding:</span> <span class="hljs-string">json</span>
+</code></pre><pre><code class="hljs language-yaml"><span class="hljs-comment"># env/development.yaml</span>
+<span class="hljs-attr">processors:</span>
+  <span class="hljs-attr">memory_limiter:</span>
+    <span class="hljs-attr">limit_mib:</span> <span class="hljs-number">256</span>
+
+<span class="hljs-attr">exporters:</span>
+  <span class="hljs-attr">otlp:</span>
+    <span class="hljs-attr">endpoint:</span> <span class="hljs-string">localhost:4317</span>
+    <span class="hljs-attr">tls:</span>
+      <span class="hljs-attr">insecure:</span> <span class="hljs-literal">true</span>
+
+  <span class="hljs-attr">debug:</span>
+    <span class="hljs-attr">verbosity:</span> <span class="hljs-string">detailed</span>
+
+<span class="hljs-attr">service:</span>
+  <span class="hljs-attr">pipelines:</span>
+    <span class="hljs-attr">traces:</span>
+      <span class="hljs-attr">exporters:</span> [<span class="hljs-string">otlp</span>, <span class="hljs-string">debug</span>]
+  <span class="hljs-attr">telemetry:</span>
+    <span class="hljs-attr">logs:</span>
+      <span class="hljs-attr">level:</span> <span class="hljs-string">debug</span>
+</code></pre><p>Deployment selects the appropriate overlay:</p>
+<pre><code class="hljs language-bash"><span class="hljs-comment"># Production</span>
+otelcol --config file:base.yaml --config file:<span class="hljs-built_in">env</span>/production.yaml
+
+<span class="hljs-comment"># Development</span>
+otelcol --config file:base.yaml --config file:<span class="hljs-built_in">env</span>/development.yaml
+</code></pre><h2>Nested file inclusion</h2>
+<p>For deeply modular configurations, the file provider supports nested inclusion. This is particularly useful for complex processor configurations like tail sampling policies, where individual policies might be maintained by different teams.</p>
+<pre><code class="hljs language-yaml"><span class="hljs-comment"># processors/tail_sampling.yaml</span>
+<span class="hljs-attr">processors:</span>
+  <span class="hljs-attr">tail_sampling:</span>
+    <span class="hljs-attr">decision_wait:</span> <span class="hljs-string">30s</span>
+    <span class="hljs-attr">num_traces:</span> <span class="hljs-number">50000</span>
+    <span class="hljs-attr">policies:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">${file:policies/errors.yaml}</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">${file:policies/slo-violations.yaml}</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">${file:policies/baseline.yaml}</span>
+</code></pre><p>Each policy file contains a single policy definition:</p>
+<pre><code class="hljs language-yaml"><span class="hljs-comment"># policies/errors.yaml</span>
+<span class="hljs-attr">name:</span> <span class="hljs-string">errors</span>
+<span class="hljs-attr">type:</span> <span class="hljs-string">status_code</span>
+<span class="hljs-attr">status_code:</span>
+  <span class="hljs-attr">status_codes:</span> [<span class="hljs-string">ERROR</span>]
+</code></pre><pre><code class="hljs language-yaml"><span class="hljs-comment"># policies/slo-violations.yaml</span>
+<span class="hljs-attr">name:</span> <span class="hljs-string">slo-violations</span>
+<span class="hljs-attr">type:</span> <span class="hljs-string">and</span>
+<span class="hljs-attr">and:</span>
+  <span class="hljs-attr">and_sub_policy:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">latency-threshold</span>
+      <span class="hljs-attr">type:</span> <span class="hljs-string">latency</span>
+      <span class="hljs-attr">latency:</span>
+        <span class="hljs-attr">threshold_ms:</span> <span class="hljs-number">2000</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">high-priority-services</span>
+      <span class="hljs-attr">type:</span> <span class="hljs-string">string_attribute</span>
+      <span class="hljs-attr">string_attribute:</span>
+        <span class="hljs-attr">key:</span> <span class="hljs-string">service.tier</span>
+        <span class="hljs-attr">values:</span> [<span class="hljs-string">critical</span>, <span class="hljs-string">high</span>]
+</code></pre><p>This granularity enables teams to own individual policies, submit focused pull requests, and test policies in isolation before integration.</p>
+<h2>Testing decomposed configurations</h2>
+<p>The collector&#39;s <code>validate</code> command accepts the same configuration sources as runtime, enabling validation of decomposed configurations:</p>
+<pre><code class="hljs language-bash"><span class="hljs-comment"># Validate merged configuration</span>
+otelcol validate --config file:base.yaml --config file:<span class="hljs-built_in">env</span>/production.yaml
+
+<span class="hljs-comment"># Validate with environment variables set</span>
+BACKEND_ENDPOINT=backend:4317 otelcol validate --config file:base.yaml --config file:<span class="hljs-built_in">env</span>/production.yaml
+</code></pre><p>For more complex validation, the <code>print-config</code> command outputs the fully resolved configuration after merging and environment variable substitution:</p>
+<pre><code class="hljs language-bash">otelcol print-config --config file:base.yaml --config file:<span class="hljs-built_in">env</span>/production.yaml
+</code></pre><p>This output shows exactly what the collector would receive, useful for debugging merge issues or unexpected environment variable values.</p>
+<p>Individual component files can be validated in isolation by wrapping them in minimal configurations. For a processor file to validate independently, it needs at least one receiver, exporter, and pipeline that uses the processor:</p>
+<pre><code class="hljs language-yaml"><span class="hljs-comment"># test-harness.yaml</span>
+<span class="hljs-attr">receivers:</span>
+  <span class="hljs-attr">otlp:</span>
+    <span class="hljs-attr">protocols:</span>
+      <span class="hljs-attr">grpc:</span>
+        <span class="hljs-attr">endpoint:</span> <span class="hljs-string">localhost:4317</span>
+
+<span class="hljs-attr">exporters:</span>
+  <span class="hljs-attr">debug:</span>
+    <span class="hljs-attr">verbosity:</span> <span class="hljs-string">basic</span>
+
+<span class="hljs-attr">service:</span>
+  <span class="hljs-attr">pipelines:</span>
+    <span class="hljs-attr">traces:</span>
+      <span class="hljs-attr">receivers:</span> [<span class="hljs-string">otlp</span>]
+      <span class="hljs-attr">processors:</span> [<span class="hljs-string">tail_sampling</span>]  <span class="hljs-comment"># processor under test</span>
+      <span class="hljs-attr">exporters:</span> [<span class="hljs-string">debug</span>]
+</code></pre><pre><code class="hljs language-bash">otelcol validate --config file:test-harness.yaml --config file:processors/tail_sampling.yaml
+</code></pre><h2>Practical considerations</h2>
+<p>The merge operation has limitations worth understanding. Arrays are not merged; the later source completely replaces the earlier source&#39;s array. This affects pipeline definitions: if <code>base.yaml</code> defines <code>processors: [a, b, c]</code> and an overlay defines <code>processors: [a, b]</code>, the result is <code>[a, b]</code>, not a combination. Plan your decomposition accordingly, keeping arrays that need to vary together in the same file.</p>
+<p>File paths in nested inclusions are relative to the working directory, not the file containing the inclusion. A <code>${file:policies/errors.yaml}</code> reference resolves relative to where the collector process runs, regardless of which configuration file contains the reference. This behavior can surprise when organizing configurations in subdirectories; consider using absolute paths or ensuring the working directory is set appropriately.</p>
+<p>Environment variable defaults (<code>${env:VAR:-default}</code>) only apply when the variable is unset. An empty string is not the same as unset; if <code>VAR=&quot;&quot;</code> is exported, the default is not used. For required variables without reasonable defaults, validate externally before starting the collector:</p>
+<pre><code class="hljs language-bash">: <span class="hljs-variable">${BACKEND_ENDPOINT:?BACKEND_ENDPOINT must be set}</span>
+otelcol --config file:config.yaml
+</code></pre><p>Custom collector distributions built with <code>ocb</code> need appropriate providers included in the manifest. The file, env, http, https, and yaml providers are not included by default. Missing providers cause cryptic errors when the configuration tries to use unsupported URI schemes:</p>
+<pre><code class="hljs language-yaml"><span class="hljs-comment"># builder.yaml</span>
+<span class="hljs-attr">providers:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">go.opentelemetry.io/collector/confmap/provider/fileprovider</span> <span class="hljs-string">v1.57.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">go.opentelemetry.io/collector/confmap/provider/envprovider</span> <span class="hljs-string">v1.57.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">go.opentelemetry.io/collector/confmap/provider/yamlprovider</span> <span class="hljs-string">v1.57.0</span>
+</code></pre><h2>When not to decompose</h2>
+<p>Decomposition adds indirection. A single-file configuration that fits on a screen is easier to understand than multiple files that must be mentally merged. Small teams with straightforward pipelines may find decomposition overhead exceeds its benefits.</p>
+<p>The patterns described here target configurations that have grown painful to maintain. If your configuration is not yet painful, keeping it simple might be the right choice. The collector&#39;s configuration system supports decomposition when you need it; you are not required to use it from the start.</p>
+<h2>Summary</h2>
+<p>The OpenTelemetry Collector&#39;s configuration merging and provider system enable modular configurations that scale with organizational complexity. Splitting by component type aligns with team ownership of pipeline stages. Splitting by signal pipeline aligns with team ownership of telemetry domains. Environment overlays separate deployment concerns from structural configuration.</p>
+<p>The key insight is that the collector&#39;s deep merge behavior lets you compose configurations from independent pieces. Each piece can be reviewed, tested, and modified in isolation. When combined with validation in CI pipelines, decomposed configurations become easier to maintain than their monolithic alternatives.</p>
+<p>Start with the decomposition pattern that matches your organizational boundaries. If platform and observability teams have clear ownership, split by component type. If traces, metrics, and logs teams operate independently, split by signal. Layer environment overlays on either approach. The collector&#39;s configuration system is flexible enough to support the structure that works for your team.</p>

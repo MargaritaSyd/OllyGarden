@@ -1,9 +1,8 @@
 import type { CSSProperties } from "react";
-import { CtaArrow } from "@/components/cta-arrow";
+import { CareersApplyCta } from "@/components/careers-apply-cta";
 import {
   CareersCard,
   CareersIconTile,
-  CareersMailLink,
   CareersStrokeIcon,
 } from "@/components/careers-card";
 import { InView } from "@/components/in-view";
@@ -75,10 +74,7 @@ export function CareersInterview() {
                 </p>
               </div>
             </div>
-            <CareersMailLink href={careersInterview.cta.href}>
-              {careersInterview.cta.label}
-              <CtaArrow />
-            </CareersMailLink>
+            <CareersApplyCta label={careersInterview.cta.label} />
           </div>
         </CareersCard>
       </div>

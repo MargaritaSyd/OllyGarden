@@ -1,0 +1,148 @@
+<p>Every team discovers OpenTelemetry the same way. First, excitement—finally, visibility into distributed systems! Then comes the instrumentation party. Spans everywhere. Every function. Every validation. Every calculation gets its own span because &quot;more data is better,&quot; right?</p>
+<p>Three months later, you&#39;re staring at a trace with 500 spans trying to figure out why a simple API call took 3 seconds. Your observability bill has grown 10x. And your engineers have given up on traces entirely because they&#39;re impossible to read.</p>
+<p>There&#39;s a better way.</p>
+<h2><strong>The Problem: Span Explosion</strong></h2>
+<p>Most teams create spans like this:</p>
+<pre><code class="hljs language-go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">ProcessPayment</span><span class="hljs-params">(ctx context.Context, payment Payment)</span></span> <span class="hljs-type">error</span> {
+    ctx, span := tracer.Start(ctx, <span class="hljs-string">&quot;process payment&quot;</span>)
+    <span class="hljs-keyword">defer</span> span.End()
+
+    validateAmount(ctx, payment.Amount)      <span class="hljs-comment">// Another span</span>
+    validateCard(ctx, payment.CardNumber)    <span class="hljs-comment">// Another span</span>
+    calculateFees(ctx, payment.Amount)       <span class="hljs-comment">// Another span</span>
+    formatCurrency(ctx, payment.Total)       <span class="hljs-comment">// Another span</span>
+    <span class="hljs-comment">// ... 10 more spans for trivial operations</span>
+}
+</code></pre><p>At 10,000 requests per minute with 15 spans each, you&#39;re generating 6.5 billion spans per month. At $0.20 per million spans, that&#39;s $1,300 monthly just for payment processing traces.</p>
+<p>But cost isn&#39;t the real problem. The real problem is that your traces become unreadable. When everything has a span, nothing stands out. Signal drowns in noise.</p>
+<h2><strong>The Variability Principle: Your New Mental Model</strong></h2>
+<p>Here&#39;s the principle that changed everything for us:</p>
+<blockquote>
+<p><strong>&quot;Is this operation unpredictable?&quot;</strong></p>
+</blockquote>
+<p>If yes, create a span. If no, don&#39;t.</p>
+<p>This simple question cuts through all the complexity. It&#39;s not about operation importance or business value—it&#39;s about performance predictability.</p>
+<h3><strong>Unpredictable = Create a Span</strong></h3>
+<p>Operations with unpredictable performance need spans:</p>
+<ul>
+<li><p><strong>Database queries</strong>: Could take 5ms or 5 seconds depending on locks, data size, indexes</p>
+</li>
+<li><p><strong>HTTP calls</strong>: Network latency, retries, timeouts are all variable</p>
+</li>
+<li><p><strong>External APIs</strong>: You don&#39;t control their performance</p>
+</li>
+<li><p><strong>Message queues</strong>: Depends on queue depth, consumer availability</p>
+</li>
+<li><p><strong>Cache operations</strong>: Network round-trip to Redis/Memcached</p>
+</li>
+<li><p><strong>File I/O</strong>: Disk performance varies, especially with network storage</p>
+</li>
+</ul>
+<p>These operations can surprise you. When they&#39;re slow, you need to know.</p>
+<h3><strong>Predictable = Skip the Span</strong></h3>
+<p>Operations with predictable performance don&#39;t need spans:</p>
+<ul>
+<li><p><strong>Validation logic</strong>: Checking if a string contains &quot;@&quot; is always microseconds</p>
+</li>
+<li><p><strong>Math calculations</strong>: CPU-bound operations are consistent</p>
+</li>
+<li><p><strong>Data transformation</strong>: Mapping objects in memory is deterministic</p>
+</li>
+<li><p><strong>String formatting</strong>: Always fast, never the problem</p>
+</li>
+<li><p><strong>Getters/setters</strong>: Not worth measuring</p>
+</li>
+</ul>
+<p>These operations can&#39;t surprise you. They&#39;re never the bottleneck.</p>
+<h2><strong>The Pattern in Practice</strong></h2>
+<p>Let&#39;s refactor that payment processing:</p>
+<pre><code class="hljs language-go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">ProcessPayment</span><span class="hljs-params">(ctx context.Context, payment Payment)</span></span> {
+    ctx, span := tracer.Start(ctx, <span class="hljs-string">&quot;process payment&quot;</span>)
+    <span class="hljs-keyword">defer</span> span.End()
+
+    <span class="hljs-comment">// Add context as attributes, not spans</span>
+    span.SetAttributes(
+        attribute.Float64(<span class="hljs-string">&quot;payment.amount&quot;</span>, payment.Amount),
+        attribute.String(<span class="hljs-string">&quot;payment.currency&quot;</span>, payment.Currency),
+    )
+
+    <span class="hljs-comment">// Validation is predictable - no span needed</span>
+    <span class="hljs-keyword">if</span> payment.Amount &lt;= <span class="hljs-number">0</span> || !isValidCard(payment.CardNumber) {
+        span.RecordError(errors.New(<span class="hljs-string">&quot;invalid payment&quot;</span>))
+        <span class="hljs-keyword">return</span>
+    }
+
+    <span class="hljs-comment">// Database operation is unpredictable - needs a span</span>
+    ctx, dbSpan := tracer.Start(ctx, <span class="hljs-string">&quot;INSERT payments&quot;</span>)
+    dbSpan.SetAttributes(
+        attribute.String(<span class="hljs-string">&quot;db.system&quot;</span>, <span class="hljs-string">&quot;postgresql&quot;</span>),
+        attribute.String(<span class="hljs-string">&quot;db.collection.name&quot;</span>, <span class="hljs-string">&quot;payments&quot;</span>),
+        attribute.String(<span class="hljs-string">&quot;db.operation.name&quot;</span>, <span class="hljs-string">&quot;INSERT&quot;</span>),
+    )
+    db.SavePayment(ctx, payment)
+    dbSpan.End()
+
+    <span class="hljs-comment">// External API is unpredictable - needs a span</span>
+    ctx, chargeSpan := tracer.Start(ctx, <span class="hljs-string">&quot;charge card&quot;</span>)
+    paymentGateway.Charge(ctx, payment)
+    chargeSpan.End()
+}
+</code></pre><p>Result: 3 spans instead of 15. Traces are readable. Engineers can actually find problems.</p>
+<h2><strong>What to Use Instead of Spans</strong></h2>
+<p>When you skip creating a span, you still need to capture information. That&#39;s where attributes and events come in.</p>
+<h3><strong>Attributes: Context Without Cost</strong></h3>
+<p>Attributes add metadata to existing spans. They&#39;re perfect for:</p>
+<ul>
+<li><p>Request/response data (user ID, order total, currency)</p>
+</li>
+<li><p>Configuration values (retry count, timeout settings)</p>
+</li>
+<li><p>Business context (customer tier, feature flags)</p>
+</li>
+</ul>
+<pre><code class="hljs language-go">span.SetAttributes(
+    attribute.String(<span class="hljs-string">&quot;user.id&quot;</span>, userID),
+    attribute.Float64(<span class="hljs-string">&quot;order.total&quot;</span>, <span class="hljs-number">157.46</span>),
+    attribute.Bool(<span class="hljs-string">&quot;cache.hit&quot;</span>, <span class="hljs-literal">true</span>),
+)
+</code></pre><p>Attributes are indexed and searchable. They let you filter traces without creating separate spans.</p>
+<h3><strong>Events: Milestones in Time</strong></h3>
+<p>Events mark important moments within a span&#39;s lifecycle. They&#39;re perfect for:</p>
+<ul>
+<li><p>Validation checkpoints</p>
+</li>
+<li><p>State transitions</p>
+</li>
+<li><p>Progress markers in loops</p>
+</li>
+</ul>
+<pre><code class="hljs language-go"><span class="hljs-comment">// Mark validation completion</span>
+span.AddEvent(<span class="hljs-string">&quot;validation completed&quot;</span>)
+
+<span class="hljs-comment">// Track calculation results</span>
+span.AddEvent(<span class="hljs-string">&quot;total calculated&quot;</span>,
+    trace.WithAttributes(
+        attribute.Int(<span class="hljs-string">&quot;line_items.count&quot;</span>, <span class="hljs-number">4</span>),
+        attribute.Float64(<span class="hljs-string">&quot;total&quot;</span>, <span class="hljs-number">157.46</span>),
+    ))
+
+<span class="hljs-comment">// Record state changes</span>
+span.AddEvent(<span class="hljs-string">&quot;payment saved&quot;</span>)
+
+<span class="hljs-comment">// Track retry attempts</span>
+span.AddEvent(<span class="hljs-string">&quot;retry attempt&quot;</span>,
+    trace.WithAttributes(
+        attribute.Int(<span class="hljs-string">&quot;attempt&quot;</span>, <span class="hljs-number">3</span>),
+        attribute.String(<span class="hljs-string">&quot;reason&quot;</span>, <span class="hljs-string">&quot;timeout&quot;</span>),
+    ))
+</code></pre><p>Events show you <em>when</em> something happened and provide rich context without the overhead of a full span. When debugging, they help you see the timeline of operations within your parent span.</p>
+<h2><strong>The Decision Framework</strong></h2>
+<p>Before creating any span, ask one question:</p>
+<p><strong>&quot;Is this operation unpredictable?&quot;</strong></p>
+<p>Yes → Create a span</p>
+<p>No → Use attributes or events</p>
+<p>That&#39;s it. This single question replaces complex decision trees and eliminates 80% of unnecessary spans.</p>
+<h2><strong>Remember This</strong></h2>
+<p>Your traces should tell a story, not document every CPU cycle. Each span costs money, performance, and clarity.</p>
+<p>Create spans only for operations that could surprise you. For everything else, there are attributes and events.</p>
+<p>The best observability isn&#39;t about having all the data—it&#39;s about having the right data.</p>

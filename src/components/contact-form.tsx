@@ -2,8 +2,9 @@
 
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { GetStartedLink } from "@/components/get-started-link";
+import { SiteFormField, siteFormFieldClass } from "@/components/site-form-field";
 import { contactForm } from "@/lib/contact";
-import { siteConfig } from "@/lib/site";
+import { submitContactMessage } from "@/lib/supabase/submissions";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -11,9 +12,6 @@ type Status = "idle" | "submitting" | "success" | "error";
 type FieldName = "name" | "email" | "message";
 type Values = Record<FieldName, string>;
 type Errors = Partial<Record<"name" | "email", string>>;
-
-const fieldClass =
-  "w-full rounded-lg border border-[#212c25] bg-[#05140a] px-4 py-3.5 text-base text-mist outline-none placeholder:text-mist/42 transition-[border-color,box-shadow] duration-[180ms] ease-out hover:border-[#3b4a3e] focus-visible:border-bitmap-highlight focus-visible:shadow-[0_0_0_3px_rgba(227,226,112,0.25)] aria-invalid:border-[#e98b7d]";
 
 export function ContactForm() {
   const [values, setValues] = useState<Values>({
@@ -62,16 +60,11 @@ export function ContactForm() {
 
     setStatus("submitting");
     try {
-      await new Promise((resolve) => window.setTimeout(resolve, 700));
-      const body = [
-        `Name: ${values.name.trim()}`,
-        `Email: ${values.email.trim()}`,
-        "",
-        values.message.trim(),
-      ].join("\n");
-      window.location.href = `${siteConfig.social.email}?subject=${encodeURIComponent(
-        `Contact — ${values.name.trim()}`,
-      )}&body=${encodeURIComponent(body)}`;
+      await submitContactMessage({
+        name: values.name.trim(),
+        email: values.email.trim(),
+        message: values.message.trim(),
+      });
       setStatus("success");
     } catch {
       setStatus("error");
@@ -113,7 +106,7 @@ export function ContactForm() {
               {contactForm.error}
             </p>
           ) : null}
-          <Field
+          <SiteFormField
             id="ct-name"
             name="name"
             label={contactForm.fields.name.label}
@@ -124,7 +117,7 @@ export function ContactForm() {
             error={errors.name}
             onChange={onChange}
           />
-          <Field
+          <SiteFormField
             id="ct-email"
             name="email"
             label={contactForm.fields.email.label}
@@ -147,7 +140,7 @@ export function ContactForm() {
               placeholder={contactForm.fields.message.placeholder}
               value={values.message}
               onChange={onChange}
-              className={`${fieldClass} min-h-[162px] resize-y`}
+              className={`${siteFormFieldClass} min-h-[162px] resize-y`}
             />
           </div>
           <button
@@ -159,64 +152,6 @@ export function ContactForm() {
           </button>
         </form>
       )}
-    </div>
-  );
-}
-
-function Field({
-  id,
-  name,
-  label,
-  placeholder,
-  autoComplete,
-  required = false,
-  type = "text",
-  value,
-  error,
-  onChange,
-}: {
-  id: string;
-  name: "name" | "email";
-  label: string;
-  placeholder: string;
-  autoComplete?: string;
-  required?: boolean;
-  type?: string;
-  value: string;
-  error?: string;
-  onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-}) {
-  const errorId = `${id}-err`;
-
-  return (
-    <div className="flex flex-col gap-2">
-      <label className="text-sm leading-none font-medium text-mist" htmlFor={id}>
-        {label}
-        {required ? (
-          <span className="ml-0.5 text-sunflower" aria-hidden="true">
-            *
-          </span>
-        ) : null}
-      </label>
-      <input
-        id={id}
-        name={name}
-        type={type}
-        placeholder={placeholder}
-        autoComplete={autoComplete}
-        required={required}
-        aria-required={required || undefined}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={error ? errorId : undefined}
-        value={value}
-        onChange={onChange}
-        className={fieldClass}
-      />
-      {error ? (
-        <p className="text-[13px] leading-[1.4] text-[#f0a99e]" id={errorId}>
-          {error}
-        </p>
-      ) : null}
     </div>
   );
 }

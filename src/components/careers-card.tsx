@@ -53,19 +53,5 @@ export function CareersStrokeIcon({ d }: { d: string }) {
   );
 }
 
-export function CareersMailLink({
-  href,
-  children,
-}: {
-  href: string;
-  children: ReactNode;
-}) {
-  return (
-    <a
-      href={href}
-      className="group inline-flex w-full shrink-0 items-center justify-center gap-2.5 rounded-xl bg-mist px-6 py-3.5 text-base leading-none font-semibold whitespace-nowrap text-forest transition-[transform,box-shadow] duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-safe:hover:scale-[1.04] motion-safe:hover:shadow-[0_0_28px_rgba(227,226,112,0.4)] sm:w-auto max-[767px]:w-full"
-    >
-      {children}
-    </a>
-  );
-}
+export const careersCtaClassName =
+  "group inline-flex w-full shrink-0 items-center justify-center gap-2.5 rounded-xl bg-mist px-6 py-3.5 text-base leading-none font-semibold whitespace-nowrap text-forest transition-[transform,box-shadow] duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-safe:hover:scale-[1.04] motion-safe:hover:shadow-[0_0_28px_rgba(227,226,112,0.4)] sm:w-auto max-[767px]:w-full";

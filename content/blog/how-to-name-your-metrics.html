@@ -1,0 +1,182 @@
+<p>Metrics are the quantitative backbone of observability—the numbers that tell us how our systems are performing. This is the third post in our OpenTelemetry naming series, where we&#39;ve already explored <a href="how-to-name-your-spans">how to name spans</a> and how to enrich them with meaningful attributes. Now let&#39;s tackle the art of naming the measurements that matter.</p>
+<p>Unlike spans that tell stories about what happened, metrics tell us about quantities: how many, how fast, how much. But here&#39;s the thing—naming them well is just as crucial as naming spans, and the principles we&#39;ve learned apply here too. The &quot;who&quot; still belongs in attributes, not names.</p>
+<h2>Learning from Traditional Systems</h2>
+<p>Before diving into OpenTelemetry best practices, let&#39;s examine how traditional monitoring systems handle metric naming. Take Kubernetes, for example. Its metrics follow patterns like:</p>
+<ul>
+<li><p><code>apiserver_request_total</code></p>
+</li>
+<li><p><code>scheduler_schedule_attempts_total</code></p>
+</li>
+<li><p><code>container_cpu_usage_seconds_total</code></p>
+</li>
+<li><p><code>kubelet_volume_stats_used_bytes</code></p>
+</li>
+</ul>
+<p>Notice the pattern? <strong>Component name + resource + action + unit</strong>. The service or component name is baked right into the metric name. This approach made sense in simpler data models where you had limited options for storing context.</p>
+<p>But this creates several problems:</p>
+<ul>
+<li><p><strong>Cluttered observability backend</strong>: Every component gets its own metric namespace, making it harder to find the right metric among dozens or hundreds of similarly-named metrics</p>
+</li>
+<li><p><strong>Inflexible aggregation</strong>: Can&#39;t easily sum metrics across different components</p>
+</li>
+<li><p><strong>Vendor lock-in</strong>: Metric names become tied to specific implementations</p>
+</li>
+<li><p><strong>Maintenance overhead</strong>: Adding new services requires new metric names</p>
+</li>
+</ul>
+<h2>The Core Anti-Pattern: Service Names in Metric Names</h2>
+<p>Here&#39;s the most important principle for OpenTelemetry metrics: <strong>Don&#39;t include your service name in the metric name</strong>.</p>
+<p>Let&#39;s say you have a payment service. You might be tempted to create metrics like:</p>
+<ul>
+<li><p><code>payment.transaction.count</code></p>
+</li>
+<li><p><code>payment.latency.p95</code></p>
+</li>
+<li><p><code>payment.error.rate</code></p>
+</li>
+</ul>
+<p>Don&#39;t do this. The service name is already available as context through the <code>service.name</code> resource attribute. Instead, use:</p>
+<ul>
+<li><p><code>transaction.count</code> with <code>service.name=payment</code></p>
+</li>
+<li><p><code>http.server.request.duration</code> with <code>service.name=payment</code></p>
+</li>
+<li><p><code>error.rate</code> with <code>service.name=payment</code></p>
+</li>
+</ul>
+<p>Why is this better? Because now you can easily aggregate across all services:</p>
+<pre><code class="hljs language-plaintext">sum(transaction.count)  // All transactions across all services
+sum(transaction.count{service.name=&quot;payment&quot;})  // Just payment transactions
+</code></pre><p>If every service had its own metric name, you&#39;d need to know every service name to build meaningful dashboards. With clean names, one query works for everything.</p>
+<h2>OpenTelemetry&#39;s Rich Context Model</h2>
+<p>OpenTelemetry metrics benefit from the same rich context model we discussed in our span attributes article. Instead of forcing everything into the metric name, we have multiple layers where context can live:</p>
+<h3>Traditional Approach (Prometheus style):</h3>
+<pre><code class="hljs language-plaintext">payment_service_transaction_total{method=&quot;credit_card&quot;,status=&quot;success&quot;}
+user_service_auth_latency_milliseconds{endpoint=&quot;/login&quot;,region=&quot;us-east&quot;}  
+inventory_service_db_query_seconds{table=&quot;products&quot;,operation=&quot;select&quot;}
+</code></pre><h3>OpenTelemetry Approach:</h3>
+<pre><code class="hljs language-plaintext">transaction.count
+- Resource: service.name=payment, service.version=1.2.3, deployment.environment.name=prod
+- Scope: instrumentation.library.name=com.acme.payment, instrumentation.library.version=2.1.0
+- Attributes: method=credit_card, status=success
+
+auth.duration  
+- Resource: service.name=user, service.version=2.0.1, deployment.environment.name=prod
+- Scope: instrumentation.library.name=express.middleware
+- Attributes: endpoint=/login, region=us-east
+- Unit: ms
+
+db.client.operation.duration
+- Resource: service.name=inventory, service.version=1.5.2
+- Scope: instrumentation.library.name=postgres.client  
+- Attributes: db.sql.table=products, db.operation=select
+- Unit: s
+</code></pre><p>This three-layer separation follows the OpenTelemetry specification&#39;s <strong>Events → Metric Streams → Timeseries</strong> model, where context flows through multiple hierarchical levels rather than being crammed into names.</p>
+<h2>Units: Keep Them Out of Names Too</h2>
+<p>Just like we learned that service names don&#39;t belong in metric names, <strong>units don&#39;t belong there either</strong>.</p>
+<p>Traditional systems often include units in the name because they lack proper unit metadata:</p>
+<ul>
+<li><p><code>response_time_milliseconds</code></p>
+</li>
+<li><p><code>memory_usage_bytes</code></p>
+</li>
+<li><p><code>throughput_requests_per_second</code></p>
+</li>
+</ul>
+<p>OpenTelemetry treats units as metadata, separate from the name:</p>
+<ul>
+<li><p><code>http.server.request.duration</code> with unit <code>ms</code></p>
+</li>
+<li><p><code>system.memory.usage</code> with unit <code>By</code></p>
+</li>
+<li><p><code>http.server.request.rate</code> with unit <code>{request}/s</code></p>
+</li>
+</ul>
+<p>This approach has several benefits:</p>
+<ol>
+<li><p><strong>Clean names</strong>: No ugly suffixes cluttering your metric names</p>
+</li>
+<li><p><strong>Standardized units</strong>: Follow the Unified Code for Units of Measure (UCUM)</p>
+</li>
+<li><p><strong>Backend flexibility</strong>: Systems can handle unit conversion automatically</p>
+</li>
+<li><p><strong>Consistent conventions</strong>: Aligns with OpenTelemetry semantic conventions</p>
+</li>
+</ol>
+<p>The specification recommends using non-prefixed units like <code>By</code> (bytes) rather than <code>MiBy</code> (mebibytes) unless there are technical reasons to do otherwise.</p>
+<h2>Practical Naming Guidelines</h2>
+<p>When creating metric names, apply the same <code>{verb} {object}</code> principle we learned for spans, where it makes sense:</p>
+<ol>
+<li><p><strong>Focus on the operation</strong>: What is being measured?</p>
+</li>
+<li><p><strong>Not the operator</strong>: Who is doing the measuring?</p>
+</li>
+<li><p><strong>Follow semantic conventions</strong>: Use established patterns when available</p>
+</li>
+<li><p><strong>Keep units as metadata</strong>: Don&#39;t suffix names with units</p>
+</li>
+</ol>
+<p>Here are examples following OpenTelemetry semantic conventions:</p>
+<ul>
+<li><p><code>http.server.request.duration</code> (not <code>payment_http_requests_ms</code>)</p>
+</li>
+<li><p><code>db.client.operation.duration</code> (not <code>user_service_db_queries_seconds</code>)</p>
+</li>
+<li><p><code>messaging.client.sent.messages</code> (not <code>order_service_messages_sent_total</code>)</p>
+</li>
+<li><p><code>transaction.count</code> (not <code>payment_transaction_total</code>)</p>
+</li>
+</ul>
+<h2>Real-world Migration Examples</h2>
+<table>
+<thead>
+<tr>
+<th>Traditional (Context+Units in Name)</th>
+<th>OpenTelemetry (Clean Separation)</th>
+<th>Why It&#39;s Better</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>payment_transaction_total</code></td>
+<td><code>transaction.count</code> + <code>service.name=payment</code> + unit <code>1</code></td>
+<td>Aggregatable across services</td>
+</tr>
+<tr>
+<td><code>user_service_auth_latency_ms</code></td>
+<td><code>auth.duration</code> + <code>service.name=user</code> + unit <code>ms</code></td>
+<td>Standard operation name, proper unit metadata</td>
+</tr>
+<tr>
+<td><code>inventory_db_query_seconds</code></td>
+<td><code>db.client.operation.duration</code> + <code>service.name=inventory</code> + unit <code>s</code></td>
+<td>Follows semantic conventions</td>
+</tr>
+<tr>
+<td><code>api_gateway_requests_per_second</code></td>
+<td><code>http.server.request.rate</code> + <code>service.name=api-gateway</code> + unit <code>{request}/s</code></td>
+<td>Clean name, proper rate unit</td>
+</tr>
+<tr>
+<td><code>redis_cache_hit_ratio_percent</code></td>
+<td><code>cache.hit_ratio</code> + <code>service.name=redis</code> + unit <code>1</code></td>
+<td>Ratios are unitless</td>
+</tr>
+</tbody></table>
+<h2>Benefits of Clean Naming</h2>
+<p>Separating context from metric names provides specific technical advantages that improve both query performance and operational workflows. The first benefit is cross-service aggregation. A query like <code>sum(transaction.count)</code> returns data from all services without requiring you to know or maintain a list of service names. In a system with 50 microservices, this means one query instead of 50, and that query doesn&#39;t break when you add the 51st service.</p>
+<p>This consistency makes dashboards reusable across services. A dashboard built for monitoring HTTP requests in your authentication service works without modification for your payment service, inventory service, or any other HTTP-serving component. You write the query once—<code>http.server.request.duration</code> filtered by <code>service.name</code>—and apply it everywhere. No more maintaining dozens of nearly-identical dashboards. Some observability vendors now take this further, automatically generating dashboards based on semantic convention metric names—when your services emit <code>http.server.request.duration</code>, the platform knows exactly what visualizations and aggregations make sense for that metric.</p>
+<p>Clean naming also reduces metric namespace clutter. Consider a platform with dozens of services each defining their own metrics. With traditional naming, your metric browser shows hundreds of service-specific variations: <code>apiserver_request_total</code>, <code>payment_service_request_total</code>, <code>user_service_request_total</code>, <code>inventory_service_request_total</code>, and so on. Finding the right metric becomes an exercise in scrolling and searching through redundant variations. With clean naming, you have one metric name (<code>request.count</code>) with attributes capturing the context. This makes metric discovery straightforward—you find the measurement you need, then filter by the service you care about.</p>
+<p>Unit handling becomes systematic when units are metadata rather than name suffixes. Observability platforms can perform unit conversions automatically—displaying the same duration metric as milliseconds in one graph and seconds in another, based on what makes sense for the visualization. The metric remains <code>request.duration</code> with unit metadata <code>ms</code>, not two separate metrics <code>request_duration_ms</code> and <code>request_duration_seconds</code>.</p>
+<p>The approach also ensures compatibility between manual and automatic instrumentation. When you follow semantic conventions like <code>http.server.request.duration</code>, your custom metrics align with those generated by auto-instrumentation libraries. This creates a consistent data model where queries work across both manually and automatically instrumented services, and engineers don&#39;t need to remember which metrics come from which source.</p>
+<h2>Common Pitfalls to Avoid</h2>
+<p>Engineers often embed deployment-specific information directly into metric names, creating patterns like <code>user_service_v2_latency</code>. This breaks when version 3 deploys—every dashboard, alert, and query that references the metric name must be updated. The same problem occurs with instance-specific names like <code>node_42_memory_usage</code>. In a cluster with dynamic scaling, you end up with hundreds of distinct metric names that represent the same measurement, making it impossible to write simple aggregation queries.</p>
+<p>Environment-specific prefixes cause similar maintenance problems. With metrics named <code>prod_payment_errors</code> and <code>staging_auth_count</code>, you can&#39;t write a single query that works across environments. A dashboard that monitors production can&#39;t be used for staging without modification. When you need to compare metrics between environments—a common debugging task—you have to write complex queries that explicitly reference each environment&#39;s metric names.</p>
+<p>Technology stack details in metric names create future migration headaches. A metric named <code>nodejs_payment_memory</code> becomes misleading when you rewrite the service in Go. Similarly, <code>postgres_user_queries</code> requires renaming if you migrate to something else. These technology-specific names also prevent you from writing queries that work across services using different tech stacks, even when they perform the same business function.</p>
+<p>Mixing business domains with infrastructure metrics violates the separation between what a system does and how it does it. A metric like <code>ecommerce_cpu_usage</code> conflates the business purpose (e-commerce) with the technical measurement (CPU usage). This makes it harder to reuse infrastructure monitoring across different business domains and complicates multi-tenant deployments where the same infrastructure serves multiple business functions.</p>
+<p>The practice of including units in metric names—<code>latency_ms</code>, <code>memory_bytes</code>, <code>count_total</code>—creates redundancy now that OpenTelemetry provides proper unit metadata. It also prevents automatic unit conversion. With <code>request_duration_ms</code> and <code>request_duration_seconds</code> as separate metrics, you need different queries for different time scales. With a single <code>request.duration</code> metric that includes unit metadata, the observability platform handles conversion automatically.</p>
+<p>The pattern is clear: context that varies by deployment, instance, environment, or version belongs in attributes, not in the metric name. The metric name should identify what you&#39;re measuring. Everything else—who&#39;s measuring it, where it&#39;s running, which version it is—goes in the attribute layer where it can be filtered, grouped, and aggregated as needed.</p>
+<h2>Cultivating Better Metrics</h2>
+<p>Just like the spans we covered earlier in this series, well-named metrics are a gift to your future self and your team. They provide clarity during incidents, enable powerful cross-service analysis, and make your observability data truly useful rather than just voluminous.</p>
+<p>The key insight is the same one we learned with spans: <strong>separation of concerns</strong>. The metric name describes what you&#39;re measuring. The context—who&#39;s measuring it, where, when, and how—lives in the rich attribute hierarchy that OpenTelemetry provides.</p>
+<p>In our next post, we&#39;ll dive deep into <strong>metric attributes</strong>—the context layer that makes metrics truly powerful. We&#39;ll explore how to structure the rich contextual information that doesn&#39;t belong in names, and how to balance informativeness with cardinality concerns.</p>
+<p>Until then, remember: a clean metric name is like a well-tended garden path—it leads you exactly where you need to go.</p>

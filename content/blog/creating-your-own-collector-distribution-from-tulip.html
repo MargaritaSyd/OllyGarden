@@ -1,0 +1,312 @@
+<p>One of the most common complaints I hear from platform teams adopting OpenTelemetry: &quot;We love the vendor neutrality, but we can&#39;t run a critical piece of infrastructure without support.&quot;</p>
+<p>The OpenTelemetry Collector is powerful. It lets you decouple your instrumentation from your backend, so switching observability platforms doesn&#39;t mean reinstrumenting your entire stack. But for many organizations, running the upstream Collector in production without a support contract is a non-starter.</p>
+<p><a href="https://github.com/ollygarden/tulip">OllyGarden Tulip</a> solves this. It&#39;s a commercially supported distribution of the OpenTelemetry Collector that gives you ready-to-use binaries and container images with a curated set of components — plus a manifest system that lets you derive your own custom builds, mixing supported components with community modules.</p>
+<p>You get the vendor neutrality that OpenTelemetry promises, backed by the support your organization requires. And when you need components beyond the curated set, you can extend Tulip while keeping commercial support for the core pipeline.</p>
+<p>This post walks through creating your own distribution derived from Tulip, using the <strong>v26.05.1</strong> release — the first Long-Term Support (LTS) release — as the baseline.</p>
+<h2>What&#39;s in the Tulip Manifest?</h2>
+<p>Before extending, understand what you&#39;re starting with. Tulip v26.05.1 includes:</p>
+<p><strong>Extensions:</strong> zpages, pprof, basicauth, bearertokenauth, oauth2client, oidc, filestorage</p>
+<p><strong>Receivers:</strong> otlp, nop, hostmetrics, filelog</p>
+<p><strong>Processors:</strong> attributes, resource, span, probabilisticsampler, filter, transform, redaction</p>
+<p><strong>Exporters:</strong> otlp, otlphttp, file, debug, nop</p>
+<p><strong>Connectors:</strong> forward</p>
+<p>This is a deliberately focused set covering the most common telemetry pipeline patterns. If you need components beyond this list — say, the Kafka receiver, Prometheus exporter, or tail sampling processor — you&#39;ll add them to your fork. One thing to keep in mind: commercial support covers only the components in the Tulip manifest. Anything you add yourself is yours to maintain. We cover exactly where that line sits in the &quot;Understanding Support Boundaries&quot; section below.</p>
+<blockquote>
+<p><strong>No batch processor?</strong> That&#39;s intentional. The <code>batchprocessor</code> was removed in the LTS May 2026 release: it has been deprecated upstream and carries a known data-loss bug. Instead, batching now happens at the exporter level via <code>sending_queue</code> and <code>batch</code> settings, which is more robust under backpressure. You&#39;ll see this reflected in the configuration examples below.</p>
+</blockquote>
+<h2>Step 1: Clone the Tulip Repository Structure</h2>
+<p>Start by creating your distribution directory. Tulip uses a multi-distribution repository structure:</p>
+<pre><code class="hljs language-shell">mkdir -p my-collector/distributions/my-distro
+cd my-collector
+</code></pre><p>Create the essential files:</p>
+<pre><code><span class="hljs-keyword">distributions/my-distro/
+</span>├── manifest.yaml           <span class="hljs-comment"># Component manifest (the important one)</span>
+├── <span class="hljs-built_in">config</span>.yaml             <span class="hljs-comment"># Default runtime configuration</span>
+├── Dockerfile              <span class="hljs-comment"># Container image</span>
+├── my-<span class="hljs-keyword">distro.service </span>      <span class="hljs-comment"># systemd service file</span>
+├── my-<span class="hljs-keyword">distro.conf </span>         <span class="hljs-comment"># systemd environment file</span>
+└── my-<span class="hljs-keyword">distro-test.yaml </span>    <span class="hljs-comment"># Test configuration</span>
+</code></pre><h2>Step 2: Create Your Manifest</h2>
+<p>The manifest is the heart of your distribution. It declares which components to include and their versions.</p>
+<p>Here&#39;s a manifest that extends Tulip with the Kafka receiver and tail sampling processor:</p>
+<pre><code class="hljs language-yaml"><span class="hljs-comment"># distributions/my-distro/manifest.yaml</span>
+<span class="hljs-attr">dist:</span>
+  <span class="hljs-attr">module:</span> <span class="hljs-string">github.com/my-org/my-collector/my-distro</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">my-distro</span>
+  <span class="hljs-attr">description:</span> <span class="hljs-string">Custom</span> <span class="hljs-string">collector</span> <span class="hljs-string">with</span> <span class="hljs-string">Kafka</span> <span class="hljs-string">and</span> <span class="hljs-string">tail</span> <span class="hljs-string">sampling</span>
+  <span class="hljs-attr">output_path:</span> <span class="hljs-string">./_build</span>
+  <span class="hljs-attr">version:</span> <span class="hljs-number">0.151</span><span class="hljs-number">.0</span>
+  <span class="hljs-attr">build_tags:</span> <span class="hljs-string">&quot;grpcnotrace&quot;</span>
+
+<span class="hljs-attr">extensions:</span>
+  <span class="hljs-comment"># Keep Tulip&#x27;s extensions</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">go.opentelemetry.io/collector/extension/zpagesextension</span> <span class="hljs-string">v0.151.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension</span> <span class="hljs-string">v0.151.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">github.com/open-telemetry/opentelemetry-collector-contrib/extension/basicauthextension</span> <span class="hljs-string">v0.151.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">github.com/open-telemetry/opentelemetry-collector-contrib/extension/bearertokenauthextension</span> <span class="hljs-string">v0.151.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">github.com/open-telemetry/opentelemetry-collector-contrib/extension/oauth2clientauthextension</span> <span class="hljs-string">v0.151.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">github.com/open-telemetry/opentelemetry-collector-contrib/extension/oidcauthextension</span> <span class="hljs-string">v0.151.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage</span> <span class="hljs-string">v0.151.0</span>
+
+<span class="hljs-attr">receivers:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">go.opentelemetry.io/collector/receiver/nopreceiver</span> <span class="hljs-string">v0.151.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">go.opentelemetry.io/collector/receiver/otlpreceiver</span> <span class="hljs-string">v0.151.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">github.com/open-telemetry/opentelemetry-collector-contrib/receiver/hostmetricsreceiver</span> <span class="hljs-string">v0.151.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver</span> <span class="hljs-string">v0.151.0</span>
+  <span class="hljs-comment"># ADD: Kafka receiver</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kafkareceiver</span> <span class="hljs-string">v0.151.0</span>
+
+<span class="hljs-attr">processors:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor</span> <span class="hljs-string">v0.151.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourceprocessor</span> <span class="hljs-string">v0.151.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">github.com/open-telemetry/opentelemetry-collector-contrib/processor/spanprocessor</span> <span class="hljs-string">v0.151.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">github.com/open-telemetry/opentelemetry-collector-contrib/processor/probabilisticsamplerprocessor</span> <span class="hljs-string">v0.151.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">github.com/open-telemetry/opentelemetry-collector-contrib/processor/filterprocessor</span> <span class="hljs-string">v0.151.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor</span> <span class="hljs-string">v0.151.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">github.com/open-telemetry/opentelemetry-collector-contrib/processor/redactionprocessor</span> <span class="hljs-string">v0.151.0</span>
+  <span class="hljs-comment"># ADD: Tail sampling processor</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">github.com/open-telemetry/opentelemetry-collector-contrib/processor/tailsamplingprocessor</span> <span class="hljs-string">v0.151.0</span>
+
+<span class="hljs-attr">exporters:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">go.opentelemetry.io/collector/exporter/nopexporter</span> <span class="hljs-string">v0.151.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">go.opentelemetry.io/collector/exporter/debugexporter</span> <span class="hljs-string">v0.151.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">go.opentelemetry.io/collector/exporter/otlpexporter</span> <span class="hljs-string">v0.151.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">go.opentelemetry.io/collector/exporter/otlphttpexporter</span> <span class="hljs-string">v0.151.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter</span> <span class="hljs-string">v0.151.0</span>
+
+<span class="hljs-attr">connectors:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">go.opentelemetry.io/collector/connector/forwardconnector</span> <span class="hljs-string">v0.151.0</span>
+
+<span class="hljs-attr">providers:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">go.opentelemetry.io/collector/confmap/provider/envprovider</span> <span class="hljs-string">v1.57.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">go.opentelemetry.io/collector/confmap/provider/fileprovider</span> <span class="hljs-string">v1.57.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">gomod:</span> <span class="hljs-string">go.opentelemetry.io/collector/confmap/provider/yamlprovider</span> <span class="hljs-string">v1.57.0</span>
+</code></pre><h3>Version Alignment Matters</h3>
+<p>Notice that all <code>opentelemetry-collector-contrib</code> components use the same version (<code>v0.151.0</code>). Keeping them aligned matters because mixing incompatible core and contrib versions leads to dependency conflicts and runtime panics.</p>
+<p>For the components you inherit from Tulip, use the versions in the Tulip manifest — that&#39;s the exact combination OllyGarden tests and supports. For components you add yourself, we strongly recommend matching that same version so the whole build stays consistent, but it isn&#39;t enforced: anything beyond the manifest is yours to keep compatible.</p>
+<p>The version mapping for Tulip v26.05.1:</p>
+<ul>
+<li><strong>Collector core / contrib components:</strong> <code>v0.151.0</code></li>
+<li><strong>Confmap providers:</strong> <code>v1.57.0</code> (these follow their own semver line)</li>
+</ul>
+<p>When upgrading, update all core and contrib versions together, and bump the confmap providers to their matching release.</p>
+<h2>Step 3: Build Your Distribution</h2>
+<p>Install the OpenTelemetry Collector Builder (ocb). For the v0.151.0 release, download the released binary rather than using <code>go install</code> — <code>go install go.opentelemetry.io/collector/cmd/builder@v0.151.0</code> resolves to the parent <code>go.opentelemetry.io/collector</code> module (which no longer carries the builder) and fails for this specific tag. Grab the prebuilt <code>ocb</code> instead, adjusting the asset name for your OS and architecture:</p>
+<pre><code class="hljs language-shell">curl --proto &#x27;=https&#x27; --tlsv1.2 -fL -o ocb \
+  https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/cmd%2Fbuilder%2Fv0.151.0/ocb_0.151.0_linux_amd64
+chmod +x ocb
+sudo mv ocb /usr/local/bin/ocb
+</code></pre><p>Generate and build:</p>
+<pre><code class="hljs language-shell">cd distributions/my-distro
+<span class="hljs-meta prompt_">
+# </span><span class="language-bash">Generate Go <span class="hljs-built_in">source</span> code from manifest</span>
+ocb --config manifest.yaml
+<span class="hljs-meta prompt_">
+# </span><span class="language-bash">Build a static binary (CGO_ENABLED=0) so it runs on the scratch-based image</span>
+cd _build
+CGO_ENABLED=0 go build -o ../bin/my-distro .
+</code></pre><p>The builder creates a <code>_build/</code> directory with generated Go code. Don&#39;t edit these files directly — regenerate from the manifest instead.</p>
+<h2>Step 4: Create a Default Configuration</h2>
+<p>Your distribution needs a sensible default configuration. Note that batching is configured on the exporter (<code>sending_queue</code> + <code>batch</code>), not as a pipeline processor:</p>
+<pre><code class="hljs language-yaml"><span class="hljs-comment"># distributions/my-distro/config.yaml</span>
+<span class="hljs-attr">extensions:</span>
+  <span class="hljs-attr">pprof:</span> {}
+
+<span class="hljs-attr">receivers:</span>
+  <span class="hljs-attr">otlp:</span>
+    <span class="hljs-attr">protocols:</span>
+      <span class="hljs-attr">grpc:</span>
+        <span class="hljs-attr">endpoint:</span> <span class="hljs-number">0.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span><span class="hljs-string">:4317</span>
+      <span class="hljs-attr">http:</span>
+        <span class="hljs-attr">endpoint:</span> <span class="hljs-number">0.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span><span class="hljs-string">:4318</span>
+
+  <span class="hljs-attr">kafka:</span>
+    <span class="hljs-attr">brokers:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">${env:KAFKA_BROKERS}</span>
+    <span class="hljs-attr">traces:</span>
+      <span class="hljs-attr">topics:</span> [<span class="hljs-string">otlp_spans</span>]
+      <span class="hljs-attr">encoding:</span> <span class="hljs-string">otlp_proto</span>
+
+<span class="hljs-attr">processors:</span>
+  <span class="hljs-attr">tail_sampling:</span>
+    <span class="hljs-attr">decision_wait:</span> <span class="hljs-string">10s</span>
+    <span class="hljs-attr">policies:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">errors</span>
+        <span class="hljs-attr">type:</span> <span class="hljs-string">status_code</span>
+        <span class="hljs-attr">status_code:</span>
+          <span class="hljs-attr">status_codes:</span> [<span class="hljs-string">ERROR</span>]
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">slow-traces</span>
+        <span class="hljs-attr">type:</span> <span class="hljs-string">latency</span>
+        <span class="hljs-attr">latency:</span>
+          <span class="hljs-attr">threshold_ms:</span> <span class="hljs-number">1000</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">probabilistic</span>
+        <span class="hljs-attr">type:</span> <span class="hljs-string">probabilistic</span>
+        <span class="hljs-attr">probabilistic:</span>
+          <span class="hljs-attr">sampling_percentage:</span> <span class="hljs-number">10</span>
+
+<span class="hljs-attr">exporters:</span>
+  <span class="hljs-attr">otlp_grpc:</span>
+    <span class="hljs-attr">endpoint:</span> <span class="hljs-string">${env:OTLP_ENDPOINT}</span>
+    <span class="hljs-attr">tls:</span>
+      <span class="hljs-attr">insecure:</span> <span class="hljs-string">${env:OTLP_INSECURE:-false}</span>
+    <span class="hljs-attr">sending_queue:</span>
+      <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>
+      <span class="hljs-attr">queue_size:</span> <span class="hljs-number">1000</span>
+      <span class="hljs-attr">batch:</span>
+        <span class="hljs-attr">flush_timeout:</span> <span class="hljs-string">200ms</span>
+        <span class="hljs-attr">min_size:</span> <span class="hljs-number">8192</span>
+    <span class="hljs-attr">retry_on_failure:</span>
+      <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>
+      <span class="hljs-attr">initial_interval:</span> <span class="hljs-string">5s</span>
+      <span class="hljs-attr">max_interval:</span> <span class="hljs-string">30s</span>
+      <span class="hljs-attr">max_elapsed_time:</span> <span class="hljs-string">300s</span>
+
+<span class="hljs-attr">service:</span>
+  <span class="hljs-attr">extensions:</span> [<span class="hljs-string">pprof</span>]
+  <span class="hljs-attr">pipelines:</span>
+    <span class="hljs-attr">traces:</span>
+      <span class="hljs-attr">receivers:</span> [<span class="hljs-string">otlp</span>, <span class="hljs-string">kafka</span>]
+      <span class="hljs-attr">processors:</span> [<span class="hljs-string">tail_sampling</span>]
+      <span class="hljs-attr">exporters:</span> [<span class="hljs-string">otlp_grpc</span>]
+</code></pre><blockquote>
+<p><strong><code>otlp_grpc</code>, not <code>otlp</code>?</strong> As of otelcol 0.151.0 the OTLP exporter is registered as <code>otlp_grpc</code> (and the HTTP variant as <code>otlp_http</code>). The old <code>otlp</code>/<code>otlphttp</code> names still resolve as deprecated aliases, but new configurations should use the explicit names. Note the OTLP <em>receiver</em> is unaffected — it&#39;s still <code>otlp</code>.</p>
+</blockquote>
+<h2>Step 5: Containerize</h2>
+<p>Create a Dockerfile for your distribution:</p>
+<pre><code class="hljs language-dockerfile"><span class="hljs-comment"># distributions/my-distro/Dockerfile</span>
+<span class="hljs-keyword">FROM</span> alpine:<span class="hljs-number">3.21</span> AS certs
+<span class="hljs-keyword">RUN</span><span class="language-bash"> apk add --no-cache ca-certificates</span>
+
+<span class="hljs-keyword">FROM</span> scratch
+
+<span class="hljs-keyword">COPY</span><span class="language-bash"> --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> --<span class="hljs-built_in">chmod</span>=755 bin/my-distro /my-distro</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> config.yaml /etc/my-distro/config.yaml</span>
+
+<span class="hljs-keyword">USER</span> <span class="hljs-number">10001</span>:<span class="hljs-number">10001</span>
+
+<span class="hljs-keyword">EXPOSE</span> <span class="hljs-number">4317</span> <span class="hljs-number">4318</span>
+
+<span class="hljs-keyword">ENTRYPOINT</span><span class="language-bash"> [<span class="hljs-string">&quot;/my-distro&quot;</span>]</span>
+<span class="hljs-keyword">CMD</span><span class="language-bash"> [<span class="hljs-string">&quot;--config=/etc/my-distro/config.yaml&quot;</span>]</span>
+</code></pre><p>Build and run:</p>
+<pre><code class="hljs language-shell">docker build -t my-distro:latest distributions/my-distro/
+docker run -p 4317:4317 -p 4318:4318 my-distro:latest
+</code></pre><p>The build context is <code>distributions/my-distro/</code>, so the <code>COPY bin/my-distro</code> and <code>COPY config.yaml</code> paths in the Dockerfile resolve relative to that directory — exactly where Step 3 wrote the binary.</p>
+<h2>Step 6: Test Your Distribution</h2>
+<p>Create a test configuration that exercises your added components:</p>
+<pre><code class="hljs language-yaml"><span class="hljs-comment"># distributions/my-distro/my-distro-test.yaml</span>
+<span class="hljs-attr">receivers:</span>
+  <span class="hljs-attr">otlp:</span>
+    <span class="hljs-attr">protocols:</span>
+      <span class="hljs-attr">grpc:</span>
+        <span class="hljs-attr">endpoint:</span> <span class="hljs-string">localhost:4317</span>
+
+<span class="hljs-attr">processors:</span>
+  <span class="hljs-attr">tail_sampling:</span>
+    <span class="hljs-attr">decision_wait:</span> <span class="hljs-string">1s</span>
+    <span class="hljs-attr">policies:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">test-policy</span>
+        <span class="hljs-attr">type:</span> <span class="hljs-string">always_sample</span>
+
+<span class="hljs-attr">exporters:</span>
+  <span class="hljs-attr">debug:</span>
+    <span class="hljs-attr">verbosity:</span> <span class="hljs-string">detailed</span>
+
+<span class="hljs-attr">service:</span>
+  <span class="hljs-attr">pipelines:</span>
+    <span class="hljs-attr">traces:</span>
+      <span class="hljs-attr">receivers:</span> [<span class="hljs-string">otlp</span>]
+      <span class="hljs-attr">processors:</span> [<span class="hljs-string">tail_sampling</span>]
+      <span class="hljs-attr">exporters:</span> [<span class="hljs-string">debug</span>]
+</code></pre><p>Run a smoke test:</p>
+<pre><code class="hljs language-shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">Start the collector</span>
+./bin/my-distro --config my-distro-test.yaml &amp;
+<span class="hljs-meta prompt_">
+# </span><span class="language-bash">Send <span class="hljs-built_in">test</span> traces</span>
+telemetrygen traces --otlp-insecure --traces 5
+<span class="hljs-meta prompt_">
+# </span><span class="language-bash">Verify output shows the trace</span>
+<span class="hljs-meta prompt_"># </span><span class="language-bash">Then stop the collector</span>
+kill %1
+</code></pre><h2>Understanding Support Boundaries</h2>
+<p>When you derive from Tulip, support scope follows a clear hierarchy:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Component</th>
+<th align="left">Support Level</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Tulip manifest components</td>
+<td align="left">Full commercial support</td>
+</tr>
+<tr>
+<td align="left">Contrib components you add</td>
+<td align="left">Best-effort guidance</td>
+</tr>
+<tr>
+<td align="left">Custom/private components</td>
+<td align="left">Your responsibility</td>
+</tr>
+</tbody></table>
+<p>This means:</p>
+<ul>
+<li>If <code>transformprocessor</code> has a bug, OllyGarden will triage and fix it</li>
+<li>If <code>kafkareceiver</code> (which you added) has issues, OllyGarden provides integration tips but won&#39;t ship patches</li>
+<li>If you add a custom receiver from your own codebase, that&#39;s entirely on you</li>
+</ul>
+<p>This model lets you extend without losing the value of commercial support for the core pipeline.</p>
+<h2>Best Practices for Maintaining Your Fork</h2>
+<h3>Pin to Tulip Release Versions</h3>
+<p>Don&#39;t chase upstream head. Align your distribution versions with Tulip releases:</p>
+<pre><code class="hljs language-yaml"><span class="hljs-comment"># Good: Match Tulip v26.05.1</span>
+<span class="hljs-attr">version:</span> <span class="hljs-number">0.151</span><span class="hljs-number">.0</span>
+
+<span class="hljs-comment"># Bad: A random version that doesn&#x27;t match a Tulip release</span>
+<span class="hljs-attr">version:</span> <span class="hljs-number">0.153</span><span class="hljs-number">.0</span>
+</code></pre><p>This ensures your base components match a tested, supported configuration.</p>
+<h3>Document Your Additions</h3>
+<p>Keep a CHANGELOG noting which components you&#39;ve added beyond Tulip&#39;s manifest:</p>
+<pre><code>## Custom Components
+
+### Receivers
+- `kafkareceiver` - Consumes traces <span class="hljs-keyword">from</span> Kafka topics
+
+### Processors
+- `tailsamplingprocessor` - Intelligent trace sampling
+
+### Rationale
+Kafka integration required for our event-driven architecture.
+Tail sampling reduces storage costs while preserving error traces.
+</code></pre><h3>Separate Configuration from Distribution</h3>
+<p>Your distribution binary should be configuration-agnostic. Ship a minimal default config, but let operators provide their own via:</p>
+<pre><code class="hljs language-shell">./my-distro --config file:/etc/my-distro/config.yaml
+</code></pre><h2>When to Consider a Custom Distribution</h2>
+<p>Deriving from Tulip makes sense when:</p>
+<ul>
+<li>You need specific receivers/exporters not in Tulip&#39;s manifest</li>
+<li>You want commercial support for the core pipeline</li>
+<li>Your organization has compliance requirements around supported software</li>
+<li>You&#39;re standardizing on a single collector binary across teams</li>
+</ul>
+<p>Consider sticking with vanilla Tulip if:</p>
+<ul>
+<li>The included components meet your needs</li>
+<li>You prefer zero maintenance overhead</li>
+<li>You&#39;re still evaluating your telemetry architecture</li>
+</ul>
+<h2>Summary</h2>
+<p>Creating a custom distribution from Tulip gives you the best of both worlds: a production-tested, commercially supported foundation with the flexibility to add components your organization needs.</p>
+<p>The process:</p>
+<ol>
+<li>Clone Tulip&#39;s manifest structure</li>
+<li>Add your required components (keeping versions aligned)</li>
+<li>Build with ocb</li>
+<li>Containerize and deploy</li>
+<li>Maintain version alignment with Tulip releases</li>
+</ol>
+<p>Your core pipeline remains supported. Your extensions remain flexible. And when issues arise, you know exactly which components fall under commercial support and which are your team&#39;s responsibility.</p>
+<hr>
+<p><em>Ready to get started? Clone the <a href="https://github.com/ollygarden/tulip">Tulip repository</a> and check out the <a href="https://github.com/open-telemetry/opentelemetry-collector-contrib">OpenTelemetry Collector Contrib repository</a> for the full component catalog.</em></p>

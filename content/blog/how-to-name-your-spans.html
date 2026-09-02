@@ -1,0 +1,124 @@
+<p>One of the most fundamental yet often overlooked aspects of good instrumentation
+is naming. This post is the first in a series dedicated to the art and science
+of naming things in OpenTelemetry. We&#39;ll start with spans, the building blocks
+of a distributed trace, and give you the most important takeaway right at the
+beginning: how to name the spans that describe your unique business logic.</p>
+<h2>Naming your business spans</h2>
+<p>While OpenTelemetry&#39;s automatic instrumentation is fantastic for covering
+standard operations (like incoming HTTP requests or database calls), the most
+valuable insights often come from the custom spans you add to your own business
+logic. These are the operations unique to your application&#39;s domain.</p>
+<p>For these custom spans, we recommend a pattern that borrows from basic grammar.
+Simple, clear sentences often follow a subject -&gt; verb -&gt; direct object
+structure. The &quot;subject&quot; (the service performing the work) is already part of
+the trace&#39;s context. We can use the rest of that structure for our span name:</p>
+<h2>{verb} {object}</h2>
+<p>This pattern is descriptive, easy to understand, and helps maintain low cardinality—a
+crucial concept we&#39;ll touch on later.</p>
+<ul>
+<li><strong>{verb}</strong>: A verb describing the work being done (for example: process, send,
+calculate, render).</li>
+<li><strong>{object}</strong>: A noun describing what is being acted upon (for example:
+payment, invoice, shopping_cart, ad).</li>
+</ul>
+<p>Let&#39;s look at some examples:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Bad Name</th>
+<th align="left">Good Span Name</th>
+<th align="left">Why It&#39;s Better</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">process_payment_for_user_jane_doe</td>
+<td align="left">process payment</td>
+<td align="left">The verb and object are clear. The user ID belongs in an attribute.</td>
+</tr>
+<tr>
+<td align="left">send<em>invoice</em>#98765</td>
+<td align="left">send invoice</td>
+<td align="left">Aggregable. You can easily find the P95 latency for sending all invoices.</td>
+</tr>
+<tr>
+<td align="left">render_ad_for_campaign_summer_sale</td>
+<td align="left">render ad</td>
+<td align="left">The specific campaign is a detail, not the core operation. Put it in an attribute.</td>
+</tr>
+<tr>
+<td align="left">calculate_shipping_for_zip_90210</td>
+<td align="left">calculate shipping</td>
+<td align="left">The operation is consistent. The zip code is a parameter, not part of the name.</td>
+</tr>
+<tr>
+<td align="left">validation_failed</td>
+<td align="left">validate user_input</td>
+<td align="left">Focus on the operation, not the outcome. The result belongs in the span&#39;s status.</td>
+</tr>
+</tbody></table>
+<p>By adhering to the <code>{verb} {object}</code> format, you create a clear, consistent
+vocabulary for your business operations. This makes your traces incredibly
+powerful. A product manager could ask, &quot;How long does it take to process
+payments?&quot; and an engineer can immediately filter for those spans and get an
+answer.</p>
+<h2>Why this pattern works</h2>
+<p>So why is <code>process payment</code> good and <code>process*invoice*#98765</code> bad? The reason is
+<strong>cardinality</strong>.</p>
+<p>Cardinality refers to the number of unique values a piece of data can have. A
+span name should have <strong>low cardinality</strong>. If you include unique identifiers
+like a user ID or an invoice number in the span name, you will create a unique
+name for every single operation. This floods your observability backend, makes
+it impossible to group and analyze similar operations, and can significantly
+increase costs.</p>
+<p>The <code>{verb} {object}</code> pattern naturally produces low-cardinality names. The
+unique, high-cardinality details (<code>invoice\_#98765, user_jane_doe</code>) belong in
+<strong>span attributes</strong>, which we will cover in a future blog post.</p>
+<h2>Learning from Semantic Conventions</h2>
+<p>This <code>{verb} {object}</code> approach isn&#39;t arbitrary. It&#39;s a best practice that
+reflects the principles behind the official <strong>OpenTelemetry Semantic Conventions
+(SemConv)</strong>. SemConv provides a standardized set of names for common operations,
+ensuring that a span for an HTTP request is named consistently, regardless of
+the language or framework.</p>
+<p>When you look closely, you&#39;ll see this same pattern of describing an operation
+on a resource echoed throughout the conventions. By following it for your custom
+spans, you are aligning with the established philosophy of the entire
+OpenTelemetry ecosystem.</p>
+<p>Let&#39;s look at a few examples from SemConv.</p>
+<h3>HTTP spans</h3>
+<p>For server-side HTTP spans, the convention is <code>{method} {route}</code>.</p>
+<ul>
+<li><strong>Example:</strong> <code>GET /api/users/:ID</code></li>
+<li><strong>Analysis:</strong> This is a verb (<code>GET</code>) acting on an object (<code>/api/users/:id</code>).
+The use of a route template instead of the actual path (<code>/api/users/123</code>) is a
+perfect example of maintaining low cardinality.</li>
+</ul>
+<h3>Database spans</h3>
+<p>Database spans are often named <code>{db.operation} {db.name}.{db.sql.table}</code>.</p>
+<ul>
+<li><strong>Example:</strong> <code>INSERT my_database.users</code></li>
+<li><strong>Analysis:</strong> This is a verb (<code>INSERT</code>) acting on an object
+(<code>my_database</code>.users). The specific values being inserted are high-cardinality
+and are rightly excluded from the name.</li>
+</ul>
+<h3>RPC spans</h3>
+<p>For Remote Procedure Calls, the convention is <code>{rpc.service}/{rpc.method}</code>.</p>
+<ul>
+<li><strong>Example:</strong> <code>com.example.UserService/GetUser</code></li>
+<li><strong>Analysis:</strong> While the format is different, the principle is the same. It
+describes a method (<code>GetUser</code>), which is a verb, within a service
+(<code>com.example.UserService</code>), which is the object or resource.</li>
+</ul>
+<p>The key takeaway is that by using <code>{verb} {object}</code>, you are speaking the same
+language as the rest of your instrumentation.</p>
+<h2>Cultivating a healthy system</h2>
+<p>Naming spans is not a trivial task. It&#39;s a foundational practice for building a
+robust and effective observability strategy. By adopting a clear, consistent
+pattern like <code>{verb} {object}</code> for your business-specific spans, you can
+transform your telemetry data from a tangled mess into a well-tended garden.</p>
+<p>A well-named span is a gift to your future self and your team. It provides
+clarity during stressful outages, enables powerful performance analysis, and
+ultimately helps you build better, more reliable software.</p>
+<p>In our next post in this series, we will dig into the next layer of detail:
+<strong>span attributes</strong>. We&#39;ll explore how to add the rich, high-cardinality context
+to your spans that is necessary for deep debugging, without compromising the
+aggregability of your span names.</p>

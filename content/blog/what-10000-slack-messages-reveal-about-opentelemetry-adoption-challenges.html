@@ -1,0 +1,242 @@
+<p>The OpenTelemetry community has grown tremendously over the past few years, and
+with that growth comes valuable insights hidden in our community conversations.
+We analyzed nearly 10,000 messages from the <code>#otel-collector</code> and
+<code>#opentelemetry</code> Slack channels spanning from May 2019 to December 2025 to understand
+what challenges users face most often, which components generate the most
+discussion, and where the community might need additional documentation or
+tooling improvements.</p>
+<h2>The Dataset</h2>
+<p>Our analysis covered 9,966 messages across two of the most active OpenTelemetry
+Slack channels:</p>
+<ul>
+<li><strong>#otel-collector</strong>: 5,570 messages (56%)</li>
+<li><strong>#opentelemetry</strong>: 4,396 messages (44%)</li>
+</ul>
+<p>These messages break down into several categories:</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Percentage</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Questions</td>
+<td>46.7%</td>
+</tr>
+<tr>
+<td>Error Reports</td>
+<td>25.9%</td>
+</tr>
+<tr>
+<td>Discussions</td>
+<td>23.3%</td>
+</tr>
+<tr>
+<td>Configuration</td>
+<td>3.0%</td>
+</tr>
+<tr>
+<td>Help Responses</td>
+<td>1.0%</td>
+</tr>
+</tbody></table>
+<p>The high proportion of questions and error reports (over 72% combined) tells us
+that these channels serve as critical support resources for the community, and
+the topics that appear most frequently represent real adoption challenges.</p>
+<p>We applied topic modeling using BERTopic to cluster similar messages, then
+analyzed sentiment and frustration indicators to identify which topics cause
+the most difficulty. Messages containing error reports, repeated requests for
+help, or expressions of confusion scored higher on our frustration metric.</p>
+<h2>Most Discussed Collector Components</h2>
+<p>Topic modeling revealed clear patterns in which Collector components generate
+the most community discussion. Here are the top components by message volume:</p>
+<h3>1. Prometheus Receiver and Exporter (498 messages, 5.0%)</h3>
+<p>Prometheus integration dominates community discussions. Users frequently ask
+about:</p>
+<ul>
+<li>Configuring the Prometheus receiver to scrape metrics</li>
+<li>Setting up the Prometheus remote write exporter</li>
+<li>Understanding metric type and metadata preservation across the pipeline</li>
+<li>Integrating with existing Prometheus infrastructure</li>
+</ul>
+<p>This makes sense given Prometheus&#39;s widespread adoption. Many organizations
+start their OpenTelemetry journey by wanting to integrate with or migrate from
+existing Prometheus setups. The remote write exporter in particular sees heavy
+use, as it allows teams to continue using Prometheus as a storage backend while
+adopting OpenTelemetry for collection and processing.</p>
+<h3>2. k8sattributes Processor (258 messages, 2.6%)</h3>
+<p>Kubernetes metadata enrichment is the second most discussed topic. Common
+challenges include:</p>
+<ul>
+<li>Pod association and metadata extraction in DaemonSet deployments</li>
+<li>RBAC permissions for accessing the Kubernetes API</li>
+<li>Performance implications in large clusters</li>
+<li>Interaction with the kubeletstats receiver</li>
+</ul>
+<p>The complexity of Kubernetes environments and the desire for rich metadata
+context makes this processor essential but sometimes tricky to configure
+correctly. Users often discover that running the Collector as a DaemonSet
+requires different pod association rules than running it as a gateway, leading
+to troubleshooting cycles that could be avoided with clearer guidance.</p>
+<h3>3. Tail Sampling Processor (167 messages, 1.7%)</h3>
+<p>Tail-based sampling generates significant discussion, often with a higher
+frustration level than other topics. Users struggle with:</p>
+<ul>
+<li>Policy configuration and interaction between multiple policies</li>
+<li>Stateful sampling across distributed services</li>
+<li>Head sampling vs. tail sampling trade-offs</li>
+<li>Debugging why traces are or aren&#39;t being sampled</li>
+<li>Understanding the decision wait period and its impact on latency</li>
+</ul>
+<p>The stateful nature of tail sampling, which requires collecting all spans of a
+trace before making a decision, adds operational complexity that head sampling
+avoids. Many teams end up running both approaches, using head sampling at the
+SDK level for baseline reduction and tail sampling in the Collector for
+intelligent retention of interesting traces.</p>
+<h3>4. Kafka Receiver and Exporter (131 messages, 1.3%)</h3>
+<p>Kafka integration appears frequently, particularly around:</p>
+<ul>
+<li>Connection and authentication issues with managed Kafka services (AWS MSK)</li>
+<li>Topic configuration and consumer group management</li>
+<li>Message format and serialization</li>
+<li>High-availability deployment patterns</li>
+</ul>
+<h3>5. Memory Limiter Processor (125 messages, 1.3%)</h3>
+<p>Resource management is a consistent concern:</p>
+<ul>
+<li>Proper memory limit configuration relative to container limits</li>
+<li>GOMEMLIMIT interaction with the memory limiter</li>
+<li>Debugging memory spikes and OOM situations</li>
+<li>CPU usage profiling with pprof</li>
+</ul>
+<p>Understanding the relationship between Go&#39;s memory management, container
+limits, and the memory limiter processor requires knowledge that spans multiple
+domains. The recent addition of <code>GOMEMLIMIT</code> support has helped, but users
+still need guidance on proper configuration for their specific deployment
+scenarios.</p>
+<h2>Top 10 Problem Areas and Pain Points</h2>
+<p>Beyond component-specific discussions, our frustration analysis identified the
+topics that cause the most difficulty for users. These represent areas where
+improved documentation, better error messages, or tooling enhancements could
+have the highest impact.</p>
+<h3>1. Connection and Export Failures</h3>
+<p>The most frustrating experiences relate to OTLP export failures, particularly:</p>
+<ul>
+<li><code>DEADLINE_EXCEEDED</code> errors when exporting to backends</li>
+<li>TLS configuration issues with load balancers</li>
+<li>gRPC vs. HTTP protocol confusion</li>
+<li>Connectivity issues behind proxies or in cloud environments</li>
+</ul>
+<h3>2. Custom Collector Distributions</h3>
+<p>Building custom distributions with <code>ocb</code> (OpenTelemetry Collector Builder)
+generates significant frustration:</p>
+<ul>
+<li>Version conflicts between components</li>
+<li>Build failures on specific platforms (Windows MSI notably painful)</li>
+<li>Dependency resolution issues</li>
+<li>Understanding which components to include</li>
+</ul>
+<h3>3. Configuration Syntax and Validation</h3>
+<p>Many users struggle with basic configuration:</p>
+<ul>
+<li>YAML syntax errors that produce cryptic error messages</li>
+<li>Understanding the relationship between receivers, processors, and exporters</li>
+<li>Pipeline configuration and data flow</li>
+<li>Environment variable substitution syntax</li>
+</ul>
+<h3>4. Context Propagation</h3>
+<p>Distributed tracing fundamentals cause confusion:</p>
+<ul>
+<li>B3 vs. W3C trace context formats</li>
+<li>Baggage propagation across service boundaries</li>
+<li>Extract and inject operations in SDKs</li>
+<li>Cross-language propagation issues</li>
+</ul>
+<h3>5. Attribute and Resource Management</h3>
+<p>Understanding the data model proves challenging:</p>
+<ul>
+<li>When to use resource attributes vs. span/metric/log attributes</li>
+<li>Moving attributes between resource and signal levels</li>
+<li>Semantic conventions compliance</li>
+<li>Attribute cardinality and its impact</li>
+</ul>
+<h3>6. OTTL (OpenTelemetry Transformation Language)</h3>
+<p>While powerful, OTTL generates confusion:</p>
+<ul>
+<li>Function syntax and available operations</li>
+<li>Context-specific paths and accessors</li>
+<li>Debugging transformation failures</li>
+<li>Performance implications of complex transforms</li>
+</ul>
+<h3>7. Kubernetes Operator and Auto-Instrumentation</h3>
+<p>The Operator simplifies deployment but introduces its own challenges:</p>
+<ul>
+<li>Instrumentation injection not working as expected</li>
+<li>Multiple collector deployment modes (DaemonSet vs. Sidecar vs. Deployment)</li>
+<li>CRD configuration options</li>
+<li>Troubleshooting injected agents</li>
+</ul>
+<h3>8. Backend Integration</h3>
+<p>Connecting to observability backends requires effort:</p>
+<ul>
+<li>Jaeger configuration and migration from legacy setups</li>
+<li>Vendor-specific exporter configuration</li>
+<li>Authentication and authorization with managed services</li>
+<li>Multi-backend routing</li>
+</ul>
+<h3>9. Docker and Container Deployment</h3>
+<p>Container-related issues appear regularly:</p>
+<ul>
+<li>Image selection (contrib vs. core)</li>
+<li>Version availability on Docker Hub</li>
+<li>Custom image building</li>
+<li>Resource limits and performance tuning</li>
+</ul>
+<h3>10. Queue and Retry Behavior</h3>
+<p>Understanding the exporter helper&#39;s behavior:</p>
+<ul>
+<li>Persistent queue configuration and storage</li>
+<li>Retry policies and backoff behavior</li>
+<li>Data loss scenarios and prevention</li>
+<li>Queue sizing for high-volume deployments</li>
+</ul>
+<h2>What This Tells Us</h2>
+<p>Several themes emerge from this analysis:</p>
+<p><strong>The Prometheus ecosystem remains central.</strong> Organizations aren&#39;t abandoning
+Prometheus; they&#39;re integrating it with OpenTelemetry. Documentation and
+tooling that bridges these ecosystems will continue to be valuable.</p>
+<p><strong>Kubernetes complexity compounds OTel complexity.</strong> The k8sattributes
+processor and Operator discussions show that Kubernetes environments introduce
+additional layers of configuration and troubleshooting. Simplified deployment
+patterns and better defaults could help.</p>
+<p><strong>Sampling is conceptually difficult.</strong> Tail sampling, despite being well
+documented, generates ongoing confusion. Interactive tools or visualization of
+sampling decisions might help users understand and debug their configurations.</p>
+<p><strong>Error messages need improvement.</strong> Many frustration-heavy discussions start
+with a cryptic error message. Investing in actionable error messages with
+suggested fixes would significantly improve the user experience.</p>
+<p><strong>The gap between &quot;getting started&quot; and &quot;production ready&quot; is real.</strong> Basic
+tutorials work, but scaling to production with proper memory limits, persistent
+queues, and multi-backend routing requires significant learning.</p>
+<h2>Moving Forward</h2>
+<p>We hope this analysis helps maintainers and SIGs identify areas where
+documentation improvements would have the highest impact. The data clearly
+shows that certain topics, particularly around configuration patterns, sampling
+strategies, and multi-backend deployments, generate recurring questions that
+better guides could address.</p>
+<p>On my end, I have lined up a series of articles that tackle some of these pain
+points directly, covering topics like decomposing Collector configuration files
+into manageable pieces, routing telemetry to multiple backends based on tenant
+or environment, and building effective tail sampling strategies.</p>
+<h2>Acknowledgments</h2>
+<p>Thank you to everyone who participates in the OpenTelemetry Slack community.
+Your questions, error reports, and discussions not only help each other but
+also provide valuable signal for where the project can improve. A special
+thanks to the community members who take time to answer questions and share
+their experiences - the 1% of help responses in our data represent countless
+hours of volunteer effort that makes this community welcoming for newcomers.</p>
+<hr>
+<p><em>This analysis used topic modeling and sentiment analysis on publicly available
+Slack messages. Individual messages were aggregated into topics; no personally
+identifiable information was used in this report.</em></p>

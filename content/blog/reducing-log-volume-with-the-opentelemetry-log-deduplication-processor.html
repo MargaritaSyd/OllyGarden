@@ -1,0 +1,69 @@
+<p>Your logs are probably at least 80% repetitive noise. Connection retries, health checks, heartbeat messages: the same log line repeated thousands of times per minute. You pay storage costs for each one while the signal drowns in noise. The OpenTelemetry Collector&#39;s log deduplication processor offers an elegant solution to this problem.</p>
+<h2>The repetitive log problem</h2>
+<p>Modern distributed systems generate enormous volumes of logs, but much of that volume provides diminishing returns. Consider a typical microservice that logs connection errors when a downstream dependency is unavailable. If the service retries every 100 milliseconds for 30 seconds, that&#39;s 300 nearly identical log entries for a single incident. Each entry consumes storage, network bandwidth, and processing capacity in your logging backend.</p>
+<p>Health check endpoints compound the problem. Kubernetes probes, load balancer checks, and monitoring systems all generate log entries at regular intervals. A single service might log thousands of health check responses per hour, none of which provide meaningful insight beyond &quot;the service was running.&quot;</p>
+<p>The logdedupprocessor in the OpenTelemetry Collector solves this by aggregating identical logs over a configurable time window. Instead of forwarding every duplicate entry, it emits a single log with a count of how many times that message appeared.</p>
+<h2>How log deduplication works</h2>
+<p>The core concept is straightforward. Logs are considered identical when they share the same resource attributes, scope, body, attributes, and severity. The processor computes a hash of these fields and tracks occurrences within a configurable interval.</p>
+<p>When the interval expires, the processor emits a single log entry with three additional attributes: <code>log_count</code> (the number of duplicates), <code>first_observed_timestamp</code>, and <code>last_observed_timestamp</code>. You keep full visibility into frequency patterns without storing every identical entry.</p>
+<p>This approach differs from sampling in an important way. Sampling discards data permanently. Deduplication preserves the information that matters (what happened, how often, and when) while eliminating redundant storage.</p>
+<h2>Practical configuration</h2>
+<p>Here is a configuration that deduplicates connection errors while preserving audit logs:</p>
+<pre><code class="hljs language-yaml"><span class="hljs-attr">processors:</span>
+  <span class="hljs-attr">logdedup:</span>
+    <span class="hljs-attr">interval:</span> <span class="hljs-string">1s</span>
+    <span class="hljs-attr">conditions:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">severity_number</span> <span class="hljs-string">&gt;=</span> <span class="hljs-string">SEVERITY_NUMBER_ERROR</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">attributes[&quot;log.type&quot;]</span> <span class="hljs-string">==</span> <span class="hljs-string">&quot;connection&quot;</span>
+    <span class="hljs-attr">exclude_fields:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">attributes.request_id</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">attributes.timestamp</span>
+</code></pre><p>The <code>conditions</code> field uses OpenTelemetry Transformation Language (OTTL) expressions to filter which logs get deduplicated. Logs that do not match pass through unchanged. In this example, only ERROR-level logs with the <code>log.type=connection</code> attribute are candidates for deduplication.</p>
+<p>The <code>exclude_fields</code> option removes high-cardinality fields from the comparison. Fields like request IDs and timestamps differ between entries even when the log message is semantically identical. By excluding them, logs that differ only in these volatile fields are treated as duplicates.</p>
+<h2>A complete pipeline example</h2>
+<p>To use the log deduplication processor, include it in your collector pipeline:</p>
+<pre><code class="hljs language-yaml"><span class="hljs-attr">receivers:</span>
+  <span class="hljs-attr">otlp:</span>
+    <span class="hljs-attr">protocols:</span>
+      <span class="hljs-attr">grpc:</span>
+        <span class="hljs-attr">endpoint:</span> <span class="hljs-number">0.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span><span class="hljs-string">:4317</span>
+
+<span class="hljs-attr">processors:</span>
+  <span class="hljs-attr">logdedup:</span>
+    <span class="hljs-attr">interval:</span> <span class="hljs-string">1s</span>
+    <span class="hljs-attr">conditions:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">severity_number</span> <span class="hljs-string">&gt;=</span> <span class="hljs-string">SEVERITY_NUMBER_ERROR</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">attributes[&quot;log.type&quot;]</span> <span class="hljs-string">==</span> <span class="hljs-string">&quot;connection&quot;</span>
+    <span class="hljs-attr">exclude_fields:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">attributes.request_id</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">attributes.timestamp</span>
+
+<span class="hljs-attr">exporters:</span>
+  <span class="hljs-attr">debug:</span>
+
+<span class="hljs-attr">service:</span>
+  <span class="hljs-attr">pipelines:</span>
+    <span class="hljs-attr">logs:</span>
+      <span class="hljs-attr">receivers:</span> [<span class="hljs-string">otlp</span>]
+      <span class="hljs-attr">processors:</span> [<span class="hljs-string">logdedup</span>]
+      <span class="hljs-attr">exporters:</span> [<span class="hljs-string">debug</span>]
+</code></pre><h2>Testing with telemetrygen</h2>
+<p>To test this configuration locally, use telemetrygen to generate connection error logs:</p>
+<pre><code class="hljs language-bash">telemetrygen logs \
+  --otlp-insecure \
+  --logs 100 \
+  --rate 10 \
+  --severity-text ERROR \
+  --severity-number 17 \
+  --body <span class="hljs-string">&quot;Connection refused: failed to connect to database at 10.0.0.5:5432&quot;</span> \
+  --telemetry-attributes <span class="hljs-string">&#x27;log.type=&quot;connection&quot;&#x27;</span> \
+  --telemetry-attributes <span class="hljs-string">&#x27;service.name=&quot;order-service&quot;&#x27;</span> \
+  --telemetry-attributes <span class="hljs-string">&#x27;db.system=&quot;postgresql&quot;&#x27;</span>
+</code></pre><p>This generates 100 logs at 10 per second, all with ERROR severity and the <code>log.type=connection</code> attribute that triggers deduplication. After a few seconds, you should see a few log entries with <code>log_count: N</code> in your backend instead of 100 separate entries.</p>
+<h2>Tradeoffs and considerations</h2>
+<p>The log deduplication processor introduces latency equal to your interval setting. Logs are held until the interval expires before being forwarded. For most use cases, a 1-second delay is acceptable, but real-time alerting systems may need adjustment.</p>
+<p>For compliance-critical logs where every occurrence must be preserved with its original timestamp, skip deduplication entirely. Audit logs, security events, and regulatory records often require complete fidelity.</p>
+<p>The tradeoff is straightforward: reduced storage and clearer signal at the cost of slight delay and losing individual timestamps. For high-volume repetitive logs, that tradeoff is usually worth it.</p>
+<h2>Conclusion</h2>
+<p>The log deduplication processor provides a practical solution to the noise problem in modern logging pipelines. By aggregating identical entries while preserving frequency information, you can dramatically reduce storage costs and improve signal clarity without sacrificing observability.</p>
+<p>Combined with other OpenTelemetry Collector processors like filtering and sampling, log deduplication gives you fine-grained control over your telemetry pipeline. The result is a logging system that captures what matters while discarding the noise.</p>
