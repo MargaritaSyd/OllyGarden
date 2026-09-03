@@ -1,13 +1,13 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "";
+const supabaseUrl = process.env.SUPABASE_URL ?? "";
+const supabasePublishableKey = process.env.SUPABASE_PUBLISHABLE_KEY ?? "";
 
 export const supabaseConfigured = Boolean(supabaseUrl && supabasePublishableKey);
 
 /** Invoke Edge Functions only when this is explicitly enabled. */
-export const supabaseSendEmail = process.env.NEXT_PUBLIC_SUPABASE_SEND_EMAIL === "true";
+export const supabaseSendEmail = process.env.SUPABASE_SEND_EMAIL === "true";
 
 let client: SupabaseClient<Database> | undefined;
 

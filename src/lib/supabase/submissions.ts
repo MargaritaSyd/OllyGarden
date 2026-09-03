@@ -1,6 +1,10 @@
+"use server";
+
 import { getSupabase, supabaseSendEmail } from "./client";
 
-export class SupabaseSubmitError extends Error {
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+class SupabaseSubmitError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "SupabaseSubmitError";
@@ -15,19 +19,31 @@ function client() {
   }
 }
 
+function requireEmail(value: string, label: string) {
+  const email = value.trim();
+  if (!email || !EMAIL_RE.test(email)) {
+    throw new SupabaseSubmitError(`${label} is required.`);
+  }
+  return email;
+}
+
 export async function submitContactMessage(input: {
   name: string;
   email: string;
   message: string;
 }) {
-  const supabase = client();
+  const name = input.name.trim();
+  if (!name) {
+    throw new SupabaseSubmitError("Name is required.");
+  }
 
   const payload = {
-    name: input.name,
-    email: input.email,
-    message: input.message,
+    name,
+    email: requireEmail(input.email, "Email"),
+    message: input.message.trim(),
   };
 
+  const supabase = client();
   const { error: dbError } = await supabase.from("contact_submissions").insert([payload]);
   if (dbError) {
     throw new SupabaseSubmitError(dbError.message);
@@ -57,16 +73,21 @@ export async function submitJobApplication(input: {
   linkedinUrl: string;
   githubUrl: string;
 }) {
+  const fullName = input.fullName.trim();
+  if (!fullName) {
+    throw new SupabaseSubmitError("Full name is required.");
+  }
+
+  const email = requireEmail(input.email, "Email");
+  const linkedinUrl = input.linkedinUrl.trim() || null;
+  const githubUrl = input.githubUrl.trim() || null;
+
   const supabase = client();
-
-  const linkedinUrl = input.linkedinUrl || null;
-  const githubUrl = input.githubUrl || null;
-
   const { error: insertError } = await supabase.from("job_applications").insert({
     job_id: OPEN_APPLICATION_JOB.jobId,
     job_title: OPEN_APPLICATION_JOB.jobTitle,
-    full_name: input.fullName,
-    email: input.email,
+    full_name: fullName,
+    email,
     linkedin_url: linkedinUrl,
     github_url: githubUrl,
   });
@@ -83,8 +104,8 @@ export async function submitJobApplication(input: {
       jobId: OPEN_APPLICATION_JOB.jobId,
       jobTitle: OPEN_APPLICATION_JOB.jobTitle,
       applicant: {
-        fullName: input.fullName,
-        email: input.email,
+        fullName,
+        email,
         linkedinUrl,
         githubUrl,
       },
