@@ -49,7 +49,7 @@ export async function submitContactMessage(input: {
     throw new SupabaseSubmitError(dbError.message);
   }
 
-  if (!supabaseSendEmail) {
+  if (!supabaseSendEmail()) {
     return;
   }
 
@@ -95,7 +95,7 @@ export async function submitJobApplication(input: {
     throw new SupabaseSubmitError(`Error saving application: ${insertError.message}`);
   }
 
-  if (!supabaseSendEmail) {
+  if (!supabaseSendEmail()) {
     return;
   }
 
