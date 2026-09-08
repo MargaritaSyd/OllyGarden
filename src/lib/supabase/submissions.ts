@@ -115,3 +115,56 @@ export async function submitJobApplication(input: {
     throw new SupabaseSubmitError(`Error sending email: ${error.message}`);
   }
 }
+
+const TULIP_TIERS = new Set(["standard", "enterprise"]);
+
+export async function submitTulipLead(input: {
+  name: string;
+  email: string;
+  company: string;
+  message: string;
+  supportTier: string;
+}) {
+  const name = input.name.trim();
+  if (!name) {
+    throw new SupabaseSubmitError("Name is required.");
+  }
+
+  const email = requireEmail(input.email, "Email");
+  const supportTier = input.supportTier.trim();
+  if (!TULIP_TIERS.has(supportTier)) {
+    throw new SupabaseSubmitError("Support tier is required.");
+  }
+
+  const company = input.company.trim() || undefined;
+  const message = input.message.trim() || undefined;
+
+  const supabase = client();
+  const { error: dbError } = await supabase.from("tulip_leads").insert({
+    name,
+    email,
+    company: company ?? null,
+    notes: message ?? null,
+    support_tier: supportTier,
+  });
+  if (dbError) {
+    throw new SupabaseSubmitError(dbError.message);
+  }
+
+  if (!supabaseSendEmail()) {
+    return;
+  }
+
+  const { error: emailError } = await supabase.functions.invoke("send-tulip-lead-email", {
+    body: {
+      name,
+      email,
+      company,
+      message,
+      supportTier,
+    },
+  });
+  if (emailError) {
+    throw new SupabaseSubmitError("Failed to send email notification");
+  }
+}

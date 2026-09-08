@@ -43,6 +43,16 @@ export type BlogPost = {
 
 export const blogPosts: readonly BlogPost[] = [
   {
+    slug: "opentelemetry-vendor-lock-in-since-2024",
+    title: "What's changed about OpenTelemetry vendor lock-in since 2024",
+    excerpt:
+      "OpenTelemetry still does not make dashboards portable, but agents, CLIs, and MCP servers have made switching observability backends noticeably less painful.",
+    date: "2026-08-21",
+    tags: ["OpenTelemetry", "Observability", "Vendor Lock-in", "AI"],
+    image: "/images/blog/opentelemetry-vendor-lock-in-since-2024.png",
+    ribbon: "Latest Post",
+  },
+  {
     slug: "the-scrape-interval-nobody-chose",
     title: "The Scrape Interval Nobody Chose",
     excerpt:
@@ -50,7 +60,7 @@ export const blogPosts: readonly BlogPost[] = [
     date: "2026-07-31",
     tags: ["Metrics", "OpenTelemetry", "Observability", "Cost"],
     image: "/images/blog/the-scrape-interval-nobody-chose.png",
-    ribbon: "Latest Post",
+    ribbon: "Featured",
   },
   {
     slug: "teach-your-coding-agent-opentelemetry",
@@ -70,7 +80,6 @@ export const blogPosts: readonly BlogPost[] = [
     date: "2026-06-29",
     tags: ["Collector", "OpenTelemetry", "Pipelines"],
     image: "/images/blog/are-collector-exporters-sequential-or-parallel.png",
-    ribbon: "Featured",
   },
   {
     slug: "creating-your-own-collector-distribution-from-tulip",

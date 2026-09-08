@@ -224,6 +224,436 @@ body {
   }
 }
 
+/* Tulip drop-in: typewriter + tip float (matches reference). */
+.dropin.js-anim :is(.di-mark, .di-label, .dropin h2, .di-body, .di-code, .di-tip) {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.35s ease-out,
+    transform 0.35s ease-out;
+}
+
+.dropin.js-anim .di-code {
+  transition-duration: 0.28s;
+  transform: scale(0.98);
+}
+
+.dropin.js-anim.in-view :is(.di-mark, .di-label, .dropin h2, .di-body, .di-tip) {
+  opacity: 1;
+  transform: none;
+}
+
+.dropin.js-anim.in-view .di-label {
+  transition-delay: 80ms;
+}
+
+.dropin.js-anim.in-view h2 {
+  transition-delay: 0.16s;
+}
+
+.dropin.js-anim.in-view .di-body {
+  transition-delay: 0.24s;
+}
+
+.dropin.js-anim.in-view .di-code {
+  opacity: 1;
+  transform: scale(1);
+  transition-delay: 0.1s;
+}
+
+.dropin.js-anim.in-view .di-tip {
+  transition-delay: 0.3s;
+  animation: di-bob 7s ease-in-out 1.4s infinite alternate;
+}
+
+.di-pre {
+  min-height: 392px;
+}
+
+.di-pre .cl {
+  display: flex;
+  min-height: 1.5em;
+}
+
+.di-pre .cl .gut {
+  flex: 0 0 2ch;
+  text-align: center;
+  user-select: none;
+}
+
+.di-pre .cl .txt {
+  white-space: pre;
+}
+
+.di-pre .cl.rm {
+  background: rgb(90 29 29 / 0.55);
+  color: #f2b8b8;
+}
+
+.di-pre .cl.add {
+  background: rgb(29 74 40 / 0.7);
+  color: #b7e3b4;
+}
+
+.di-code.typing .cl.rm,
+.di-code.typing .cl.add {
+  background: transparent;
+  color: inherit;
+}
+
+.di-code.typing .cl .gut {
+  opacity: 0;
+}
+
+.di-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 1em;
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  background: rgb(202 213 226 / 0.4);
+  animation: di-blink 0.7s step-end infinite;
+}
+
+@keyframes di-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes di-band-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  70% {
+    opacity: 1;
+    filter: brightness(1.35);
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 1;
+    filter: none;
+    transform: translateX(0);
+  }
+}
+
+.di-pre .cl.flash {
+  animation: di-band-in 0.32s ease-out both;
+}
+
+@keyframes di-bob {
+  0% {
+    transform: translateY(-3px) rotate(-0.3deg);
+  }
+  100% {
+    transform: translateY(3px) rotate(0.3deg);
+  }
+}
+
+@media (width <= 1199px) {
+  .di-pre {
+    min-height: 360px;
+  }
+
+  .dropin .di-tip {
+    position: static;
+    width: 100%;
+    margin-top: 24px;
+  }
+}
+
+@media (width <= 767px) {
+  .di-pre {
+    min-height: 300px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dropin.js-anim :is(.di-mark, .di-label, .dropin h2, .di-body, .di-code, .di-tip) {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .dropin.js-anim.in-view .di-tip,
+  .di-pre .cl.flash,
+  .di-cursor {
+    animation: none !important;
+  }
+}
+
+/* Tulip hero entrance (matches reference th-* animations). */
+@keyframes th-up {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes th-icon-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes th-ctas-in {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes th-note-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.th-icon {
+  animation: th-icon-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.th-badge {
+  animation: th-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+}
+
+.tulip-hero h1 {
+  animation: th-up 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both;
+}
+
+.th-lede {
+  animation: th-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+}
+
+.th-ctas {
+  animation: th-ctas-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.54s both;
+}
+
+.th-note {
+  animation: th-note-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.7s both;
+}
+
+/* Tulip in Action cards. */
+.js-anim .ta-card,
+.js-anim .ta-arrow {
+  opacity: 0;
+}
+
+.js-anim .ta-card {
+  transform: translateY(16px);
+  transition:
+    opacity 0.4s ease-out,
+    transform 0.4s ease-out,
+    border-color 0.25s ease-out,
+    background-color 0.25s ease-out,
+    box-shadow 0.25s ease-out;
+}
+
+.js-anim .ta-arrow {
+  transform: scale(0.96);
+  transition:
+    opacity 0.4s ease-out,
+    transform 0.4s ease-out,
+    box-shadow 0.2s;
+}
+
+.js-anim.in-view .ta-card,
+.js-anim.in-view .ta-arrow {
+  opacity: 1;
+  transform: none;
+}
+
+.js-anim.in-view .ta-card:nth-child(1) {
+  transition-delay: 50ms;
+}
+
+.js-anim.in-view .ta-card:nth-child(2) {
+  transition-delay: 0.17s;
+}
+
+.js-anim.in-view .ta-card:nth-child(3) {
+  transition-delay: 0.29s;
+}
+
+.js-anim.in-view .ta-arrow-1 {
+  transition-delay: 0.24s;
+}
+
+.js-anim.in-view .ta-arrow-2 {
+  transition-delay: 0.34s;
+}
+
+.js-anim.in-view .ta-card:hover,
+.ta-card:hover {
+  border-color: rgba(227, 226, 112, 0.7);
+  background-color: rgba(0, 48, 18, 0.66);
+  transition-delay: 0s;
+  transform: translateY(-6px);
+  box-shadow:
+    0 24px 50px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(217, 229, 51, 0.12);
+}
+
+/* Tulip Support Plans. */
+.tp-plans.js-anim .tp-head,
+.tp-plans.js-anim .tp-card {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.28s ease-out,
+    transform 0.28s ease-out,
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.tp-plans.js-anim.in-view .tp-head,
+.tp-plans.js-anim.in-view .tp-card {
+  opacity: 1;
+  transform: none;
+}
+
+.tp-plans.js-anim.in-view .tp-card:nth-child(1) {
+  transition-delay: 80ms;
+}
+
+.tp-plans.js-anim.in-view .tp-card:nth-child(2) {
+  transition-delay: 0.16s;
+}
+
+.tp-plans .tp-card:hover {
+  border-color: #9ca703;
+  transform: scale(1.01);
+  box-shadow:
+    inset 0 0 44px rgba(156, 167, 3, 0.18),
+    0 14px 34px rgba(0, 0, 0, 0.3);
+}
+
+.tp-plans .tp-card:hover .tp-check {
+  transform: scale(1.1);
+}
+
+/* Tulip FAQ. */
+.tulip-faq.js-anim .fq-head,
+.tulip-faq.js-anim .fq-item {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.28s ease-out,
+    transform 0.28s ease-out;
+}
+
+.tulip-faq.js-anim.in-view .fq-head,
+.tulip-faq.js-anim.in-view .fq-item {
+  opacity: 1;
+  transform: none;
+}
+
+.tulip-faq.js-anim.in-view .fq-item:nth-child(1) {
+  transition-delay: 60ms;
+}
+
+.tulip-faq.js-anim.in-view .fq-item:nth-child(2) {
+  transition-delay: 0.12s;
+}
+
+.tulip-faq.js-anim.in-view .fq-item:nth-child(3) {
+  transition-delay: 0.18s;
+}
+
+.tulip-faq.js-anim.in-view .fq-item:nth-child(4) {
+  transition-delay: 0.24s;
+}
+
+.tulip-faq.js-anim.in-view .fq-item:nth-child(5) {
+  transition-delay: 0.3s;
+}
+
+.tulip-faq.js-anim.in-view .fq-item:nth-child(6) {
+  transition-delay: 0.36s;
+}
+
+.tulip-faq.js-anim.in-view .fq-item:nth-child(7) {
+  transition-delay: 0.42s;
+}
+
+/* Tulip lead form. */
+.tulip-lead.js-anim .lf-copy > *,
+.tulip-lead.js-anim .lf-card {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.3s ease-out,
+    transform 0.3s ease-out;
+}
+
+.tulip-lead.js-anim.in-view .lf-copy > *,
+.tulip-lead.js-anim.in-view .lf-card {
+  opacity: 1;
+  transform: none;
+}
+
+.tulip-lead.js-anim.in-view .lf-copy > :nth-child(2) {
+  transition-delay: 80ms;
+}
+
+.tulip-lead.js-anim.in-view .lf-copy > :nth-child(3) {
+  transition-delay: 0.16s;
+}
+
+.tulip-lead.js-anim.in-view .lf-card {
+  transition-delay: 0.12s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .th-icon,
+  .th-badge,
+  .tulip-hero h1,
+  .th-lede,
+  .th-ctas,
+  .th-note {
+    animation: none;
+  }
+
+  .js-anim .ta-card,
+  .js-anim .ta-arrow,
+  .tp-plans.js-anim .tp-head,
+  .tp-plans.js-anim .tp-card,
+  .tulip-faq.js-anim .fq-head,
+  .tulip-faq.js-anim .fq-item,
+  .tulip-lead.js-anim .lf-copy > *,
+  .tulip-lead.js-anim .lf-card {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .js-anim.in-view .ta-card:hover,
+  .tp-plans .tp-card:hover,
+  .tp-plans .tp-card:hover .tp-check {
+    transform: none;
+  }
+}
+
 /* Paper grain from the live OllyGarden site (`texture-grain.png` tiled 328×140). */
 .texture-grain {
   background-image: url("/images/texture-grain.png");
@@ -848,66 +1278,85 @@ body {
 }
 
 .ogsec {
-  --cell: 62px;
-  --cluster: calc(var(--cell) * 6);
-  --badge: calc(var(--cluster) * 0.465);
+  --sec-bg: #011e0c;
+  --sec-card: #011a09;
+  --sec-border: #d1d10052;
+  --sec-border-hover: #d1d10085;
+  --sec-eyebrow: #9ca703;
   --sec-paper: #faf9f0;
-  --sec-olive: #9ca703;
   --sec-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --sec-radius: 24px;
   isolation: isolate;
   position: relative;
-  display: flex;
-  align-items: center;
-  min-height: 441px;
   overflow: hidden;
-  background: #011e0c;
+  background: var(--sec-bg);
+  padding: 96px 104px;
 }
 
-.ogsec::before {
-  content: "";
-  position: absolute;
-  inset: 0;
+.ogsec .tulip-grid {
   z-index: 0;
-  background: linear-gradient(162.3deg, #011e0c 26.2%, #787e27 146%);
-}
-
-.ogsec-grain {
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='g' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2.5' numOctaves='3' seed='5078' stitchTiles='stitch' result='n'/%3E%3CfeColorMatrix in='n' type='luminanceToAlpha' result='a'/%3E%3CfeComponentTransfer in='a' result='m'%3E%3CfeFuncA type='linear' slope='1.191' intercept='-0.0375'/%3E%3C/feComponentTransfer%3E%3CfeComposite operator='in' in='m' in2='SourceGraphic' result='clip'/%3E%3CfeFlood flood-color='%23031E0C' result='c'/%3E%3CfeComposite operator='in' in='c' in2='clip'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23g)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 256px 256px;
+  animation: none;
 }
 
 .ogsec-inner {
   position: relative;
-  z-index: 4;
-  width: 100%;
-  max-width: 1328px;
+  z-index: 1;
+  max-width: 1232px;
   margin-inline: auto;
-  padding: clamp(24px, 4vw, 40px) clamp(16px, 5vw, 48px);
+}
+
+.ogsec-card {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 48px;
+  min-height: 235px;
+  padding: 32px 56px;
+  border: 1px solid var(--sec-border);
+  border-radius: var(--sec-radius);
+  background-color: var(--sec-card);
+  background-image:
+    linear-gradient(182deg, rgba(120, 126, 39, 0.086) 0%, rgba(120, 126, 39, 0) 45%),
+    linear-gradient(rgba(1, 26, 9, 0.5), rgba(1, 26, 9, 0.5)),
+    url("/images/texture-grain.png");
+  background-repeat: no-repeat, no-repeat, repeat;
+  background-size: 100% 100%, 100% 100%, 328px 140px;
+  transition:
+    border-color 0.45s var(--sec-ease),
+    box-shadow 0.45s var(--sec-ease);
+}
+
+.ogsec-card:hover,
+.ogsec-card:focus-within {
+  border-color: var(--sec-border-hover);
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.34),
+    0 0 0 1px rgba(209, 209, 0, 0.08),
+    0 0 46px -12px rgba(120, 126, 39, 0.34);
 }
 
 .ogsec-copy {
-  position: relative;
-  top: -2px;
-  max-width: min(620px, calc(100% - var(--cluster) - 48px));
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 6px;
 }
 
 .ogsec-eyebrow {
-  margin: 0 0 11px;
+  margin: 0;
   font-size: 16px;
   font-weight: 700;
   line-height: 20px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--sec-olive);
+  color: var(--sec-eyebrow);
 }
 
 .ogsec-title {
-  margin: 0 0 17px;
+  margin: -6px 0 0;
   font-size: 48px;
   font-weight: 700;
   line-height: 61px;
@@ -919,55 +1368,18 @@ body {
   margin: 0;
   font-size: 16px;
   font-weight: 400;
-  line-height: 1.4;
+  line-height: 22px;
   letter-spacing: 0.02em;
   color: var(--sec-paper);
-}
-
-.ogsec-deco {
-  position: absolute;
-  z-index: 3;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: var(--cluster);
-  height: var(--cluster);
-  margin-block: auto;
-}
-
-.ogsec-deco:focus {
-  outline: none;
-}
-
-.ogsec-deco:focus-visible {
-  outline: 2px solid var(--sec-olive);
-  outline-offset: 4px;
-}
-
-.ogsec-sq {
-  position: absolute;
-  top: calc(var(--r) * var(--cell));
-  left: calc(var(--c) * var(--cell));
-  display: block;
-  width: var(--cell);
-  height: var(--cell);
-}
-
-.ogsec-fill {
-  pointer-events: none;
-  display: block;
-  width: 100%;
-  height: 100%;
-  transition: opacity 0.24s ease-out;
+  opacity: 0.92;
 }
 
 .ogsec-badge {
-  position: absolute;
-  top: calc(50% + var(--cluster) * 0.00126);
-  left: calc(50% + var(--cluster) * 0.00777);
-  width: var(--badge);
-  height: var(--badge);
-  margin: calc(var(--badge) / -2) 0 0 calc(var(--badge) / -2);
+  position: relative;
+  flex: 0 0 auto;
+  width: 171px;
+  height: 171px;
+  transition: transform 0.45s var(--sec-ease);
 }
 
 .ogsec-badge img {
@@ -977,143 +1389,183 @@ body {
   border-radius: 50%;
 }
 
+.ogsec-card:hover .ogsec-badge {
+  transform: translateY(-4px) rotate(1.5deg);
+}
+
 .ogsec-tm {
   position: absolute;
-  top: 88%;
+  top: 89%;
   left: 91%;
-  font-size: calc(var(--cell) * 0.13);
+  font-size: 8px;
   font-weight: 700;
   line-height: 1;
   letter-spacing: 0.04em;
   color: #fff;
 }
 
-.js-anim.ogsec::before,
+.ogsec-card:focus-visible,
+.ogsec-badge:focus-visible {
+  outline: 2px solid #e3e270;
+  outline-offset: 4px;
+}
+
+.js-anim.ogsec .tulip-grid {
+  opacity: 0;
+}
+
+.js-anim.ogsec.in-view .tulip-grid {
+  opacity: 1;
+  transition: opacity 0.5s 0.25s;
+}
+
+.js-anim.ogsec .ogsec-card {
+  opacity: 0;
+  transform: translateY(24px) scale(0.98);
+}
+
+.js-anim.ogsec.in-view .ogsec-card {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.55s var(--sec-ease),
+    transform 0.55s var(--sec-ease),
+    border-color 0.45s var(--sec-ease),
+    box-shadow 0.45s var(--sec-ease);
+}
+
+.js-anim.ogsec .ogsec-copy > * {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.js-anim.ogsec.in-view .ogsec-copy > * {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.45s var(--sec-ease) var(--d, 0.12s),
+    transform 0.45s var(--sec-ease) var(--d, 0.12s);
+}
+
+.js-anim.ogsec .ogsec-copy > :nth-child(2) {
+  --d: 0.2s;
+}
+
+.js-anim.ogsec .ogsec-copy > :nth-child(3) {
+  --d: 0.28s;
+}
+
 .js-anim.ogsec .ogsec-badge {
-  will-change: transform, opacity;
-}
-
-.js-anim.ogsec::before {
-  transform: scale(1.05) translate(-1.2%, -1.2%);
-  transition: transform 0.85s var(--sec-ease);
-}
-
-.js-anim.ogsec.in-view::before {
-  transform: none;
-}
-
-.js-anim .ogsec-copy > * {
   opacity: 0;
-  transform: translateY(16px);
-  transition:
-    opacity 0.5s var(--sec-ease),
-    transform 0.5s var(--sec-ease);
+  transform: scale(0.86);
 }
 
-.js-anim .ogsec-copy > :nth-child(2) {
-  transition-delay: 80ms;
-}
-
-.js-anim .ogsec-copy > :nth-child(3) {
-  transition-delay: 0.16s;
-}
-
-.js-anim.in-view .ogsec-copy > * {
+.js-anim.ogsec.in-view .ogsec-badge {
   opacity: 1;
   transform: none;
-}
-
-.js-anim .ogsec-sq {
-  opacity: 0;
-  transform: scale(0.94);
   transition:
-    opacity 0.4s var(--sec-ease) calc(0.2s + var(--i) * 45ms),
-    transform 0.4s var(--sec-ease) calc(0.2s + var(--i) * 45ms);
+    opacity 0.4s 0.24s,
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.24s;
 }
 
-.js-anim.in-view .ogsec-sq {
-  opacity: 1;
-  transform: none;
-}
-
-.js-anim .ogsec-badge {
-  opacity: 0;
-  transform: scale(0.98);
-  transition:
-    opacity 0.42s var(--sec-ease) 0.26s,
-    transform 0.42s var(--sec-ease) 0.26s;
-}
-
-.js-anim.in-view .ogsec-badge {
-  opacity: 1;
-  transform: none;
-  animation: ogsec-float 4.5s ease-in-out 0.9s infinite;
-}
-
-@keyframes ogsec-float {
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translateY(-2.5px);
-  }
+.js-anim.ogsec.in-view .ogsec-card:hover .ogsec-badge {
+  transform: translateY(-4px) rotate(1.5deg);
 }
 
 @media (width <= 1279px) {
   .ogsec {
-    --cell: 53px;
-    min-height: 400px;
+    padding: 88px clamp(40px, 6vw, 80px);
   }
 
   .ogsec-title {
-    margin-bottom: 16px;
-    font-size: clamp(36px, 3.2vw, 40px);
-    line-height: 1.25;
+    font-size: 42px;
+    line-height: 54px;
   }
 
-  .ogsec-copy {
-    max-width: min(560px, calc(100% - var(--cluster) - 24px));
+  .ogsec-badge {
+    width: 150px;
+    height: 150px;
   }
 }
 
 @media (width <= 1023px) {
   .ogsec {
-    --cell: 44px;
-    min-height: 360px;
+    padding: 72px clamp(24px, 5vw, 48px);
+  }
+
+  .ogsec-card {
+    min-height: 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    padding: 40px;
+    text-align: center;
+  }
+
+  .ogsec-copy {
+    align-items: center;
+  }
+
+  .ogsec-badge {
+    width: 128px;
+    height: 128px;
   }
 }
 
 @media (width <= 767px) {
   .ogsec {
-    --cell: min(46px, 12vw);
-    min-height: 0;
-    display: block;
+    padding: 56px 22px;
   }
 
-  .ogsec-inner {
-    padding: 32px clamp(16px, 5vw, 24px) 0;
+  .ogsec-card {
+    gap: 28px;
+    padding: 32px 24px;
   }
 
-  .ogsec-copy {
-    max-width: none;
+  .ogsec-eyebrow {
+    font-size: 14px;
+    line-height: 18px;
   }
 
   .ogsec-title {
-    font-size: clamp(28px, 7.5vw, 32px);
-    line-height: 1.2;
+    font-size: 32px;
+    line-height: 40px;
   }
 
-  .ogsec-deco {
-    position: relative;
-    inset: auto;
-    margin: 28px auto 32px;
+  .ogsec-body {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .ogsec-badge {
+    width: 104px;
+    height: 104px;
+  }
+
+  .ogsec-tm {
+    font-size: 7px;
+  }
+
+  .ogsec-card:hover {
+    border-color: var(--sec-border);
+    box-shadow: none;
+  }
+
+  .ogsec-card:hover .ogsec-badge,
+  .js-anim.ogsec.in-view .ogsec-card:hover .ogsec-badge {
+    transform: none;
   }
 }
 
-@media (width <= 360px) {
-  .ogsec-tm {
-    display: none;
+@media (width <= 479px) {
+  .ogsec-title {
+    font-size: 28px;
+    line-height: 34px;
+  }
+
+  .ogsec-badge {
+    width: 96px;
+    height: 96px;
   }
 }
 
@@ -1422,19 +1874,18 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ogsec::before,
-  .ogsec-copy > *,
-  .ogsec-sq,
+  .ogsec-card,
   .ogsec-badge,
-  .ogsec.in-view .ogsec-badge {
+  .ogsec .tulip-grid,
+  .ogsec-copy > * {
     opacity: 1;
     transform: none;
     animation: none;
     transition: none;
   }
 
-  .ogsec-fill {
-    transition: none;
+  .ogsec-card:hover .ogsec-badge {
+    transform: none;
   }
 
   .why-card,
@@ -1468,9 +1919,9 @@ body {
     transform: none;
   }
 
-  .js-anim .ogsec-copy > *,
-  .js-anim .ogsec-sq,
-  .js-anim .ogsec-badge,
+  .js-anim.ogsec .ogsec-copy > *,
+  .js-anim.ogsec .ogsec-badge,
+  .js-anim.ogsec .ogsec-card,
   .js-anim .why-copy > *,
   .js-anim .voices-head > *,
   .js-anim .voice-card,
@@ -1768,6 +2219,65 @@ body {
 .js-anim.in-view .action-video {
   opacity: 1;
   transform: none;
+}
+
+/* Insights hero entrance (matches reference riseIn / fx delays). */
+@keyframes ih-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.insights-hero .ih-fx {
+  animation: ih-rise-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.insights-hero .ih-fx-1 {
+  animation-delay: 50ms;
+}
+
+.insights-hero .ih-fx-2 {
+  animation-delay: 0.13s;
+}
+
+.insights-hero .ih-fx-3 {
+  animation-delay: 0.21s;
+}
+
+.insights-hero .ih-fx-4 {
+  animation-delay: 0.29s;
+}
+
+.insights-hero .ih-card-fx {
+  animation: ih-rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.insights-hero .ih-card-fx-a {
+  animation-delay: 0.38s;
+}
+
+.insights-hero .ih-card-fx-b {
+  animation-delay: 0.52s;
+}
+
+.js-anim .insights-plan-mid {
+  transition-delay: 60ms;
+}
+
+.js-anim.in-view .insights-plan-mid {
+  transition-delay: 60ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .insights-hero .ih-fx,
+  .insights-hero .ih-card-fx {
+    animation: none;
+  }
 }
 
 .js-anim .m-card {

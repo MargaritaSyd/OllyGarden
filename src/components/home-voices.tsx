@@ -50,29 +50,60 @@ function VoiceCard({
     <article
       className={
         wide
-          ? "voice-card overflow-hidden bg-[#011407] md:grid md:grid-cols-[minmax(16rem,24.75rem)_minmax(0,1fr)] md:items-center"
+          ? "voice-card voice-wide overflow-hidden bg-[#011407] md:grid md:grid-cols-[auto_minmax(0,1fr)] md:items-center"
           : "voice-card flex flex-col overflow-hidden bg-[#011407]"
       }
     >
-      <div className="grid grid-cols-[84px_minmax(0,1fr)] grid-rows-[52px_52px]">
-        <VoicePhoto quote={quote} />
-        <span className="flex items-center bg-olive px-5 text-[15px] font-semibold tracking-[0.01em] text-mist">
+      <div
+        className={
+          wide
+            ? "vc-head grid justify-items-start [grid-template-areas:'img'_'name'_'role'] [grid-template-rows:101px_52px_52px]"
+            : "vc-head grid [grid-template-areas:'img_name'_'img_role'] [grid-template-columns:84px_minmax(0,1fr)] [grid-template-rows:52px_52px]"
+        }
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={quote.image}
+          alt={quote.imageAlt}
+          width={wide ? 105 : 84}
+          height={wide ? 101 : 104}
+          className={
+            wide
+              ? "[grid-area:img] block h-[101px] w-[105px] object-cover"
+              : "[grid-area:img] block h-[104px] w-[84px] object-cover"
+          }
+        />
+        <span
+          className={
+            wide
+              ? "vc-name flex min-w-[260px] items-center justify-self-start bg-olive px-[26px] text-[15px] font-semibold tracking-[0.01em] whitespace-nowrap text-mist max-md:min-w-0 max-md:whitespace-normal max-sm:px-3.5 max-sm:text-[13.5px]"
+              : "vc-name flex min-w-[77%] items-center justify-self-start bg-olive px-5 text-[15px] font-semibold tracking-[0.01em] whitespace-nowrap text-mist max-md:whitespace-normal max-sm:px-3.5 max-sm:text-[13.5px]"
+          }
+        >
           {quote.name}
         </span>
-        <span className="flex items-center bg-sunflower px-5 text-[14.5px] leading-snug font-semibold tracking-[0.01em] text-forest">
+        <span
+          className={
+            wide
+              ? "vc-role flex min-w-[396px] items-center justify-self-start bg-[#d9e533] px-[26px] text-[14.5px] leading-snug font-semibold tracking-[0.01em] whitespace-nowrap text-[#0b2410] max-md:min-w-0 max-md:whitespace-normal max-sm:px-3.5 max-sm:text-[13.5px]"
+              : "vc-role flex items-center bg-[#d9e533] px-5 text-[14.5px] leading-snug font-semibold tracking-[0.01em] whitespace-nowrap text-[#0b2410] max-md:whitespace-normal max-sm:px-3.5 max-sm:text-[13.5px]"
+          }
+        >
           {quote.role}
         </span>
       </div>
       <blockquote
         className={
-          wide ? "px-8 py-9 md:px-16 md:py-9" : "px-7 pt-16 pb-[60px]"
+          wide
+            ? "vc-quote px-7 pt-4 pb-[46px] md:px-16 md:pt-[34px] md:pb-[38px]"
+            : "vc-quote px-7 pt-16 pb-[60px]"
         }
       >
         <QuoteMark />
         <p
           className={
             wide
-              ? "mt-[18px] text-[20px] leading-snug text-[#e9ece0]"
+              ? "mt-[18px] max-w-[56ch] text-[20px] leading-snug text-[#e9ece0] max-sm:text-[17.5px]"
               : "mt-[18px] text-[18.5px] leading-snug text-[#e9ece0]"
           }
         >
@@ -80,23 +111,6 @@ function VoiceCard({
         </p>
       </blockquote>
     </article>
-  );
-}
-
-function VoicePhoto({
-  quote,
-}: {
-  quote: (typeof homeVoices.quotes)[number];
-}) {
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={quote.image}
-      alt={quote.imageAlt}
-      width={84}
-      height={104}
-      className="row-span-2 h-[104px] w-[84px] object-cover"
-    />
   );
 }
 

@@ -1,63 +1,66 @@
 import { GetStartedLink } from "@/components/get-started-link";
+import { InView } from "@/components/in-view";
 import { tulipPlans } from "@/lib/tulip";
 
 export function TulipPlans() {
   return (
-    <section aria-labelledby="tp-title" className="px-6 py-20 sm:px-12 lg:px-[104px] lg:py-24">
-      <div className="mx-auto max-w-[1328px]">
-        <div className="mx-auto mb-14 max-w-[720px] text-center">
+    <InView
+      as="section"
+      aria-labelledby="tp-title"
+      className="tp-plans flex justify-center overflow-hidden px-5 py-16 sm:px-8 lg:px-[104px] lg:pt-[120px] lg:pb-24"
+    >
+      <div className="tp-inner flex w-full max-w-[1232px] flex-col gap-10 sm:gap-12 lg:gap-14">
+        <div className="tp-head mx-auto flex max-w-[720px] flex-col items-center gap-4 text-center">
           <PlansMark />
-          <p className="mt-4 text-sm font-bold tracking-[0.14em] text-bitmap-mid uppercase">
+          <p className="text-base font-bold tracking-[0.1em] text-bitmap-mid uppercase">
             {tulipPlans.eyebrow}
           </p>
           <h2
             id="tp-title"
-            className="mt-4 text-[clamp(1.75rem,3.8vw,3rem)] leading-[1.27] font-bold tracking-[-0.02em] text-balance text-mist"
+            className="max-w-[700px] text-[clamp(1.75rem,3.8vw,3rem)] leading-[1.27] font-bold tracking-[-0.02em] text-balance text-mist"
           >
             {tulipPlans.title}
           </h2>
-          <p className="mx-auto mt-5 max-w-[700px] text-base leading-[1.66] text-mist/75">
+          <p className="mx-auto mt-1 max-w-[571px] text-base leading-[1.4] tracking-[0.02em] text-[#d1d5db]">
             {tulipPlans.sub}
           </p>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-2">
+        <div className="tp-grid grid items-stretch gap-6 lg:grid-cols-2">
           <PlanCard plan={tulipPlans.standard} />
-          <PlanCard plan={tulipPlans.enterprise} darker />
+          <PlanCard plan={tulipPlans.enterprise} />
         </div>
       </div>
-    </section>
+    </InView>
   );
 }
 
 function PlanCard({
   plan,
-  darker = false,
 }: {
   plan: typeof tulipPlans.standard | typeof tulipPlans.enterprise;
-  darker?: boolean;
 }) {
   return (
-    <article
-      className={`surface-grain relative flex flex-col overflow-hidden rounded-3xl border p-[clamp(1.625rem,3.2vw,2.75rem)] ${
-        darker ? "border-white/8 bg-[#071008]" : "border-[#d9e533]/20 bg-[#19321e]"
-      }`}
-    >
-      <p className="text-xs font-bold tracking-[0.14em] text-bitmap-mid uppercase">
-        {plan.tier}
-      </p>
-      <p className="mt-3 text-[clamp(2rem,3vw,2.5rem)] leading-none font-bold text-mist">
-        {plan.price}
-        {plan.suffix ? (
-          <span className="ml-1 text-lg font-medium text-mist/60">{plan.suffix}</span>
-        ) : null}
-      </p>
-      <p className="mt-3 mb-8 text-sm leading-[1.55] text-mist/65">{plan.note}</p>
-      <ul className="mb-9 flex flex-col gap-3.5">
+    <article className="tp-card surface-grain flex flex-col gap-5 rounded-2xl border border-sunflower/32 bg-[#002810] p-6 transition-[transform,border-color,box-shadow] duration-200">
+      <div className="flex flex-col gap-2">
+        <p className="text-xs tracking-[0.04em] text-mist/70 uppercase">{plan.tier}</p>
+        <p className="flex items-baseline gap-2">
+          <strong className="text-[clamp(2rem,3vw,2.25rem)] leading-[1.28] font-bold tracking-[-0.02em] text-mist">
+            {plan.price}
+          </strong>
+          {plan.suffix ? (
+            <span className="text-sm leading-[1.3] font-medium tracking-[0.02em] text-mist/90">
+              {plan.suffix}
+            </span>
+          ) : null}
+        </p>
+        <p className="text-sm leading-[1.4] text-mist/85">{plan.note}</p>
+      </div>
+      <ul className="flex flex-1 flex-col gap-3">
         {plan.items.map((item) => (
           <li
             key={item}
-            className="flex items-start gap-3 text-[15px] leading-[1.5] text-[#e9ece0]/85"
+            className="flex items-center gap-3 text-sm leading-[1.4] text-mist"
           >
             <CheckIcon />
             {item}
@@ -73,10 +76,15 @@ function PlanCard({
 
 function CheckIcon() {
   return (
-    <svg className="mt-0.5 shrink-0" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+    <svg
+      className="tp-check size-[18px] shrink-0 text-bitmap-mid transition-transform duration-200 ease-out"
+      viewBox="0 0 18 18"
+      fill="none"
+      aria-hidden="true"
+    >
       <path
         d="M3.2 9.6l3.6 3.6 8-9"
-        stroke="#9CA703"
+        stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"

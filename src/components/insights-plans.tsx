@@ -1,11 +1,12 @@
 import { GetStartedLink } from "@/components/get-started-link";
+import { InView } from "@/components/in-view";
 import { insightsPlans } from "@/lib/insights";
 
 export function InsightsPlans() {
   return (
-    <section aria-labelledby="pricing-title">
+    <InView as="section" aria-labelledby="pricing-title">
       <div className="mx-auto w-full max-w-[1328px] px-5 py-[clamp(5.25rem,9vw,8.75rem)] sm:px-12">
-        <div className="mx-auto mb-[clamp(2.75rem,5vw,4rem)] text-center">
+        <div className="ov-stagger mx-auto mb-[clamp(2.75rem,5vw,4rem)] text-center">
           <PlansMark />
           <p className="mt-4 text-sm font-bold tracking-[0.14em] text-bitmap-mid uppercase">
             {insightsPlans.eyebrow}
@@ -23,26 +24,34 @@ export function InsightsPlans() {
 
         <div className="grid gap-[clamp(1.5rem,3vw,2.25rem)] lg:grid-cols-3">
           {insightsPlans.cards.map((plan, index) => (
-            <PlanCard key={plan.tier} plan={plan} darker={index === 2} />
+            <PlanCard
+              key={plan.tier}
+              plan={plan}
+              variant={index === 0 ? "free" : index === 2 ? "ent" : "mid"}
+            />
           ))}
         </div>
       </div>
-    </section>
+    </InView>
   );
 }
 
 function PlanCard({
   plan,
-  darker = false,
+  variant,
 }: {
   plan: (typeof insightsPlans.cards)[number];
-  darker?: boolean;
+  variant: "free" | "mid" | "ent";
 }) {
   return (
     <article
-      className={`surface-grain relative flex flex-col overflow-hidden rounded-3xl border p-[clamp(1.5rem,3vw,2.25rem)] ${
-        darker ? "border-white/8 bg-[#071008]" : "border-[#d9e533]/20 bg-[#19321e]"
-      }`}
+      className={`plan-card relative flex flex-col overflow-hidden rounded-3xl border p-[clamp(1.5rem,3vw,2.25rem)] ${
+        variant === "ent"
+          ? "plan-ent border-white/8"
+          : variant === "free"
+            ? "plan-free border-[#d9e533]/20"
+            : "border-[#d9e533]/20"
+      } ${variant === "mid" ? "insights-plan-mid" : ""}`}
     >
       <p className="text-xs font-bold tracking-[0.14em] text-bitmap-mid uppercase">
         {plan.tier}

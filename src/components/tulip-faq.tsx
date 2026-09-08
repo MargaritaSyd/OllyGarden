@@ -1,16 +1,18 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { InView } from "@/components/in-view";
 import { tulipFaq } from "@/lib/tulip";
 
 export function TulipFaq() {
   return (
-    <section
+    <InView
+      as="section"
       aria-labelledby="fq-title"
-      className="flex justify-center px-5 py-16 sm:px-8 lg:px-[104px] lg:pt-24 lg:pb-[140px]"
+      className="tulip-faq flex justify-center px-5 py-16 sm:px-8 lg:px-[104px] lg:pt-24 lg:pb-[140px]"
     >
       <div className="flex w-full max-w-[1232px] flex-col gap-8 lg:gap-12">
-        <div className="flex flex-col gap-4">
+        <div className="fq-head flex flex-col gap-4">
           <h2
             id="fq-title"
             className="text-[clamp(1.75rem,3.6vw,2.75rem)] leading-[1.18] font-bold tracking-[-0.02em] text-mist"
@@ -28,7 +30,7 @@ export function TulipFaq() {
           ))}
         </div>
       </div>
-    </section>
+    </InView>
   );
 }
 
@@ -50,7 +52,7 @@ function FaqItem({
   return (
     <details
       ref={ref}
-      className="tulip-faq-item overflow-hidden rounded-xl border border-sunflower/32 bg-[#002810] bg-[url('/images/texture-grain.png')] bg-repeat [background-size:328px_140px] transition-[border-color,box-shadow] duration-200 ease-out hover:border-sunflower/55 hover:shadow-[0_14px_34px_rgba(0,0,0,0.26)]"
+      className="tulip-faq-item fq-item overflow-hidden rounded-xl border border-sunflower/32 bg-[#002810] bg-[url('/images/texture-grain.png')] bg-repeat [background-size:328px_140px] transition-[border-color,box-shadow,opacity,transform] duration-200 ease-out hover:border-sunflower/55 hover:shadow-[0_14px_34px_rgba(0,0,0,0.26)]"
     >
       <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-[18px] py-5 text-left select-none sm:px-6 sm:py-[26px] [&::-webkit-details-marker]:hidden marker:content-none focus-visible:rounded-xl focus-visible:outline-3 focus-visible:outline-offset-[-3px] focus-visible:outline-[#9ca703]/90">
         <h3 className="text-[17px] leading-[1.3] font-semibold tracking-[-0.01em] text-mist sm:text-lg">

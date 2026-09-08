@@ -1,3 +1,6 @@
+import { InsightsMascot } from "@/components/insights-mascot";
+import { RoseMascot } from "@/components/rose-mascot";
+import { TulipMascot } from "@/components/tulip-mascot";
 import type { MenuIconName } from "@/lib/nav";
 
 export function MenuItemIcon({ name }: { name: MenuIconName }) {
@@ -5,37 +8,19 @@ export function MenuItemIcon({ name }: { name: MenuIconName }) {
 
   switch (name) {
     case "insights":
-      return (
-        <svg className={className} viewBox="0 0 40 40" fill="currentColor" aria-hidden="true">
-          <path d="M20 4a10 10 0 0 0-6.5 17.6c.6.5 1 1.2 1.2 2V26h10.6v-2.4c.2-.8.6-1.5 1.2-2A10 10 0 0 0 20 4Zm-3.3 24v2.2h6.6V28H16.7Zm1.2 4.2v2.3h4.2v-2.3h-4.2Z" />
-          <circle cx="14" cy="14" r="2.2" />
-          <circle cx="26" cy="14" r="2.2" />
-          <circle cx="20" cy="8.5" r="1.6" />
-        </svg>
-      );
+      return <InsightsMascot className={className} viewBox="7.16 1.48 33 40" />;
     case "rose":
-      return (
-        <svg className={className} viewBox="0 0 40 40" fill="currentColor" aria-hidden="true">
-          <path d="M20 8c2.4 3.2 3.2 6.4 2.4 8.8 2.4-.8 5.6 0 8.8 2.4-3.2 2.4-6.4 3.2-8.8 2.4.8 2.4 0 5.6-2.4 8.8-2.4-3.2-3.2-6.4-2.4-8.8-2.4.8-5.6 0-8.8-2.4 3.2-2.4 6.4-3.2 8.8-2.4C16.8 14.4 17.6 11.2 20 8Z" />
-          <circle cx="20" cy="20" r="3.2" />
-        </svg>
-      );
+      return <RoseMascot className={className} viewBox="7.19 3.45 33 40" />;
     case "tulip":
-      return (
-        <svg className={className} viewBox="0 0 40 40" fill="currentColor" aria-hidden="true">
-          <path d="M20 4c4.8 4 7.2 8.8 7.2 13.2 0 4-3.2 6.8-7.2 6.8s-7.2-2.8-7.2-6.8C12.8 12.8 15.2 8 20 4Z" />
-          <path d="M19 24h2v12h-2z" />
-          <path d="M20 30c-4 0-7 2-8.5 5h3c1-1.6 3-2.6 5.5-2.6 2.5 0 4.5 1 5.5 2.6h3C27 32 24 30 20 30Z" />
-        </svg>
-      );
+      return <TulipMascot className={className} viewBox="9.73 3.66 33 40" />;
     case "polder":
       return (
-        <svg className={className} viewBox="0 0 40 40" fill="currentColor" aria-hidden="true">
-          <circle cx="20" cy="20" r="6" />
-          <circle cx="10" cy="10" r="3.2" />
-          <circle cx="30" cy="10" r="3.2" />
-          <circle cx="10" cy="30" r="3.2" />
-          <circle cx="30" cy="30" r="3.2" />
+        <svg className={className} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path d="M2.5104 5.00658C3.89686 5.00658 5.02081 3.88582 5.02081 2.50329C5.02081 1.12076 3.89686 0 2.5104 0C1.12395 0 0 1.12076 0 2.50329C0 3.88582 1.12395 5.00658 2.5104 5.00658Z" />
+          <path d="M17.4896 5.00658C18.8761 5.00658 20 3.88582 20 2.50329C20 1.12076 18.8761 0 17.4896 0C16.1031 0 14.9792 1.12076 14.9792 2.50329C14.9792 3.88582 16.1031 5.00658 17.4896 5.00658Z" />
+          <path d="M2.5104 20C3.89686 20 5.02081 18.8792 5.02081 17.4967C5.02081 16.1142 3.89686 14.9934 2.5104 14.9934C1.12395 14.9934 0 16.1142 0 17.4967C0 18.8792 1.12395 20 2.5104 20Z" />
+          <path d="M17.4896 20C18.876 20 20 18.8792 20 17.4967C20 16.1142 18.876 14.9934 17.4896 14.9934C16.1031 14.9934 14.9792 16.1142 14.9792 17.4967C14.9792 18.8792 16.1031 20 17.4896 20Z" />
+          <path d="M9.99798 14.9701C12.7602 14.9701 14.9995 12.7372 14.9995 9.98275C14.9995 7.22831 12.7602 4.9954 9.99798 4.9954C7.23571 4.9954 4.99646 7.22831 4.99646 9.98275C4.99646 12.7372 7.23571 14.9701 9.99798 14.9701Z" />
         </svg>
       );
     case "overview":

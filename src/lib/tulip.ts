@@ -219,9 +219,18 @@ export const tulipLead = {
   cardSub:
     "Tell us how you run the collector today and what kind of support you need. We’ll follow up within the Tulip SLA.",
   submit: "Talk to an OpenTelemetry Expert",
+  submitting: "Sending…",
   successTitle: "Thanks — your details are on their way!",
   successBody:
     "The Tulip team will follow up within the SLA for your chosen tier. Keep an eye on your inbox.",
+  error:
+    "Something went wrong sending your details. Please try again — your form is still here.",
+  errors: {
+    name: "Please enter your name.",
+    emailRequired: "Please enter your work email.",
+    emailInvalid: "Please enter a valid email address.",
+    supportTier: "Please choose a support tier.",
+  },
   tiers: [
     {
       value: "standard",

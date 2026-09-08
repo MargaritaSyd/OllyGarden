@@ -1,6 +1,6 @@
 # Supabase
 
-Contact and careers forms submit through Next.js Server Actions to the OllyGarden Supabase project. The browser never receives the Supabase URL or key. Never put a secret / `service_role` key in this repo.
+Contact, careers, and Tulip lead forms submit through Next.js Server Actions to the OllyGarden Supabase project. The browser never receives the Supabase URL or key. Never put a secret / `service_role` key in this repo.
 
 Env names are server-only (`SUPABASE_*`, no `NEXT_PUBLIC_`).
 
@@ -30,6 +30,10 @@ flowchart LR
   ActionJ --> InsertJ["insert job_applications"]
   InsertJ --> GateJ{"SEND_EMAIL true?"}
   GateJ -->|yes| FnJ["send-application-email"]
+  Tulip["/products/tulip"] --> ActionT["Server Action"]
+  ActionT --> InsertT["insert tulip_leads"]
+  InsertT --> GateT{"SEND_EMAIL true?"}
+  GateT -->|yes| FnT["send-tulip-lead-email"]
 ```
 
 **Contact** ([`src/components/contact-form.tsx`](../src/components/contact-form.tsx)): name, work email, optional message → Server Action → `contact_submissions` → optional `send-contact-email`.
@@ -39,6 +43,8 @@ flowchart LR
 `job_applications.job_id` is NOT NULL in Postgres even though this site has no job listings. Both CTAs send the sentinel `job_id: "open-application"` and `job_title: "Open Application"` ([`src/lib/supabase/submissions.ts`](../src/lib/supabase/submissions.ts)). If that column is a UUID, the insert will fail until product provides a real id.
 
 There is no message field on job applications in the current schema.
+
+**Tulip** ([`src/components/tulip-lead.tsx`](../src/components/tulip-lead.tsx)): name, email, and support tier required; company and deployment notes optional → Server Action → `tulip_leads` → optional `send-tulip-lead-email`. Invoke body: `{ name, email, company?, message?, supportTier }`. DB columns: `support_tier` (tier) and `notes` (maps from `message`).
 
 ## Client
 
@@ -54,8 +60,8 @@ Package: `@supabase/supabase-js` only. No `@supabase/ssr` (no sessions).
 
 1. Set URL + publishable key.
 2. Leave `SUPABASE_SEND_EMAIL` as `false`.
-3. Submit `/contact` and the careers modal.
-4. Check Table Editor: `contact_submissions` and `job_applications`.
+3. Submit `/contact`, the careers modal, and the Tulip lead form on `/products/tulip`.
+4. Check Table Editor: `contact_submissions`, `job_applications`, and `tulip_leads`.
 
 When you want the first real notification, set `SUPABASE_SEND_EMAIL=true` and restart. That flag only skips **our** `functions.invoke`. A database trigger or webhook on insert would still fire.
 

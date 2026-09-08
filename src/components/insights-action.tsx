@@ -1,11 +1,12 @@
+import { InView } from "@/components/in-view";
 import { VideoFrame } from "@/components/video-frame";
 import { insightsAction } from "@/lib/insights";
 
 export function InsightsAction() {
   return (
-    <section aria-labelledby="insights-action-title">
+    <InView as="section" aria-labelledby="insights-action-title">
       <div className="mx-auto w-full max-w-[1328px] px-5 py-[clamp(5.25rem,9vw,8.75rem)] sm:px-12">
-        <div className="mb-[clamp(2.5rem,4.5vw,4rem)] max-w-[640px]">
+        <div className="ov-stagger mb-[clamp(2.5rem,4.5vw,4rem)] max-w-[640px]">
           <ActionMark />
           <p className="mt-4 text-sm font-bold tracking-[0.14em] text-bitmap-mid uppercase">
             {insightsAction.eyebrow}
@@ -20,9 +21,13 @@ export function InsightsAction() {
             {insightsAction.sub}
           </p>
         </div>
-        <VideoFrame src={insightsAction.video.src} label={insightsAction.video.label} />
+        <VideoFrame
+          className="action-video"
+          src={insightsAction.video.src}
+          label={insightsAction.video.label}
+        />
       </div>
-    </section>
+    </InView>
   );
 }
 

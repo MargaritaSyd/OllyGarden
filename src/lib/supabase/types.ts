@@ -46,6 +46,30 @@ export type Database = {
         };
         Relationships: [];
       };
+      tulip_leads: {
+        Row: {
+          company: string | null;
+          email: string;
+          name: string;
+          notes: string | null;
+          support_tier: string;
+        };
+        Insert: {
+          company?: string | null;
+          email: string;
+          name: string;
+          notes?: string | null;
+          support_tier: string;
+        };
+        Update: {
+          company?: string | null;
+          email?: string;
+          name?: string;
+          notes?: string | null;
+          support_tier?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

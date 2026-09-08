@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { InView } from "@/components/in-view";
 import { insightsLevels } from "@/lib/insights";
 
 const GLOW_RADIUS = 150;
@@ -9,10 +10,10 @@ const PEAK_OPACITY = 0.9;
 
 export function InsightsLevels() {
   return (
-    <section aria-labelledby="iia-title" className="relative overflow-hidden">
+    <section aria-labelledby="iia-title" className="insights-levels relative overflow-hidden">
       <LevelsBlobs />
       <div className="relative z-10 mx-auto w-full max-w-[1328px] px-5 py-[clamp(4.75rem,8vw,7.5rem)] sm:px-12">
-        <div className="mb-[clamp(2.5rem,4.5vw,4rem)] max-w-[720px]">
+        <InView className="ov-stagger mb-[clamp(2.5rem,4.5vw,4rem)] max-w-[720px]">
           <LevelsMark />
           <p className="mt-4 text-sm font-bold tracking-[0.14em] text-bitmap-mid uppercase">
             {insightsLevels.eyebrow}
@@ -26,9 +27,9 @@ export function InsightsLevels() {
           <p className="mt-5 max-w-[560px] text-[16.5px] leading-[1.68] text-mist/75">
             {insightsLevels.sub}
           </p>
-        </div>
+        </InView>
 
-        <div className="mx-auto w-[88%] max-w-[1169px] grid gap-[clamp(1.3rem,2.65vw,2rem)] lg:grid-cols-2">
+        <InView className="ov-stagger mx-auto grid w-[88%] max-w-[1169px] gap-[clamp(1.3rem,2.65vw,2rem)] lg:grid-cols-2">
           {insightsLevels.cards.map((card) => (
             <article
               key={card.title}
@@ -56,7 +57,7 @@ export function InsightsLevels() {
               />
             </article>
           ))}
-        </div>
+        </InView>
       </div>
     </section>
   );

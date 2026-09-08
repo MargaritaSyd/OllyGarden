@@ -22,9 +22,9 @@ export default function Home() {
     <>
       <JsonLd data={homeGraph()} />
       <HomeHero />
-      <HomeSecurity />
       <HomeWhy />
       <HomeVoices />
+      <HomeSecurity />
       <HomeHow />
       <HomeBlog />
       <SiteCta />

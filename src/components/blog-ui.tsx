@@ -50,14 +50,16 @@ export function BlogReadLink({
   children,
   external = false,
   ariaLabel,
+  className = "",
 }: {
   href: string;
   children: string;
   external?: boolean;
   ariaLabel?: string;
+  className?: string;
 }) {
-  const className =
-    "group inline-flex h-8 shrink-0 items-center gap-2 text-lg font-medium tracking-[0.02em] text-sunflower";
+  const composedClassName =
+    `group inline-flex h-8 shrink-0 items-center gap-2 text-lg font-medium tracking-[0.02em] text-sunflower ${className}`.trim();
   const inner = (
     <>
       <span className="underline underline-offset-2">{children}</span>
@@ -71,7 +73,7 @@ export function BlogReadLink({
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className={className}
+        className={composedClassName}
         aria-label={ariaLabel}
       >
         {inner}
@@ -80,7 +82,7 @@ export function BlogReadLink({
   }
 
   return (
-    <Link href={href} className={className} aria-label={ariaLabel}>
+    <Link href={href} className={composedClassName} aria-label={ariaLabel}>
       {inner}
     </Link>
   );

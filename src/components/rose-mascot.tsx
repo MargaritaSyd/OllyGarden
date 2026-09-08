@@ -1,10 +1,16 @@
-export function RoseMascot({ className }: { className?: string }) {
+export function RoseMascot({
+  className,
+  viewBox = "0 0 48 48",
+}: {
+  className?: string;
+  viewBox?: string;
+}) {
   return (
     <svg
       className={className}
       width="48"
       height="48"
-      viewBox="0 0 48 48"
+      viewBox={viewBox}
       fill="none"
       aria-hidden="true"
     >

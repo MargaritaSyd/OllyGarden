@@ -148,13 +148,14 @@ export type FeaturedResource = {
 
 export const featuredResources: FeaturedResource[] = [
   {
-    href: "/resources/blog/the-scrape-interval-nobody-chose",
+    href: "/resources/blog/opentelemetry-vendor-lock-in-since-2024",
     category: "Blog",
-    date: "July 31, 2026",
+    date: "August 21, 2026",
     source: "OllyGarden",
-    title: "The Scrape Interval Nobody Chose",
-    image: "/images/blog/the-scrape-interval-nobody-chose.png",
-    imageAlt: "Cover illustration for “The Scrape Interval Nobody Chose”",
+    title: "What's changed about OpenTelemetry vendor lock-in since 2024",
+    image: "/images/blog/opentelemetry-vendor-lock-in-since-2024.png",
+    imageAlt:
+      "Cover illustration for “What's changed about OpenTelemetry vendor lock-in since 2024”",
   },
   {
     href: "/resources/webinars-conferences",

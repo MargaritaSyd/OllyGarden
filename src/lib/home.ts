@@ -9,7 +9,7 @@ export const homeSecurity = {
   eyebrow: "We take security seriously",
   title: "Security you can trust",
   body: "OllyGarden has completed a SOC 2® Type II examination.",
-  badgeAlt: "AICPA SOC badge",
+  badgeAlt: "AICPA SOC seal for service organizations",
   badgeSrc: "/images/soc-badge.png",
 } as const;
 

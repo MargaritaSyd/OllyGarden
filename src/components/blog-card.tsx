@@ -10,8 +10,8 @@ import {
 
 export function BlogCard({ post }: { post: BlogPost }) {
   return (
-    <article className="flex flex-col overflow-hidden rounded-3xl border border-sunflower/40 bg-[#00280e]">
-      <div className="h-[250px] overflow-hidden">
+    <article className="flex h-full flex-col overflow-hidden rounded-3xl border border-sunflower/40 bg-[#00280e]">
+      <div className="h-[250px] shrink-0 overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={post.image}
@@ -32,7 +32,9 @@ export function BlogCard({ post }: { post: BlogPost }) {
         </h3>
         <p className="text-base leading-[1.4] text-mist/85">{post.excerpt}</p>
         <BlogTags tags={blogCardTags(post)} />
-        <BlogReadLink href={blogPostHref(post.slug)}>Read Article</BlogReadLink>
+        <BlogReadLink href={blogPostHref(post.slug)} className="mt-auto">
+          Read Article
+        </BlogReadLink>
       </div>
     </article>
   );

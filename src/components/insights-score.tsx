@@ -47,7 +47,7 @@ export function InsightsScore() {
     <div className="relative mx-auto w-full max-w-[48rem] aspect-[736/623] lg:mx-0">
       <div className="iscore-bob-a absolute top-0 left-0 z-0 h-[62%] w-[56%]">
         <section
-          className="surface-grain flex size-full flex-col overflow-hidden rounded-3xl border border-[#e3e270]/40 bg-[#19321e]/90 shadow-[inset_0_1px_rgba(255,255,255,0.06),0_24px_60px_rgba(0,0,0,0.35)]"
+          className="ih-card-fx ih-card-fx-a surface-grain flex size-full flex-col overflow-hidden rounded-3xl border border-[#e3e270]/40 bg-[#19321e]/90 shadow-[inset_0_1px_rgba(255,255,255,0.06),0_24px_60px_rgba(0,0,0,0.35)]"
           aria-label="Instrumentation Score summary"
         >
           <div className="flex items-center justify-between gap-4 px-6 pt-6">
@@ -76,7 +76,7 @@ export function InsightsScore() {
         <div className="iscore-bob-b absolute top-[38%] left-[42%] z-10 h-[62%] w-[58%]">
           <section
             id={detailsId}
-            className="surface-grain flex size-full flex-col overflow-hidden rounded-3xl border border-[#e3e270]/40 bg-[#19321e]/90 shadow-[inset_0_1px_rgba(255,255,255,0.06),0_24px_60px_rgba(0,0,0,0.35)]"
+            className="ih-card-fx ih-card-fx-b surface-grain flex size-full flex-col overflow-hidden rounded-3xl border border-[#e3e270]/40 bg-[#19321e]/90 shadow-[inset_0_1px_rgba(255,255,255,0.06),0_24px_60px_rgba(0,0,0,0.35)]"
             aria-label="Instrumentation Score details"
           >
             <div className="flex items-center justify-between gap-4 px-6 pt-6">

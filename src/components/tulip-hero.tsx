@@ -5,16 +5,16 @@ import { tulipHero } from "@/lib/tulip";
 
 export function TulipHero() {
   return (
-    <section className="relative isolate min-h-svh overflow-hidden">
+    <section className="tulip-hero relative isolate min-h-svh overflow-hidden">
       <MotifField
         kind="tulip"
         className="pointer-events-none absolute inset-0 -z-10 select-none"
       />
 
       <div className="mx-auto flex min-h-svh w-full max-w-[1232px] flex-col items-center justify-center px-6 pt-[130px] pb-24 text-center">
-        <TulipMascot className="h-12 w-12 text-mist" />
+        <TulipMascot className="th-icon h-12 w-12 text-mist" />
 
-        <div className="surface-grain mt-6 inline-flex h-[26px] items-center gap-2 rounded-full border border-white/14 bg-[#19321e] px-4 text-[13px] font-medium tracking-[0.01em] text-bitmap-highlight">
+        <div className="th-badge surface-grain mt-6 inline-flex h-[26px] items-center gap-2 rounded-full border border-white/14 bg-[#19321e] px-4 text-[13px] font-medium tracking-[0.01em] text-bitmap-highlight">
           <BadgeChevrons />
           {tulipHero.badge}
         </div>
@@ -23,18 +23,18 @@ export function TulipHero() {
           {tulipHero.title}
         </h1>
 
-        <p className="mt-6 max-w-[660px] text-base leading-[1.4] text-mist/90">
+        <p className="th-lede mt-6 max-w-[660px] text-base leading-[1.4] text-mist/90">
           {tulipHero.lede}
         </p>
 
-        <div className="mt-6 flex w-full max-w-[420px] flex-col items-center justify-center gap-4 sm:max-w-none sm:flex-row">
+        <div className="th-ctas mt-6 flex w-full max-w-[420px] flex-col items-center justify-center gap-4 sm:max-w-none sm:flex-row">
           <GetStartedLink href="/products/tulip#ta-title">{tulipHero.primary}</GetStartedLink>
           <GetStartedLink href="/products/tulip#lead-title" variant="secondary">
             {tulipHero.secondary}
           </GetStartedLink>
         </div>
 
-        <p className="paper-grain texture-grain mt-6 max-w-[720px] rounded-2xl border border-[#e3e270]/40 px-6 py-4 text-sm leading-5 text-[#c9cb65]">
+        <p className="th-note paper-grain texture-grain mt-6 max-w-[720px] rounded-2xl border border-[#e3e270]/40 px-6 py-4 text-sm leading-5 text-[#c9cb65]">
           {tulipHero.note}
         </p>
       </div>
