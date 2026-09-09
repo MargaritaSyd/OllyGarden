@@ -26,7 +26,7 @@ flowchart LR
   ActionC --> InsertC["insert contact_submissions"]
   InsertC --> GateC{"SEND_EMAIL true?"}
   GateC -->|yes| FnC["send-contact-email"]
-  Careers["/careers both CTAs"] --> ActionJ["Server Action"]
+  Careers["/careers Apply CTAs"] --> ActionJ["Server Action"]
   ActionJ --> InsertJ["insert job_applications"]
   InsertJ --> GateJ{"SEND_EMAIL true?"}
   GateJ -->|yes| FnJ["send-application-email"]
@@ -38,9 +38,18 @@ flowchart LR
 
 **Contact** ([`src/components/contact-form.tsx`](../src/components/contact-form.tsx)): name, work email, optional message → Server Action → `contact_submissions` → optional `send-contact-email`.
 
-**Careers** ([`src/components/careers-apply-cta.tsx`](../src/components/careers-apply-cta.tsx)): **Submit Open Application** and **Submit Application** share one modal and one submit path. Fields: full name, email, optional LinkedIn and GitHub → Server Action → `job_applications` → optional `send-application-email`.
+**Careers** ([`src/components/careers-apply-cta.tsx`](../src/components/careers-apply-cta.tsx)): **Apply Now** (per open position), **Submit Open Application**, and **Submit Application** share one modal and one Server Action path. Fields: full name, email, optional LinkedIn and GitHub → `job_applications` → optional `send-application-email`.
 
-`job_applications.job_id` is NOT NULL in Postgres even though this site has no job listings. Both CTAs send the sentinel `job_id: "open-application"` and `job_title: "Open Application"` ([`src/lib/supabase/submissions.ts`](../src/lib/supabase/submissions.ts)). If that column is a UUID, the insert will fail until product provides a real id.
+Open positions are the `careersOpenPositions` array in [`src/lib/careers.ts`](../src/lib/careers.ts). Full content/ops docs: [`careers.md`](careers.md).
+
+| CTA | `job_id` | `job_title` |
+| --- | --- | --- |
+| **Apply Now** on a listed role | that role’s `id` (e.g. `founding-enterprise-account-executive`) | that role’s `title` |
+| **Submit Open Application** / interview **Submit Application** | `open-application` | `Open Application` |
+
+With `SUPABASE_SEND_EMAIL=false`, only the insert runs. With `true`, the Edge Function receives `{ jobId, jobTitle, applicant: { fullName, email, linkedinUrl, githubUrl } }` using the same ids/titles as the insert.
+
+If `job_id` is a UUID column in Postgres, slug inserts will fail until product provides real ids.
 
 There is no message field on job applications in the current schema.
 

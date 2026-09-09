@@ -1,12 +1,16 @@
 import type { CSSProperties } from "react";
 import { CareersApplyCta } from "@/components/careers-apply-cta";
 import { CareersCard } from "@/components/careers-card";
+import { CareersJobCard } from "@/components/careers-job-card";
 import { InView } from "@/components/in-view";
-import { careersJoin } from "@/lib/careers";
+import { careersJoin, getActiveCareersPositions } from "@/lib/careers";
 
 const delay = (i: number) => ({ "--i": i }) as CSSProperties;
 
 export function CareersJoin() {
+  const positions = getActiveCareersPositions();
+  let stagger = 1;
+
   return (
     <InView
       as="section"
@@ -37,10 +41,33 @@ export function CareersJoin() {
         </header>
 
         <div className="flex flex-col gap-10 max-[767px]:gap-6">
+          {positions.map((position) => {
+            const style = delay(stagger);
+            stagger += 1;
+            return (
+              <CareersJobCard key={position.id} position={position} style={style} />
+            );
+          })}
+
+          {positions.length === 0 ? (
+            <CareersCard
+              className="rv max-[767px]:rounded-2xl max-[767px]:p-5"
+              hover="tint"
+              style={delay(stagger)}
+            >
+              <h3 className="mb-3 text-xl leading-[1.3] font-bold tracking-[-0.01em] text-mist">
+                {careersJoin.empty.title}
+              </h3>
+              <p className="max-w-[760px] text-base leading-[1.5] tracking-[0.02em] text-mist/75">
+                {careersJoin.empty.body}
+              </p>
+            </CareersCard>
+          ) : null}
+
           <CareersCard
             className="rv max-[767px]:rounded-2xl max-[767px]:p-5"
             hover="tint"
-            style={delay(1)}
+            style={delay(positions.length === 0 ? stagger + 1 : stagger)}
           >
             <div className="flex flex-col items-start justify-between gap-8 min-[768px]:flex-row min-[768px]:items-center max-[767px]:gap-5">
               <div className="max-w-[760px]">
@@ -53,18 +80,6 @@ export function CareersJoin() {
               </div>
               <CareersApplyCta label={careersJoin.openApp.cta} />
             </div>
-          </CareersCard>
-          <CareersCard
-            className="rv max-[767px]:rounded-2xl max-[767px]:p-5"
-            hover="tint"
-            style={delay(2)}
-          >
-            <h3 className="mb-3 text-xl leading-[1.3] font-bold tracking-[-0.01em] text-mist">
-              {careersJoin.empty.title}
-            </h3>
-            <p className="max-w-[760px] text-base leading-[1.5] tracking-[0.02em] text-mist/75">
-              {careersJoin.empty.body}
-            </p>
           </CareersCard>
         </div>
       </div>

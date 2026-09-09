@@ -27,6 +27,60 @@ export const careersJoin = {
   },
 } as const;
 
+export const careersPositionUi = {
+  applyLabel: "Apply Now",
+  expandLabel: "View More",
+  collapseLabel: "View Less",
+  lookingForTitle: "What We’re Looking For",
+  youWillDoTitle: "What You’ll Do",
+  bonusPointsTitle: "Bonus Points",
+} as const;
+
+export type CareersPosition = {
+  id: string;
+  active: boolean;
+  title: string;
+  location: string;
+  time: "Full-time" | "Part-time";
+  description: string;
+  lookingFor: string[];
+  youWillDo: string[];
+  bonusPoints: string[];
+};
+
+/** Toggle `active` to show/hide a role without deleting its copy. See doc/careers.md. */
+export const careersOpenPositions: CareersPosition[] = [
+  {
+    id: "founding-enterprise-account-executive",
+    active: true,
+    title: "Founding Enterprise Account Executive",
+    location: "United States",
+    time: "Full-time",
+    description:
+      "Build OllyGarden’s first enterprise sales motion, personally source and close technical deals, and turn what works into a repeatable playbook.",
+    lookingFor: [
+      "A quantified record of personally sourcing and closing complex B2B infrastructure or developer-tool deals",
+      "Credibility with observability, SRE, platform, and engineering buyers",
+      "Experience building pipeline without depending on a mature SDR, marketing, or RevOps organization",
+      "US-based, with practical access to buyers and relevant observability and infrastructure communities",
+    ],
+    youWillDo: [
+      "Own prospecting, discovery, technical evaluations, proof-of-value conversion, negotiation, procurement, and closing",
+      "Refine our ICP, messaging, qualification criteria, forecasting, and objection handling with the founders",
+      "Build the lightweight systems and operating rhythm that future sellers can reuse",
+      "Hand closed customers cleanly to Customer Success while engineering owns deep technical implementation",
+    ],
+    bonusPoints: [
+      "OpenTelemetry familiarity and an existing network among observability or infrastructure buyers",
+      "Experience working directly with a technical founder",
+    ],
+  },
+];
+
+export function getActiveCareersPositions() {
+  return careersOpenPositions.filter((position) => position.active);
+}
+
 export const careersInterview = {
   eyebrow: "What we are looking for",
   title: ["How to Have a", "Successful Interview"],

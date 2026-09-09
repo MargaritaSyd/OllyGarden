@@ -61,7 +61,7 @@ export async function submitContactMessage(input: {
   }
 }
 
-/** Postgres requires job_id; there are no listings yet, so both CTAs share this. */
+/** Default when Apply is not tied to a listed role (open application CTAs). */
 const OPEN_APPLICATION_JOB = {
   jobId: "open-application",
   jobTitle: "Open Application",
@@ -72,6 +72,8 @@ export async function submitJobApplication(input: {
   email: string;
   linkedinUrl: string;
   githubUrl: string;
+  jobId?: string;
+  jobTitle?: string;
 }) {
   const fullName = input.fullName.trim();
   if (!fullName) {
@@ -81,11 +83,13 @@ export async function submitJobApplication(input: {
   const email = requireEmail(input.email, "Email");
   const linkedinUrl = input.linkedinUrl.trim() || null;
   const githubUrl = input.githubUrl.trim() || null;
+  const jobId = input.jobId?.trim() || OPEN_APPLICATION_JOB.jobId;
+  const jobTitle = input.jobTitle?.trim() || OPEN_APPLICATION_JOB.jobTitle;
 
   const supabase = client();
   const { error: insertError } = await supabase.from("job_applications").insert({
-    job_id: OPEN_APPLICATION_JOB.jobId,
-    job_title: OPEN_APPLICATION_JOB.jobTitle,
+    job_id: jobId,
+    job_title: jobTitle,
     full_name: fullName,
     email,
     linkedin_url: linkedinUrl,
@@ -101,8 +105,8 @@ export async function submitJobApplication(input: {
 
   const { error } = await supabase.functions.invoke("send-application-email", {
     body: {
-      jobId: OPEN_APPLICATION_JOB.jobId,
-      jobTitle: OPEN_APPLICATION_JOB.jobTitle,
+      jobId,
+      jobTitle,
       applicant: {
         fullName,
         email,

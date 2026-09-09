@@ -8,7 +8,6 @@ import {
   type ChangeEvent,
   type FormEvent,
 } from "react";
-import { CtaArrow } from "@/components/cta-arrow";
 import { careersCtaClassName } from "@/components/careers-card";
 import { SiteFormField } from "@/components/site-form-field";
 import { careersApplyForm } from "@/lib/careers";
@@ -28,7 +27,15 @@ const emptyValues: Values = {
   github: "",
 };
 
-export function CareersApplyCta({ label }: { label: string }) {
+export function CareersApplyCta({
+  label,
+  jobId = "open-application",
+  jobTitle = "Open Application",
+}: {
+  label: string;
+  jobId?: string;
+  jobTitle?: string;
+}) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const [open, setOpen] = useState(false);
@@ -106,6 +113,8 @@ export function CareersApplyCta({ label }: { label: string }) {
         email: values.email.trim(),
         linkedinUrl: values.linkedin.trim(),
         githubUrl: values.github.trim(),
+        jobId,
+        jobTitle,
       });
       setStatus("success");
     } catch {
@@ -117,7 +126,6 @@ export function CareersApplyCta({ label }: { label: string }) {
     <>
       <button type="button" className={careersCtaClassName} onClick={openDialog}>
         {label}
-        <CtaArrow />
       </button>
       <dialog
         ref={dialogRef}

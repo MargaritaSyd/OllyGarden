@@ -23,7 +23,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-Set `NEXT_PUBLIC_SITE_URL` to the production origin before deploying. That value drives canonical URLs, Open Graph tags, the sitemap, robots.txt, JSON-LD, and the RSS feed.
+Set `NEXT_PUBLIC_SITE_URL` to the production origin in every deployed environment (any host). There is no Vercel/Netlify auto-detect — without it, canonicals and the sitemap fall back to `http://localhost:3000`. That value drives canonical URLs, Open Graph tags, the sitemap, robots.txt, JSON-LD, and the RSS feed.
 
 Form submits need `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` (server-only). Leave `SUPABASE_SEND_EMAIL` as `false` until you want Edge Function emails. Details: [`doc/supabase.md`](doc/supabase.md).
 
