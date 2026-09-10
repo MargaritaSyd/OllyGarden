@@ -7,6 +7,7 @@ import {
   type HTMLAttributes,
   type ReactNode,
 } from "react";
+import { useIsClient, usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
 type InViewTag = "div" | "section" | "article" | "li";
 
@@ -30,26 +31,26 @@ export function InView({
   ...rest
 }: InViewProps) {
   const ref = useRef<HTMLElement>(null);
-  const [armed, setArmed] = useState(false);
-  const [visible, setVisible] = useState(false);
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const isClient = useIsClient();
+  const armed = isClient && !prefersReducedMotion;
+  const [inView, setInView] = useState(false);
+  const visible = prefersReducedMotion || inView;
 
   useEffect(() => {
+    if (prefersReducedMotion) {
+      return;
+    }
+
     const node = ref.current;
     if (!node) {
       return;
     }
 
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setVisible(true);
-      return;
-    }
-
-    setArmed(true);
-
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting) {
-          setVisible(true);
+          setInView(true);
           if (once) {
             observer.disconnect();
           }
@@ -60,7 +61,7 @@ export function InView({
     observer.observe(node);
 
     return () => observer.disconnect();
-  }, [once, threshold, rootMargin]);
+  }, [once, prefersReducedMotion, threshold, rootMargin]);
 
   const classes = [armed && "js-anim", visible && mark, className]
     .filter(Boolean)

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useIsClient, usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { insightsHow } from "@/lib/insights";
 
 const PLAY_MS = 6200;
@@ -18,24 +19,24 @@ const OUT_PACKETS = ["4.95s", "5.07s", "5.2s"] as const;
 
 export function InsightsFlow() {
   const wrapRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const isClient = useIsClient();
+  const armed = isClient && !prefersReducedMotion;
   const [play, setPlay] = useState(0);
-  const [armed, setArmed] = useState(false);
   const [playing, setPlaying] = useState(false);
-  const [done, setDone] = useState(false);
+  const [completedPlay, setCompletedPlay] = useState<number | null>(null);
+  const effectivePlaying = prefersReducedMotion || playing;
+  const done = prefersReducedMotion || completedPlay === play;
 
   useEffect(() => {
+    if (prefersReducedMotion) {
+      return;
+    }
+
     const node = wrapRef.current;
     if (!node) {
       return;
     }
-
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setPlaying(true);
-      setDone(true);
-      return;
-    }
-
-    setArmed(true);
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -49,21 +50,20 @@ export function InsightsFlow() {
     observer.observe(node);
 
     return () => observer.disconnect();
-  }, []);
+  }, [prefersReducedMotion]);
 
   useEffect(() => {
-    if (!playing || !armed) {
+    if (!playing || !armed || prefersReducedMotion) {
       return;
     }
 
-    setDone(false);
-    const timer = window.setTimeout(() => setDone(true), PLAY_MS);
+    const timer = window.setTimeout(() => setCompletedPlay(play), PLAY_MS);
     return () => window.clearTimeout(timer);
-  }, [armed, play, playing]);
+  }, [armed, play, playing, prefersReducedMotion]);
 
   function replay() {
-    setDone(false);
     setPlaying(false);
+    setCompletedPlay(null);
     setPlay((value) => value + 1);
     window.setTimeout(() => setPlaying(true), 40);
   }
@@ -71,7 +71,7 @@ export function InsightsFlow() {
   const flowClass = [
     "hiw insights-flow mx-auto w-full max-w-[1232px]",
     armed && "js-armed",
-    playing && "is-playing",
+    effectivePlaying && "is-playing",
     done && "is-done",
   ]
     .filter(Boolean)

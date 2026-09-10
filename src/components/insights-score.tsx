@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { insightsScore } from "@/lib/insights";
 
 const SCORE_END = Number(insightsScore.value);
@@ -11,11 +12,12 @@ export function InsightsScore() {
   const [open, setOpen] = useState(true);
   const detailsId = useId();
   const label = open ? insightsScore.hide : insightsScore.show;
+  const prefersReducedMotion = usePrefersReducedMotion();
   const [score, setScore] = useState(0);
+  const displayScore = prefersReducedMotion ? SCORE_END : score;
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setScore(SCORE_END);
+    if (prefersReducedMotion) {
       return;
     }
 
@@ -41,7 +43,7 @@ export function InsightsScore() {
       window.clearTimeout(delay);
       window.cancelAnimationFrame(frame);
     };
-  }, []);
+  }, [prefersReducedMotion]);
 
   return (
     <div className="relative mx-auto w-full max-w-[48rem] aspect-[736/623] lg:mx-0">
@@ -63,7 +65,7 @@ export function InsightsScore() {
           </div>
           <div className="flex flex-1 flex-col items-center justify-center pb-6">
             <p className="text-[clamp(4.5rem,10vw,6.5rem)] leading-none font-bold tracking-[-0.04em] text-bitmap-highlight tabular-nums">
-              {score}
+              {displayScore}
             </p>
             <p className="mt-2 text-xl font-semibold text-bitmap-highlight">
               {insightsScore.verdict}
@@ -83,7 +85,7 @@ export function InsightsScore() {
               <h2 className="flex items-baseline gap-2.5 text-base font-bold tracking-[0.01em] text-mist">
                 {insightsScore.title}
                 <span className="text-lg font-bold text-bitmap-highlight tabular-nums">
-                  {score}
+                  {displayScore}
                 </span>
               </h2>
               <ToggleButton

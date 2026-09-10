@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
 type FinancialStatProps = {
   end: number;
@@ -17,18 +18,17 @@ function formatStat(value: number, sep: boolean, suffix: string, prefix = "") {
 
 export function FinancialStat({ end, suffix, sep, prefix = "" }: FinancialStatProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
   const [value, setValue] = useState(0);
   const [started, setStarted] = useState(false);
 
   useEffect(() => {
-    const node = ref.current;
-    if (!node) {
+    if (prefersReducedMotion) {
       return;
     }
 
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) {
-      setValue(end);
+    const node = ref.current;
+    if (!node) {
       return;
     }
 
@@ -44,10 +44,10 @@ export function FinancialStat({ end, suffix, sep, prefix = "" }: FinancialStatPr
     observer.observe(node);
 
     return () => observer.disconnect();
-  }, [end]);
+  }, [end, prefersReducedMotion]);
 
   useEffect(() => {
-    if (!started) {
+    if (!started || prefersReducedMotion) {
       return;
     }
 
@@ -66,14 +66,16 @@ export function FinancialStat({ end, suffix, sep, prefix = "" }: FinancialStatPr
 
     frame = window.requestAnimationFrame(tick);
     return () => window.cancelAnimationFrame(frame);
-  }, [end, started]);
+  }, [end, prefersReducedMotion, started]);
+
+  const shown = prefersReducedMotion ? end : started ? value : 0;
 
   return (
     <div
       ref={ref}
       className="mb-[22px] text-[clamp(3rem,5vw,4.5rem)] leading-none font-bold tracking-[-0.02em] text-sunflower"
     >
-      {formatStat(started ? value : 0, sep, suffix, prefix)}
+      {formatStat(shown, sep, suffix, prefix)}
     </div>
   );
 }

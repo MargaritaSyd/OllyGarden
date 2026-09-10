@@ -1,39 +1,41 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useIsClient, usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { tulipDropin } from "@/lib/tulip";
 
 const FULL_LINES: string[] = tulipDropin.lines.map((line) => line.text);
+const EMPTY_LINES: string[] = FULL_LINES.map(() => "");
 
 export function TulipDropin() {
   const sectionRef = useRef<HTMLElement>(null);
-  const [armed, setArmed] = useState(false);
-  const [visible, setVisible] = useState(false);
-  const [display, setDisplay] = useState<string[]>(FULL_LINES);
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const isClient = useIsClient();
+  const armed = isClient && !prefersReducedMotion;
+  const [inView, setInView] = useState(false);
+  const visible = prefersReducedMotion || inView;
+  const [typed, setTyped] = useState<string[] | null>(null);
+  const display = !armed ? FULL_LINES : (typed ?? EMPTY_LINES);
   const [cursorAt, setCursorAt] = useState<number | null>(null);
   const [typing, setTyping] = useState(false);
   const [flashRm, setFlashRm] = useState(false);
   const [flashAdd, setFlashAdd] = useState(false);
 
   useEffect(() => {
+    if (prefersReducedMotion) {
+      return;
+    }
+
     const node = sectionRef.current;
     if (!node) {
       return;
     }
 
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setVisible(true);
-      return;
-    }
-
-    setArmed(true);
-    setDisplay(FULL_LINES.map(() => ""));
-
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries.some((entry) => entry.isIntersecting)) {
           observer.disconnect();
-          setVisible(true);
+          setInView(true);
         }
       },
       { threshold: 0.3 },
@@ -41,7 +43,7 @@ export function TulipDropin() {
     observer.observe(node);
 
     return () => observer.disconnect();
-  }, []);
+  }, [prefersReducedMotion]);
 
   useEffect(() => {
     if (!armed || !visible) {
@@ -55,6 +57,7 @@ export function TulipDropin() {
       setTyping(true);
       setFlashRm(false);
       setFlashAdd(false);
+      setTyped(EMPTY_LINES);
 
       for (let index = 0; index < FULL_LINES.length; index++) {
         if (cancelled) {
@@ -74,11 +77,15 @@ export function TulipDropin() {
             return;
           }
           const next = text.slice(0, cursor + step);
-          setDisplay((current) => current.map((line, i) => (i === index ? next : line)));
+          setTyped((current) =>
+            (current ?? EMPTY_LINES).map((line, i) => (i === index ? next : line)),
+          );
           await wait(16);
         }
 
-        setDisplay((current) => current.map((line, i) => (i === index ? text : line)));
+        setTyped((current) =>
+          (current ?? EMPTY_LINES).map((line, i) => (i === index ? text : line)),
+        );
         await wait(isImage ? 60 : 18);
       }
 

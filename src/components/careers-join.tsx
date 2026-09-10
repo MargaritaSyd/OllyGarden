@@ -9,7 +9,8 @@ const delay = (i: number) => ({ "--i": i }) as CSSProperties;
 
 export function CareersJoin() {
   const positions = getActiveCareersPositions();
-  let stagger = 1;
+  const emptyStagger = 1;
+  const openAppStagger = positions.length === 0 ? emptyStagger + 1 : positions.length + 1;
 
   return (
     <InView
@@ -41,19 +42,19 @@ export function CareersJoin() {
         </header>
 
         <div className="flex flex-col gap-10 max-[767px]:gap-6">
-          {positions.map((position) => {
-            const style = delay(stagger);
-            stagger += 1;
-            return (
-              <CareersJobCard key={position.id} position={position} style={style} />
-            );
-          })}
+          {positions.map((position, index) => (
+            <CareersJobCard
+              key={position.id}
+              position={position}
+              style={delay(index + 1)}
+            />
+          ))}
 
           {positions.length === 0 ? (
             <CareersCard
               className="rv max-[767px]:rounded-2xl max-[767px]:p-5"
               hover="tint"
-              style={delay(stagger)}
+              style={delay(emptyStagger)}
             >
               <h3 className="mb-3 text-xl leading-[1.3] font-bold tracking-[-0.01em] text-mist">
                 {careersJoin.empty.title}
@@ -67,7 +68,7 @@ export function CareersJoin() {
           <CareersCard
             className="rv max-[767px]:rounded-2xl max-[767px]:p-5"
             hover="tint"
-            style={delay(positions.length === 0 ? stagger + 1 : stagger)}
+            style={delay(openAppStagger)}
           >
             <div className="flex flex-col items-start justify-between gap-8 min-[768px]:flex-row min-[768px]:items-center max-[767px]:gap-5">
               <div className="max-w-[760px]">
