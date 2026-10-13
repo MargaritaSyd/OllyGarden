@@ -1,0 +1,64 @@
+[INTRO]
+BIANCA: [warmly] Hi, I'm Bianca.
+FLORIAN: And I'm Florian. You might know us from the OTel Drops podcast, but today we're here to tell you a story.
+BIANCA: A real one. OllyGarden shared it with us, anonymized. So no company names and no people, but every number is real.
+FLORIAN: [curiously] Here's the setup. A mid-size B2B SaaS platform in Latin America. Multi-tenant, running customer workloads on Kubernetes, across two public clouds.
+BIANCA: [dryly] And an observability backend that bills per record. Every log line, every datapoint. So the bill grew with volume, and nobody could say what was driving it, because nobody had a view at the source.
+
+[THE CONSTRAINT]
+FLORIAN: What I like about this team is their platform lead's instinct. They didn't want more filtering in the backend. Their argument was simple: once a log reaches the backend, the backend can't make it better anymore. Fix it where it's born.
+BIANCA: [thoughtfully] That's the right instinct. But there was a hard constraint. Most of their log volume is customer workload content, the output of their customers' jobs. It can contain personal data.
+FLORIAN: So that content was off limits. Not reduced, not analyzed, not touched. Full stop.
+BIANCA: The security review was strict, too. They started in staging, and production data only flowed once the contract and the security approval were in place.
+FLORIAN: Then they set a bar. A six-week proof of value, with pass or fail targets. Twenty percent fewer log records, and ten percent fewer metric datapoints reaching the backend.
+
+[WHAT THEY FOUND]
+BIANCA: So OllyGarden Insights started looking at samples. And the staging assessment was... [short pause] a lot.
+FLORIAN: Metrics were about ninety-seven percent of all records. And more than half of the metric data had no service name. Just "unknown".
+BIANCA: [sigh] Which means you can't attribute cost. You're paying for data, and you can't even say whose it is.
+FLORIAN: It gets better. About eighty-nine percent of the logs were duplicates.
+BIANCA: Eighty-nine?!
+FLORIAN: [chuckles] And almost a third of the traces were single spans. Cache health pings, liveness probes. Noise.
+BIANCA: [curiously] And production?
+FLORIAN: Production had a Kubernetes detail I love. More than half of the volume metric series came from static mounts. Config maps, secrets, projected volumes. They never change size.
+BIANCA: So those series carry no signal at all.
+FLORIAN: None. And they were scraped three times more often than needed.
+
+[THE WAVES]
+BIANCA: So how do you fix all of that without breaking anything? OllyGarden shipped the work in numbered waves of drop-in OpenTelemetry Collector configurations.
+FLORIAN: And here's the part the operator in me appreciates. Every wave was replayed against real samples before it went anywhere near production.
+BIANCA: One wave cut those volume metrics from three datapoints a minute to one. Another turned high-volume access logs into request rate, error rate, and latency metrics.
+FLORIAN: And then the replays earned their keep. One of the new log-to-metric rules put real user email addresses into a metric label.
+BIANCA: [cautiously] Oof. How?
+FLORIAN: One per-user path segment wasn't templated. So every email became a label value. A privacy problem and a cardinality explosion, in one line of config.
+BIANCA: And the next sample caught it. A fix shipped, and the day after, zero personal data.
+FLORIAN: Then a new cluster came online. About seventy-eight percent of its log volume was the pipeline complaining about itself.
+BIANCA: [curiously] Complaining about what?
+FLORIAN: An in-app agent couldn't reach its export endpoint, so it logged a stack trace on every pod, nonstop. And that noise was hiding a real outage. That cluster's traces and metrics weren't reaching the backend at all.
+BIANCA: [thoughtfully] That's the thing about noise. It doesn't just cost money. It hides the signal you actually need.
+
+[RESULTS]
+BIANCA: So, the six weeks. Did they hit the targets?
+FLORIAN: They did. Twenty-four percent fewer log records, against a target of twenty. And about twenty-five percent fewer metric datapoints, against a target of ten.
+BIANCA: [warmly] And the log deduplication is my favorite part. It's count-preserving, so you still know how many times something happened. On the eligible logs, it collapsed volume by about sixty-one percent.
+FLORIAN: And the customer workload logs?
+BIANCA: Passed through one to one. Untouched. Exactly as promised.
+FLORIAN: The customer accepted the proof of value, and the work kept going.
+
+[THE HONEST PART]
+BIANCA: Now, this is the part I respect most about this story. It doesn't end with a perfect bill.
+FLORIAN: [sigh] No. After the proof of value, the clusters moved from the vendor's operator to a self-managed Collector. And service name resolution silently disappeared.
+BIANCA: How bad?
+FLORIAN: Ninety-nine and a half percent of logs, and seventy-seven percent of metrics, showed service name unknown. That logic lived in the operator's config, and nobody carried it over.
+BIANCA: [dryly] The hidden tax of a Collector migration.
+FLORIAN: And in August, the monthly bill still jumped by about a third. Incident-driven metrics, and deployments with hundreds to thousands of replicas.
+BIANCA: Which is the real lesson. The cost driver was series count. Cardinality. Not scrape frequency.
+FLORIAN: So it stopped being a one-time project. The team now brings OllyGarden in early, whenever the bill starts to move.
+
+[OUTRO]
+BIANCA: So, what would I take from this? First, look for telemetry that never changes. Static series and repeated logs are the cheapest wins you'll find.
+FLORIAN: Second, replay every change against real data before rollout. That's how you catch an email address in a metric label.
+BIANCA: Third, protect your customers' data by design. Decide what's off limits first, then optimize everything else.
+FLORIAN: And fourth, telemetry quality is a habit, not a project.
+BIANCA: [warmly] The full written story, with all the numbers, is on the OllyGarden website. Thanks for listening.
+FLORIAN: [chuckles] Until next time.

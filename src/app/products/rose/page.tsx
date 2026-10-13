@@ -1,19 +1,25 @@
 import { JsonLd } from "@/components/json-ld";
+import { RelatedReading } from "@/components/related-reading";
 import { RoseAction } from "@/components/rose-action";
 import { RoseClients } from "@/components/rose-clients";
-import { RoseContext } from "@/components/rose-context";
+import { RoseDoes } from "@/components/rose-does";
+import { RoseFaq } from "@/components/rose-faq";
 import { RoseHero } from "@/components/rose-hero";
 import { RoseHow } from "@/components/rose-how";
-import { RoseMatters } from "@/components/rose-matters";
+import { RoseMvi } from "@/components/rose-mvi";
 import { RosePlans } from "@/components/rose-plans";
+import { RoseProblem } from "@/components/rose-problem";
+import { RoseSecurity } from "@/components/rose-security";
+import { RoseTeams } from "@/components/rose-teams";
 import { SiteCta } from "@/components/site-cta";
 import { createPageMetadata } from "@/lib/metadata";
-import { roseCta, roseHero, roseMeta } from "@/lib/rose";
+import { productReading } from "@/lib/related";
+import { roseCta, roseMeta } from "@/lib/rose";
 import { roseGraph } from "@/lib/structured-data";
 
 export const metadata = createPageMetadata({
   title: roseMeta.title,
-  description: roseHero.lede,
+  description: roseMeta.description,
   path: roseMeta.path,
   absoluteTitle: true,
 });
@@ -23,12 +29,17 @@ export default function RosePage() {
     <>
       <JsonLd data={roseGraph()} />
       <RoseHero />
+      <RoseProblem />
+      <RoseDoes />
       <RoseHow />
+      <RoseMvi />
       <RoseAction />
-      <RoseMatters />
+      <RoseTeams />
       <RoseClients />
-      <RoseContext />
+      <RoseSecurity />
       <RosePlans />
+      <RoseFaq />
+      <RelatedReading {...productReading(roseMeta.path)} />
       <SiteCta content={roseCta} />
     </>
   );

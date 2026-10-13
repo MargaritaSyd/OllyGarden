@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { FaqSidenav } from "@/components/faq-sidenav";
 import { GetStartedLink } from "@/components/get-started-link";
 import { faqSections, faqSupport } from "@/lib/faq";
+import { registerOpenTelemetry } from "@/lib/trademarks";
 
 export function FaqTopics() {
   return (
@@ -8,7 +10,7 @@ export function FaqTopics() {
       <div className="mx-auto grid max-w-[1232px] grid-cols-[232px_minmax(0,1fr)] gap-16 max-[1100px]:grid-cols-[196px_minmax(0,1fr)] max-[1100px]:gap-10 max-[900px]:block">
         <FaqSidenav />
         <div>
-          {faqSections.map((section) => (
+          {faqSections.map((section, sectionIndex) => (
             <section
               key={section.id}
               id={section.id}
@@ -22,7 +24,7 @@ export function FaqTopics() {
                 {section.title}
               </h2>
               <ul className="flex flex-col gap-4">
-                {section.items.map((item) => (
+                {section.items.map((item, itemIndex) => (
                   <li
                     key={item.q}
                     className="rounded-2xl border border-sunflower/32 bg-[#002810]"
@@ -31,8 +33,18 @@ export function FaqTopics() {
                       {item.q}
                     </h3>
                     <p className="px-6 pb-6 text-sm leading-[18px] text-[#9dafa3] max-[700px]:px-5 max-[700px]:pb-5">
-                      {item.a}
+                      {sectionIndex === 0 && itemIndex === 0 ? registerOpenTelemetry(item.a) : item.a}
                     </p>
+                    {item.link ? (
+                      <p className="-mt-2 px-6 pb-6 text-sm max-[700px]:px-5 max-[700px]:pb-5">
+                        <Link
+                          href={item.link.href}
+                          className="font-semibold text-sunflower underline-offset-2 hover:underline"
+                        >
+                          {item.link.label} →
+                        </Link>
+                      </p>
+                    ) : null}
                   </li>
                 ))}
               </ul>

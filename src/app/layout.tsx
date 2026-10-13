@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk } from "next/font/google";
+import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { AnalyticsConsentBanner } from "@/components/analytics-consent-banner";
+import { AnnouncementBar } from "@/components/announcement-bar";
 import { PageMotif } from "@/components/page-motif";
-import { SiteChrome } from "@/components/site-chrome";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { WebsiteAnalytics } from "@/components/website-analytics";
 import { rootMetadata } from "@/lib/metadata";
 import { siteConfig } from "@/lib/site";
 import { tokens } from "@/lib/tokens";
@@ -14,6 +16,14 @@ const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   display: "swap",
   weight: ["300", "400", "500", "700"],
+});
+
+// Code panels in the Rose MVI section (Figma uses JetBrains Mono there).
+const jetBrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400"],
 });
 
 export const metadata: Metadata = rootMetadata;
@@ -28,13 +38,39 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang={siteConfig.language}
-      className={`${spaceGrotesk.variable} h-full antialiased`}
+      className={`${spaceGrotesk.variable} ${jetBrainsMono.variable} h-full antialiased`}
     >
+      <head>
+        <link
+          rel="service-doc"
+          type="text/markdown"
+          title="OllyGarden API Documentation"
+          href="/api-docs.md"
+        />
+        <link
+          rel="sunset"
+          type="text/markdown"
+          title="OllyGarden API Versioning and Deprecation Policy"
+          href="/api-versioning.md"
+        />
+        <link
+          rel="service-desc"
+          type="application/vnd.oai.openapi+json"
+          title="OllyGarden REST API"
+          href="/openapi.json"
+        />
+      </head>
       <body className="relative isolate flex min-h-full flex-col bg-forest font-sans text-mist">
-        <PageMotif />
-        <SiteChrome header={<SiteHeader />} footer={<SiteFooter />}>
-          {children}
-        </SiteChrome>
+        <AnnouncementBar />
+        {/* The header and motif are absolute at the top of this wrapper, so they start below the bar. */}
+        <div className="relative flex flex-1 flex-col">
+          <PageMotif />
+          <SiteHeader />
+          <main className="flex-1">{children}</main>
+        </div>
+        <SiteFooter />
+        <AnalyticsConsentBanner />
+        <WebsiteAnalytics />
       </body>
     </html>
   );

@@ -29,6 +29,7 @@ export async function generateMetadata({
     title: post.title,
     description: post.description,
     path: `/blog/${post.slug}`,
+    noIndex: true,
     type: "article",
     publishedTime: post.date,
     modifiedTime: post.updated ?? post.date,

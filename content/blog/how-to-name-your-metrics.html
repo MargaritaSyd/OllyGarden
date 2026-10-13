@@ -162,6 +162,7 @@ db.client.operation.duration
 <td>Ratios are unitless</td>
 </tr>
 </tbody></table>
+<!-- cta -->
 <h2>Benefits of Clean Naming</h2>
 <p>Separating context from metric names provides specific technical advantages that improve both query performance and operational workflows. The first benefit is cross-service aggregation. A query like <code>sum(transaction.count)</code> returns data from all services without requiring you to know or maintain a list of service names. In a system with 50 microservices, this means one query instead of 50, and that query doesn&#39;t break when you add the 51st service.</p>
 <p>This consistency makes dashboards reusable across services. A dashboard built for monitoring HTTP requests in your authentication service works without modification for your payment service, inventory service, or any other HTTP-serving component. You write the query once—<code>http.server.request.duration</code> filtered by <code>service.name</code>—and apply it everywhere. No more maintaining dozens of nearly-identical dashboards. Some observability vendors now take this further, automatically generating dashboards based on semantic convention metric names—when your services emit <code>http.server.request.duration</code>, the platform knows exactly what visualizations and aggregations make sense for that metric.</p>

@@ -3,6 +3,7 @@ export const homeHero = {
   titleLead: "Observability starts",
   titleAccent: "good telemetry",
   lede: "OllyGarden helps teams find and fix bad telemetry before it reaches any observability backend, giving engineers and AI agents data they can rely on — from pull request to production.",
+  cta: "Get Started",
 } as const;
 
 export const homeSecurity = {
@@ -46,9 +47,52 @@ export const homeWhy = {
 
 export type WhyMotif = (typeof homeWhy.cards)[number]["motif"];
 
+export const homeReality = {
+  eyebrow: "The New Reality",
+  title: "Humans wrote code",
+  titleAccent: "Now agents do too",
+  cards: [
+    {
+      title: "More code, same context",
+      body: "Coding agents now write much of the new code. They instrument it with the context they have, which rarely includes your conventions or what your team needs to see during an incident.",
+      icon: "/images/home/nr-blend.svg",
+    },
+    {
+      title: "Review can’t keep up",
+      body: "Your observability engineers know what good instrumentation looks like. They can’t read every pull request in every repository.",
+      icon: "/images/home/nr-square-stack.svg",
+    },
+    {
+      title: "The gap grows with every merge",
+      body: "A pattern that slips through gets copied into the next service. By the time it shows up on a bill or in an incident, it is in every repository.",
+      icon: "/images/home/nr-gap-horizontal.svg",
+    },
+    {
+      title: "More code, more telemetry",
+      body: "More services, more signals, more to run. Your Collectors carry it and your backend stores it, whether or not the data is worth keeping.",
+      icon: "/images/home/nr-layers-arrow-down.svg",
+    },
+  ],
+  stats: [
+    {
+      value: "82%",
+      body: "Of logs were duplicates at a fintech we audited.",
+    },
+    {
+      value: "63%",
+      body: "Of trace data was waste at another company.",
+    },
+    {
+      value: "5 of 6",
+      body: "Audits surfaced leaked credentials or personal data.",
+    },
+  ],
+  note: "From OllyGarden telemetry audits.",
+} as const;
+
 export const homeVoices = {
   title: "What people are saying",
-  sub: "Voices from engineers and observability leaders working with OpenTelemetry, telemetry quality, and production systems.",
+  sub: "Voices from engineers and observability leaders working with OpenTelemetry®, telemetry quality, and production systems.",
   quotes: [
     {
       name: "Blake Irvin",
@@ -111,23 +155,11 @@ export const homeHow = {
     },
     {
       n: "2",
-      icon: "tulip" as const,
-      label: "OllyGarden Tulip",
-      title: "Run OpenTelemetry Collector with confidence",
-      body: "Tulip is a supported distribution of the OpenTelemetry Collector. It helps teams operate collector-based telemetry pipelines with curated components, predictable releases, security fixes, and enterprise support — while staying vendor-neutral.",
-      flip: true,
-      video: {
-        src: "/videos/tulip-demo.mp4",
-        label: "OllyGarden Tulip — product demo video",
-      },
-    },
-    {
-      n: "3",
       icon: "insights" as const,
       label: "OllyGarden Insights",
       title: "Analyze and score telemetry quality",
       body: "Insights detects quality issues across your services and helps teams understand where telemetry is breaking down.",
-      flip: false,
+      flip: true,
       video: {
         src: "/videos/insights-demo.mp4",
         label: "OllyGarden Insights — product demo video",
@@ -136,9 +168,13 @@ export const homeHow = {
   ],
 } as const;
 
+// Figma 1:599: single-color title, 57px buttons, quiz as the secondary action.
+// This is also the default SiteCta content on other pages, so the home-only
+// flush spacing is set at the call site in src/app/page.tsx.
 export const homeCta = {
   title: ["Keep your observability backend", "Send it better telemetry"],
-  titleAccent: "better telemetry",
+  secondary: { label: "Test Your OTel Knowledge", href: "/otel-quiz" },
+  buttonSize: "lg",
 } as const;
 
 export const homeBlog = {

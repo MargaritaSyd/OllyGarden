@@ -3,7 +3,7 @@ import { GetStartedLink } from "@/components/get-started-link";
 import { InView } from "@/components/in-view";
 import { ResourceCard, ResourceCardImage } from "@/components/resource-card";
 import {
-  blogAuthor,
+  blogAuthorLabel,
   blogCoverAlt,
   blogPostHref,
   featuredBlogPosts,
@@ -24,7 +24,9 @@ export function HomeBlog() {
       <div className="relative z-[1] mx-auto max-w-[1232px]">
         <div className="mb-12 flex flex-col gap-8 min-[881px]:flex-row min-[881px]:items-center min-[881px]:justify-between">
           <div className="home-blog-copy flex max-w-[1010px] flex-col gap-4">
-            <p className="text-base font-bold text-bitmap-mid">{homeBlog.eyebrow}</p>
+            <p className="text-base font-bold tracking-[0.1em] text-bitmap-mid uppercase">
+              {homeBlog.eyebrow}
+            </p>
             <h2
               id="home-blog-title"
               className="text-[clamp(2rem,4vw,3rem)] leading-[1.08] font-bold tracking-[-0.02em] text-mist"
@@ -52,7 +54,7 @@ export function HomeBlog() {
                 <ResourceCardImage src={post.image} alt={blogCoverAlt(post.title)} />
               }
               date={formatBlogDate(post.date, "short")}
-              suffix={`Author: ${blogAuthor}`}
+              suffix={blogAuthorLabel(post)}
               title={post.title}
               cta="Read Article"
             />

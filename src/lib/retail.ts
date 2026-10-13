@@ -6,12 +6,14 @@ export const retailHero = {
     "100K collectors to",
     "billions of spans",
   ],
-  lede: "Retail and e-commerce platforms operate at a scale where telemetry noise drowns out signal. OllyGarden helps you improve instrumentation quality, run a supported Collector, and cut through noise so your telemetry pipeline stays reliable across every release.",
+  lede: "Retail and e-commerce platforms operate at a scale where telemetry noise drowns out signal. OllyGarden helps you improve instrumentation quality and cut through noise so your telemetry pipeline stays reliable across every release.",
   cta: "Talk to our Team",
 } as const;
 
 export const retailMeta = {
-  title: "Retail & E-commerce — OllyGarden Solutions",
+  title: "Telemetry Quality for Retail & E-commerce — OllyGarden",
+  description:
+    "Keep telemetry reliable at retail scale: improve OpenTelemetry instrumentation, fix noisy signals at the source, and cut noise across every release.",
   path: "/solutions/retail-ecommerce",
 } as const;
 
@@ -81,16 +83,9 @@ export const retailStats = {
 export const retailProducts = {
   eyebrow: "Products & Services",
   title: "How OllyGarden helps",
-  sub: "Purpose-built tools to improve telemetry quality, manage your pipeline, and support your collectors.",
+  sub: "Purpose-built tools to measure telemetry quality and fix instrumentation at the source.",
   glyph: "/images/solutions/financial/target.svg",
   cards: [
-    {
-      href: "/products/tulip",
-      icon: "/images/solutions/financial/tulip.svg",
-      family: "OllyGarden Tulip",
-      title: "Tulip",
-      body: "Run a curated, commercially supported Collector with predictable quarterly releases and patch guarantees — even at 100K+ scale.",
-    },
     {
       href: "/products/insights",
       icon: "/images/solutions/financial/insights.svg",

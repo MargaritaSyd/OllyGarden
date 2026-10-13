@@ -34,13 +34,11 @@ export function CommunityEvents() {
               <ResourceCard
                 href={event.href}
                 external
-                ariaLabel={`${event.title}, ${event.date} in ${event.place} — register (opens in a new tab)`}
+                ariaLabel={`${event.title}, ${event.date} in ${event.place.replace(/\s+[\u{1F1E6}-\u{1F1FF}]+$/u, "")} — register (opens in a new tab)`}
                 media={
                   <ResourceCardPoster
                     host={event.host}
-                    hostLogos={event.hostLogos}
                     posterTitle={event.posterTitle}
-                    highlight={event.highlight}
                     note={event.note}
                   />
                 }

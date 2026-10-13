@@ -1,5 +1,7 @@
 export const companyMeta = {
-  title: "Our Company — OllyGarden",
+  title: "About OllyGarden — Founded by OpenTelemetry Contributors",
+  description:
+    "OllyGarden was founded by OpenTelemetry contributors to help teams find bad telemetry, fix instrumentation at the source, and cut observability costs.",
   path: "/company",
 } as const;
 
@@ -7,7 +9,7 @@ export const companyHero = {
   badge: "Our Company",
   title: ["Cultivating Clarity", "in Observability"],
   ledes: [
-    "At OllyGarden, we believe reliable systems start with high-quality telemetry. Founded by OpenTelemetry contributors, OllyGarden helps engineering teams identify bad telemetry, improve instrumentation at the source, reduce unnecessary observability costs, and get more value from their data — no matter which backend they use.",
+    "At OllyGarden, we believe reliable systems start with high-quality telemetry. Founded by OpenTelemetry® contributors, OllyGarden helps engineering teams identify bad telemetry, improve instrumentation at the source, reduce unnecessary observability costs, and get more value from their data — no matter which backend they use.",
     "Our mission is to make telemetry cleaner, more trustworthy, and easier to use, so engineers, teams, and AI agents can work from reliable signals.",
   ],
   image: {
@@ -109,7 +111,7 @@ export const companyTeamMembers = {
     github: "https://github.com/jpkrohling",
   },
   arianna: {
-    name: "Arianna Vespri",
+    name: "Arianna Vespri Knudsen",
     role: "Founding Backend Engineer",
     img: "/images/company/team-arianna.jpg",
     bio: "Arianna is a talented backend engineer passionate about building robust distributed systems. At OllyGarden, she contributes to the development of our core platform services, helping deliver powerful observability capabilities to our customers.",
@@ -189,4 +191,9 @@ export const companyOpenSource = {
   href: "https://github.com/instrumentation-score/spec",
   linkLabel: "Instrumentation Score",
   cta: "View on GitHub",
+  community: [
+    { href: "/resources/events", label: "Meet us at upcoming events" },
+    { href: "/resources/webinars-conferences", label: "Watch our talks and webinars" },
+    { href: "/otel-quiz", label: "Take the OTel Quiz" },
+  ],
 } as const;

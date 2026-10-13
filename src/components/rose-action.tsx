@@ -4,25 +4,30 @@ import { roseAction } from "@/lib/rose";
 
 export function RoseAction() {
   return (
-    <InView as="section" aria-labelledby="action-title">
-      <div className="mx-auto w-full max-w-[1328px] px-5 py-[clamp(5.25rem,9vw,8.75rem)] sm:px-12">
-        <div className="ov-stagger mb-[clamp(2.5rem,4.5vw,4rem)] max-w-[640px]">
+    <InView
+      as="section"
+      aria-labelledby="action-title"
+      className="relative overflow-hidden"
+    >
+      <div className="tulip-grid" aria-hidden="true" />
+      <div className="relative mx-auto w-full max-w-[1328px] px-5 py-[clamp(3.5rem,6.7vw,6rem)] sm:px-12">
+        <div className="ov-stagger mb-12 flex max-w-[640px] flex-col items-start gap-4">
           <ActionMark />
-          <p className="mt-4 text-sm font-bold tracking-[0.14em] text-bitmap-mid uppercase">
+          <p className="text-base leading-[normal] font-bold tracking-[0.1em] text-bitmap-mid uppercase">
             {roseAction.eyebrow}
           </p>
           <h2
             id="action-title"
-            className="mt-4 max-w-[560px] text-[clamp(2rem,3.8vw,3.375rem)] leading-[1.16] font-semibold tracking-[-0.02em] text-mist"
+            className="max-w-[593px] text-[clamp(2rem,3.4vw,3rem)] leading-[normal] font-bold tracking-[-0.02em] text-mist"
           >
             {roseAction.title}
           </h2>
-          <p className="mt-5 max-w-[540px] text-[16.5px] leading-[1.68] text-mist/75">
+          <p className="max-w-[516px] text-base leading-[1.4] tracking-[0.02em] text-mist">
             {roseAction.sub}
           </p>
         </div>
         <VideoFrame
-          className="action-video"
+          className="action-video rounded-[40px]! border-0"
           src={roseAction.video.src}
           label={roseAction.video.label}
         />
@@ -31,13 +36,18 @@ export function RoseAction() {
   );
 }
 
+/** Figma 2371:31733 — tulip glyph, same fill as the eyebrow. */
 function ActionMark() {
   return (
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <path
-        d="M32 0C27.072 0 22.664 2.346 19.729 5.837A16.6 16.6 0 0 0 16 0a16.6 16.6 0 0 0-3.728 5.837C9.336 2.344 4.928 0 0 0v16.062C0 24.865 7.163 32 16 32s16-7.135 16-15.938V0Z"
-        fill="#C9D32A"
-      />
+    <svg
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+      fill="currentColor"
+      className="text-bitmap-mid"
+      aria-hidden="true"
+    >
+      <path d="M32 0C27.072 0 22.664 2.346 19.729 5.837A16.6 16.6 0 0 0 16 0a16.6 16.6 0 0 0-3.728 5.837C9.336 2.344 4.928 0 0 0v16.062C0 24.865 7.163 32 16 32s16-7.135 16-15.938V0Z" />
     </svg>
   );
 }

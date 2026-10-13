@@ -9,22 +9,37 @@ import {
   type FormEvent,
 } from "react";
 import { careersCtaClassName } from "@/components/careers-card";
-import { SiteFormField } from "@/components/site-form-field";
+import {
+  FormPrivacyNotice,
+  SiteFormField,
+  siteFormFieldClass,
+} from "@/components/site-form-field";
 import { careersApplyForm } from "@/lib/careers";
+import { captureFormEvent, useFormStarted } from "@/lib/form-analytics";
+import { capturePostHogEvent } from "@/lib/posthog";
 import { submitJobApplication } from "@/lib/supabase/submissions";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type Status = "idle" | "submitting" | "success" | "error";
-type FieldName = "fullName" | "email" | "linkedin" | "github";
+type FieldName =
+  | "fullName"
+  | "email"
+  | "linkedin"
+  | "github"
+  | "coolProject"
+  | "motivation";
 type Values = Record<FieldName, string>;
 type Errors = Partial<Record<"fullName" | "email", string>>;
+const FORM_NAME = "job_application_form";
 
 const emptyValues: Values = {
   fullName: "",
   email: "",
   linkedin: "",
   github: "",
+  coolProject: "",
+  motivation: "",
 };
 
 export function CareersApplyCta({
@@ -42,6 +57,7 @@ export function CareersApplyCta({
   const [values, setValues] = useState<Values>(emptyValues);
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<Status>("idle");
+  const markStarted = useFormStarted(FORM_NAME);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -64,13 +80,20 @@ export function CareersApplyCta({
     setErrors({});
     setStatus("idle");
     setOpen(true);
+    capturePostHogEvent("job_application_form_opened", {
+      job_id: jobId,
+      job_title: jobTitle,
+      page_path: window.location.pathname,
+    });
   }
 
   function closeDialog() {
     setOpen(false);
   }
 
-  function onChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+  function onChange(
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) {
     const { name, value } = event.target;
     const field = name as FieldName;
     setValues((current) => ({ ...current, [field]: value }));
@@ -96,9 +119,15 @@ export function CareersApplyCta({
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    markStarted();
+    captureFormEvent("form_submission_attempted", FORM_NAME);
     const next = validate(values);
     setErrors(next);
     if (Object.keys(next).length) {
+      captureFormEvent("form_submission_failed", FORM_NAME, {
+        failure_type: "validation",
+        job_id: jobId,
+      });
       const first = (["fullName", "email"] as const).find((key) => next[key]);
       if (first) {
         document.getElementById(`ca-${first}`)?.focus();
@@ -108,23 +137,49 @@ export function CareersApplyCta({
 
     setStatus("submitting");
     try {
-      await submitJobApplication({
+      const result = await submitJobApplication({
         fullName: values.fullName.trim(),
         email: values.email.trim(),
         linkedinUrl: values.linkedin.trim(),
         githubUrl: values.github.trim(),
+        coolProject: values.coolProject.trim(),
+        motivation: values.motivation.trim(),
         jobId,
         jobTitle,
       });
+      captureFormEvent("form_submitted", FORM_NAME, { job_id: jobId });
+      capturePostHogEvent("job_application_submitted", {
+        job_id: jobId,
+        job_title: jobTitle,
+        page_path: window.location.pathname,
+      });
+      if (result.notification === "failed") {
+        captureFormEvent("form_notification_failed", FORM_NAME, {
+          failure_type: "notification",
+          job_id: jobId,
+        });
+        capturePostHogEvent("job_application_notification_failed", {
+          job_id: jobId,
+          page_path: window.location.pathname,
+        });
+      }
       setStatus("success");
     } catch {
+      captureFormEvent("form_submission_failed", FORM_NAME, {
+        failure_type: "persistence",
+        job_id: jobId,
+      });
       setStatus("error");
     }
   }
 
   return (
     <>
-      <button type="button" className={careersCtaClassName} onClick={openDialog}>
+      <button
+        type="button"
+        className={careersCtaClassName}
+        onClick={openDialog}
+      >
         {label}
       </button>
       <dialog
@@ -165,7 +220,9 @@ export function CareersApplyCta({
             <h3 className="text-[22px] leading-[1.25] font-bold tracking-[-0.01em]">
               {careersApplyForm.successTitle}
             </h3>
-            <p className="text-base leading-[1.5] text-mist/75">{careersApplyForm.successBody}</p>
+            <p className="text-base leading-[1.5] text-mist/75">
+              {careersApplyForm.successBody}
+            </p>
             <button
               type="button"
               onClick={closeDialog}
@@ -175,7 +232,12 @@ export function CareersApplyCta({
             </button>
           </div>
         ) : (
-          <form className="flex flex-col gap-5" noValidate onSubmit={onSubmit}>
+          <form
+            className="flex flex-col gap-5"
+            noValidate
+            onChangeCapture={markStarted}
+            onSubmit={onSubmit}
+          >
             {status === "error" ? (
               <p
                 className="rounded-lg border border-[#e98b7d]/40 bg-[#e98b7d]/12 px-4 py-3.5 text-sm leading-[1.45] text-[#f0a99e]"
@@ -227,12 +289,35 @@ export function CareersApplyCta({
               value={values.github}
               onChange={onChange}
             />
+            {(["coolProject", "motivation"] as const).map((field) => (
+              <div key={field} className="flex flex-col gap-2">
+                <label
+                  className="text-sm leading-5 font-medium text-mist"
+                  htmlFor={`${titleId}-${field}`}
+                >
+                  {careersApplyForm.fields[field].label}
+                  <span className="ml-1 text-mist/60">(optional)</span>
+                </label>
+                <textarea
+                  id={`${titleId}-${field}`}
+                  name={field}
+                  rows={3}
+                  placeholder={careersApplyForm.fields[field].placeholder}
+                  value={values[field]}
+                  onChange={onChange}
+                  className={`${siteFormFieldClass} min-h-[110px] resize-y`}
+                />
+              </div>
+            ))}
+            <FormPrivacyNotice />
             <button
               type="submit"
               disabled={status === "submitting"}
               className="mt-1 inline-flex h-12 w-full items-center justify-center self-start rounded-xl bg-mist px-6 text-base font-semibold text-forest transition-[transform,box-shadow] duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-safe:hover:scale-[1.04] motion-safe:hover:shadow-[0_0_28px_rgba(227,226,112,0.4)] disabled:cursor-default disabled:opacity-60 disabled:hover:scale-100 disabled:hover:shadow-none sm:w-auto"
             >
-              {status === "submitting" ? careersApplyForm.submitting : careersApplyForm.submit}
+              {status === "submitting"
+                ? careersApplyForm.submitting
+                : careersApplyForm.submit}
             </button>
           </form>
         )}
@@ -243,7 +328,13 @@ export function CareersApplyCta({
 
 function CloseIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden="true"
+    >
       <path
         d="M3.5 3.5 12.5 12.5M12.5 3.5 3.5 12.5"
         stroke="currentColor"
@@ -256,7 +347,13 @@ function CloseIcon() {
 
 function SuccessCheck() {
   return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
       <path
         d="M20 6 9 17l-5-5"
         stroke="#00280E"

@@ -111,3 +111,18 @@ export function PetalMark({
     </svg>
   );
 }
+
+/** A wrapping row of arrow links, for follow-ups after a section. */
+export function ArrowLinks({ links }: { links: readonly { href: string; label: string }[] }) {
+  if (links.length === 0) return null;
+
+  return (
+    <p className="mt-6 flex flex-wrap gap-x-8 gap-y-2">
+      {links.map((link) => (
+        <BlogReadLink key={link.href} href={link.href}>
+          {link.label}
+        </BlogReadLink>
+      ))}
+    </p>
+  );
+}

@@ -2,19 +2,9 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import type { MouseEvent } from "react";
 import { MenuItemIcon } from "@/components/menu-icons";
+import { isExternalHref, isPlainLeftClick } from "@/lib/dom";
 import type { NavGroup, NavLink } from "@/lib/nav";
-
-export function isPlainLeftClick(event: MouseEvent) {
-  return (
-    event.button === 0 &&
-    !event.metaKey &&
-    !event.ctrlKey &&
-    !event.shiftKey &&
-    !event.altKey
-  );
-}
 
 export function MegaMenu({ menu }: { menu: NavGroup }) {
   return (
@@ -65,7 +55,7 @@ export function MegaMenuItem({ item }: { item: NavLink }) {
     active ? "bg-mist/10" : ""
   }`;
 
-  if (item.hash) {
+  if (item.hash || isExternalHref(item.href)) {
     return (
       <a href={item.href} className={className}>
         {content}

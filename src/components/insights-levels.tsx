@@ -10,56 +10,62 @@ const PEAK_OPACITY = 0.9;
 
 export function InsightsLevels() {
   return (
-    <section aria-labelledby="iia-title" className="insights-levels relative overflow-hidden">
+    <InView
+      as="section"
+      aria-labelledby="iia-title"
+      className="insights-levels relative isolate overflow-hidden"
+    >
       <LevelsBlobs />
-      <div className="relative z-10 mx-auto w-full max-w-[1328px] px-5 py-[clamp(4.75rem,8vw,7.5rem)] sm:px-12">
-        <InView className="ov-stagger mb-[clamp(2.5rem,4.5vw,4rem)] max-w-[720px]">
+      <div className="il-inner relative z-10">
+        <header className="il-head ov-stagger">
           <LevelsMark />
-          <p className="mt-4 text-sm font-bold tracking-[0.14em] text-bitmap-mid uppercase">
-            {insightsLevels.eyebrow}
-          </p>
-          <h2
-            id="iia-title"
-            className="mt-4 text-[clamp(2rem,3.8vw,3.375rem)] leading-[1.16] font-semibold tracking-[-0.02em] text-mist"
-          >
-            {insightsLevels.title}
+          <p className="il-eyebrow">{insightsLevels.eyebrow}</p>
+          <h2 id="iia-title" className="il-title">
+            {insightsLevels.title[0]}
+            <br />
+            {insightsLevels.title[1]}
           </h2>
-          <p className="mt-5 max-w-[560px] text-[16.5px] leading-[1.68] text-mist/75">
-            {insightsLevels.sub}
-          </p>
-        </InView>
+          <p className="il-sub">{insightsLevels.sub}</p>
+        </header>
 
-        <InView className="ov-stagger mx-auto grid w-[88%] max-w-[1169px] gap-[clamp(1.3rem,2.65vw,2rem)] lg:grid-cols-2">
+        <div className="il-grid">
           {insightsLevels.cards.map((card) => (
-            <article
+            <div
               key={card.title}
-              className={`surface-grain overflow-hidden rounded-[20px] border border-[#d9e533]/18 bg-[#19321e] p-[clamp(1.3rem,2.65vw,2rem)] ${
-                card.wide ? "lg:col-span-2" : ""
-              }`}
+              className={`il-cell${card.wide ? " il-cell--wide" : ""}`}
             >
-              <h3 className="text-[clamp(1.25rem,1.75vw,1.55rem)] font-semibold tracking-[-0.01em] text-mist">
-                {card.title}
-              </h3>
-              <p className="mt-3 max-w-[62ch] text-[15.5px] leading-[1.66] text-mist/75">
-                {card.body}
-              </p>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={card.image}
-                alt={card.imageAlt}
-                width={card.wide ? 1142 : 1128}
-                height={card.wide ? 516 : 636}
-                className={
-                  card.wide
-                    ? "mt-7 aspect-[15/4] w-full rounded-xl object-cover object-top"
-                    : "mt-7 h-auto w-full rounded-xl"
-                }
-              />
-            </article>
+              <article
+                className={`il-card${card.wide ? " il-card--wide" : " il-card--half"}`}
+              >
+                {card.wide ? (
+                  <div className="il-copy">
+                    <h3 className="il-card-title">{card.title}</h3>
+                    <p className="il-card-body">{card.body}</p>
+                  </div>
+                ) : (
+                  <>
+                    <h3 className="il-card-title">{card.title}</h3>
+                    <p className="il-card-body">{card.body}</p>
+                  </>
+                )}
+                <div
+                  className={`il-media${card.wide ? " il-media--side" : " il-media--fill"}`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={card.image}
+                    alt={card.imageAlt}
+                    width={card.wide ? 604 : 564}
+                    height={card.wide ? 320 : 360}
+                    loading="lazy"
+                  />
+                </div>
+              </article>
+            </div>
           ))}
-        </InView>
+        </div>
       </div>
-    </section>
+    </InView>
   );
 }
 
@@ -88,21 +94,21 @@ function LevelsBlobs() {
       return;
     }
 
-    const tracks: BlobTrack[] = Array.from(
-      frame.querySelectorAll("svg"),
-    ).map((svg) => ({
-      svg,
-      mx: -9999,
-      my: -9999,
-      gx: -9999,
-      gy: -9999,
-      pt: svg.createSVGPoint(),
-      cells: Array.from(svg.querySelectorAll("rect")).map((el) => ({
-        el,
-        cx: el.x.baseVal.value + el.width.baseVal.value / 2,
-        cy: el.y.baseVal.value + el.height.baseVal.value / 2,
-      })),
-    }));
+    const tracks: BlobTrack[] = Array.from(frame.querySelectorAll("svg")).map(
+      (svg) => ({
+        svg,
+        mx: -9999,
+        my: -9999,
+        gx: -9999,
+        gy: -9999,
+        pt: svg.createSVGPoint(),
+        cells: Array.from(svg.querySelectorAll("rect")).map((el) => ({
+          el,
+          cx: el.x.baseVal.value + el.width.baseVal.value / 2,
+          cy: el.y.baseVal.value + el.height.baseVal.value / 2,
+        })),
+      }),
+    );
 
     function baseOpacity() {
       return window.innerWidth <= 767 ? 0.15 : 0.3;
@@ -173,11 +179,11 @@ function LevelsBlobs() {
   return (
     <div
       ref={frameRef}
-      className="pointer-events-none absolute inset-0 z-0"
+      className="il-frame pointer-events-none absolute inset-0 z-0"
       aria-hidden="true"
     >
       <svg
-        className="absolute top-[17px] right-[-12px] h-[546px] w-[204px] [&_rect]:opacity-30 max-md:[&_rect]:opacity-15"
+        className="il-sq il-sq--r"
         viewBox="0 0 204 546"
         shapeRendering="crispEdges"
         xmlns="http://www.w3.org/2000/svg"
@@ -193,7 +199,7 @@ function LevelsBlobs() {
         <rect x="68" y="477" width="68" height="69" fill="#D1D100" />
       </svg>
       <svg
-        className="absolute bottom-[51px] left-[-12px] h-[545px] w-[136px] [&_rect]:opacity-30 max-md:hidden"
+        className="il-sq il-sq--l"
         viewBox="0 0 136 545"
         shapeRendering="crispEdges"
         xmlns="http://www.w3.org/2000/svg"
@@ -214,10 +220,17 @@ function LevelsBlobs() {
 
 function LevelsMark() {
   return (
-    <svg width="32" height="32" viewBox="0 0 16 12" fill="none" aria-hidden="true">
+    <svg
+      className="il-mark"
+      width="32"
+      height="32"
+      viewBox="0 0 16 12"
+      fill="none"
+      aria-hidden="true"
+    >
       <path
         d="M1 1l3 5-3 5M5.5 1l3 5-3 5M10 1l3 5-3 5"
-        stroke="#9CA703"
+        stroke="currentColor"
         strokeWidth="1.6"
         strokeLinecap="round"
         strokeLinejoin="round"

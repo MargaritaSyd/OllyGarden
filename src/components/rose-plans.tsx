@@ -1,49 +1,55 @@
 import { GetStartedLink } from "@/components/get-started-link";
 import { InView } from "@/components/in-view";
+import { PlansLink, type PlansHeading } from "@/components/insights-plans";
+import { RoseOpenSourceApplication } from "@/components/rose-open-source-application";
 import { rosePlans } from "@/lib/rose";
 
-export function RosePlans() {
+const planTitleClass =
+  "text-[clamp(1.75rem,2.6vw,2.25rem)] leading-[1.16] font-bold tracking-[-0.02em] text-mist";
+const featureClass =
+  "flex items-start gap-2.5 text-sm leading-[1.4] tracking-[0.02em] text-mist";
+
+export function RosePlans({
+  id,
+  heading = rosePlans,
+}: {
+  id?: string;
+  heading?: PlansHeading;
+}) {
   return (
-    <InView as="section" aria-labelledby="plans-title">
-      <div className="mx-auto w-full max-w-[1328px] px-5 py-[clamp(5.25rem,9vw,8.75rem)] sm:px-12">
-        <div className="ov-stagger mx-auto mb-[clamp(2.75rem,5vw,4rem)] max-w-[720px] text-center">
+    <InView as="section" id={id} aria-labelledby="plans-title" className="scroll-mt-24">
+      <div className="mx-auto w-full max-w-[1328px] px-5 py-[clamp(4.75rem,8vw,6rem)] sm:px-12">
+        <div className="ov-stagger mx-auto mb-14 max-w-[800px] text-center">
           <PlansMark />
-          <p className="mt-4 text-sm font-bold tracking-[0.14em] text-bitmap-mid uppercase">
-            {rosePlans.eyebrow}
+          <p className="mt-4 text-base font-bold tracking-[0.1em] text-bitmap-mid uppercase">
+            {heading.eyebrow}
           </p>
           <h2
             id="plans-title"
-            className="mt-4 text-[clamp(2rem,3.8vw,3.375rem)] leading-[1.16] font-semibold tracking-[-0.02em] text-mist"
+            className="mt-4 text-[clamp(2rem,3.4vw,3rem)] leading-[normal] font-bold tracking-[-0.02em] text-mist"
           >
-            {rosePlans.title}
+            {heading.title}
           </h2>
-          <p className="mx-auto mt-5 max-w-[640px] text-base leading-[1.66] text-mist/75">
-            {rosePlans.sub}
+          <p className="mx-auto mt-4 max-w-[718px] text-base leading-[1.4] tracking-[0.02em] text-mist">
+            {heading.sub}
           </p>
+          <PlansLink heading={heading} />
         </div>
 
-        <div className="grid gap-[clamp(1.75rem,3vw,2.75rem)] lg:grid-cols-2">
-          <PlanCard plan={rosePlans.free} motif />
+        <div className="grid gap-6 lg:grid-cols-2 lg:gap-10">
+          <PlanCard plan={rosePlans.free} />
           <PlanCard plan={rosePlans.enterprise} darker />
-          <article className="plan-os relative grid items-center gap-x-10 gap-y-[18px] overflow-hidden rounded-3xl border border-[#d9e533]/45 p-[clamp(1.625rem,3.2vw,2.75rem)] lg:col-span-2 lg:grid-cols-[minmax(0,1fr)_auto]">
+          <article className="plan-os relative grid items-center gap-x-10 gap-y-5 overflow-hidden rounded-2xl border border-sunflower/32 p-5 sm:p-6 lg:col-span-2 lg:grid-cols-[minmax(0,1fr)_auto]">
             <div>
-              <h3 className="text-[clamp(1.625rem,2.4vw,2rem)] font-semibold tracking-[-0.01em] text-mist">
-                {rosePlans.openSource.title}
-              </h3>
-              <p className="mt-1.5 text-sm text-mist/60">{rosePlans.openSource.note}</p>
+              <h3 className={planTitleClass}>{rosePlans.openSource.title}</h3>
+              <p className="mt-2 text-sm leading-[1.4] tracking-[0.02em] text-mist/90">
+                {rosePlans.openSource.note}
+              </p>
             </div>
-            <GetStartedLink
-              href={rosePlans.openSource.href}
-              className="rounded-xl lg:justify-self-end"
-            >
-              {rosePlans.openSource.cta}
-            </GetStartedLink>
-            <ul className="flex flex-wrap gap-x-11 gap-y-3.5 lg:col-span-2">
+            <RoseOpenSourceApplication label={rosePlans.openSource.cta} />
+            <ul className="flex flex-wrap gap-x-8 gap-y-3 lg:col-span-2">
               {rosePlans.openSource.items.map((item) => (
-                <li
-                  key={item}
-                  className="flex items-start gap-3 text-[15px] leading-[1.5] text-[#e9ece0]/85"
-                >
+                <li key={item} className={featureClass}>
                   <CheckIcon />
                   {item}
                 </li>
@@ -58,36 +64,42 @@ export function RosePlans() {
 
 function PlanCard({
   plan,
-  motif = false,
   darker = false,
 }: {
   plan: typeof rosePlans.free | typeof rosePlans.enterprise;
-  motif?: boolean;
   darker?: boolean;
 }) {
   return (
     <article
-      className={`plan-card relative flex flex-col overflow-hidden rounded-3xl border p-[clamp(1.625rem,3.2vw,2.75rem)] ${
-        darker ? "plan-ent border-white/8" : "plan-free border-[#d9e533]/20"
+      className={`plan-card relative flex flex-col overflow-hidden rounded-2xl border p-5 sm:p-6 ${
+        darker ? "plan-ent border-[#556812]/36" : "plan-free border-[#556812]/32"
       }`}
     >
-      {motif ? <PlanPixels /> : null}
-      <h3 className="text-[clamp(1.625rem,2.4vw,2rem)] font-semibold tracking-[-0.01em] text-mist">
-        {plan.title}
-      </h3>
-      <p className="mt-1.5 mb-7 text-sm text-mist/60">{plan.note}</p>
-      <ul className="mb-9 flex flex-col gap-3.5">
+      <h3 className={planTitleClass}>{plan.title}</h3>
+      <p
+        className={`mt-2 mb-5 text-sm leading-[1.4] tracking-[0.02em] ${
+          darker ? "text-mist/80" : "text-mist/90"
+        }`}
+      >
+        {plan.note}
+      </p>
+      <ul className="mb-5 flex flex-col gap-3">
         {plan.items.map((item) => (
-          <li
-            key={item}
-            className="flex items-start gap-3 text-[15px] leading-[1.5] text-[#e9ece0]/85"
-          >
+          <li key={item} className={featureClass}>
             <CheckIcon />
             {item}
           </li>
         ))}
       </ul>
-      <GetStartedLink href={plan.href} fullWidth className="mt-auto rounded-xl">
+      <GetStartedLink
+        href={plan.href}
+        fullWidth
+        className="mt-auto rounded-xl"
+        analytics={{
+          id: `rose_pricing_${plan.title.toLowerCase()}`,
+          section: "pricing",
+        }}
+      >
         {plan.cta}
       </GetStartedLink>
     </article>
@@ -96,7 +108,14 @@ function PlanCard({
 
 function CheckIcon() {
   return (
-    <svg className="mt-0.5 shrink-0" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+    <svg
+      className="mt-px shrink-0"
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
+      aria-hidden="true"
+    >
       <path
         d="M15 4.5 6.75 12.75 3 9"
         stroke="#9CA703"
@@ -107,28 +126,16 @@ function CheckIcon() {
   );
 }
 
-function PlanPixels() {
-  return (
-    <span
-      className="plan-pixels pointer-events-none absolute top-[6%] right-0 z-0 opacity-90"
-      aria-hidden="true"
-    >
-      <svg width="120" height="150" viewBox="0 0 120 150" fill="none">
-        <rect x="72" y="0" width="24" height="24" fill="#4A5D16" />
-        <rect x="96" y="24" width="24" height="24" fill="#697D07" />
-        <rect x="48" y="24" width="24" height="24" fill="#86971F" />
-        <rect x="72" y="48" width="24" height="24" fill="#3F5A21" />
-        <rect x="96" y="72" width="24" height="24" fill="#697D07" />
-        <rect x="72" y="96" width="24" height="24" fill="#4A5D16" />
-        <rect x="96" y="120" width="24" height="24" fill="#86971F" />
-      </svg>
-    </span>
-  );
-}
-
 function PlansMark() {
   return (
-    <svg className="mx-auto" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+    <svg
+      className="mx-auto"
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+      fill="none"
+      aria-hidden="true"
+    >
       <path
         d="M16 0C7.164 0 0 7.164 0 16s7.164 16 16 16 16-7.164 16-16S24.838 0 16 0Zm0 28.087C9.324 28.087 3.913 22.676 3.913 16S9.325 3.913 16 3.913 28.087 9.324 28.087 16 22.676 28.087 16 28.087Z"
         fill="#9CA703"

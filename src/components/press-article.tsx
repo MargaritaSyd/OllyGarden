@@ -7,8 +7,11 @@ import {
   type PressBlock,
   type PressRelease,
 } from "@/lib/press";
+import { registerFirstOpenTelemetry } from "@/lib/trademarks";
 
 export function PressArticle({ release }: { release: PressRelease }) {
+  const [title, dek] = registerFirstOpenTelemetry(release.title, release.dek);
+
   return (
     <article className="pr-article relative">
       <div className="pr-grid-bg" aria-hidden="true" />
@@ -61,13 +64,13 @@ export function PressArticle({ release }: { release: PressRelease }) {
 
           <InView className="pr-fx">
             <h1 className="pr-title mt-6 text-[clamp(2.25rem,5vw,4rem)] leading-[1.125] font-bold tracking-[-0.02em] text-mist">
-              {release.title}
+              {title}
             </h1>
           </InView>
 
           <InView className="pr-fx">
             <p className="mt-6 text-[clamp(1.125rem,1.6vw,1.25rem)] leading-[1.4] tracking-[0.02em] text-[#cdcdcd]">
-              {release.dek}
+              {dek}
             </p>
           </InView>
         </header>
@@ -84,7 +87,7 @@ export function PressArticle({ release }: { release: PressRelease }) {
   );
 }
 
-function PressBlockView({ block }: { block: PressBlock }) {
+export function PressBlockView({ block }: { block: PressBlock }) {
   switch (block.type) {
     case "lead":
       return <p className="pr-p pr-p-lead">{block.text}</p>;

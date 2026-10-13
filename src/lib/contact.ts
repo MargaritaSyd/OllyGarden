@@ -1,5 +1,7 @@
 export const contactMeta = {
-  title: "Contact Us — OllyGarden",
+  title: "Contact OllyGarden",
+  description:
+    "Talk to the OllyGarden team about Insights, Rose, the Instrumentation Score, or partnerships. We’d love to hear about your telemetry.",
   path: "/contact",
 } as const;
 

@@ -100,7 +100,7 @@ function ensureCell(cells: MotifCell[], col: number, row: number): MotifCell {
   return cell;
 }
 
-export type MotifKind = "frame" | "sides" | "corners" | "insights" | "tulip" | "lead";
+export type MotifKind = "frame" | "sides" | "corners" | "insights" | "lead";
 
 function buildMotif(width: number, height: number, kind: MotifKind): MotifCell[] {
   // Sides hug both edges: ceil leftover instead of leaving a background strip.
@@ -109,8 +109,11 @@ function buildMotif(width: number, height: number, kind: MotifKind): MotifCell[]
   const rows = Math.max(1, fit(height / CELL));
   const radius = Math.min(cols, rows) / 2;
   const cells: MotifCell[] = [];
-  const isCorners = kind === "corners" || kind === "insights" || kind === "tulip";
-  const tulipBlLift = 0;
+  const isCorners = kind === "corners" || kind === "insights";
+  // Rose: wider top-right strip.
+  const trWidth = Math.max(10, Math.floor(cols * 0.22));
+  const blRadius = 7.4;
+  const blExtent = 6;
 
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
@@ -128,35 +131,17 @@ function buildMotif(width: number, height: number, kind: MotifKind): MotifCell[]
         continue;
       }
 
-      // Rose: wider top-right strip. Tulip: compact TR + thin BL band toward center.
-      const trWidth =
-        kind === "tulip"
-          ? Math.max(6, Math.floor(cols * 0.14))
-          : Math.max(10, Math.floor(cols * 0.22));
-      const blRadius = 7.4;
-      const blExtent = 6;
-      const tulipBlWidth = Math.max(18, Math.floor(cols * 0.55));
-
       if (isCorners) {
         const bottomLeft = Math.hypot(fromLeft, fromBottom);
         const inTopRight =
-          kind === "tulip"
-            ? fromRight <= trWidth &&
-              fromTop <= (fromRight <= 3 ? 3 : 2)
-            : fromRight <= trWidth &&
-              fromTop >= 1 &&
-              fromTop <= (fromRight <= 4 ? 3 : 2);
-        const tulipBlHeight = fromLeft <= 4 ? 2 : fromLeft <= 11 ? 1 : 0;
+          fromRight <= trWidth &&
+          fromTop >= 1 &&
+          fromTop <= (fromRight <= 4 ? 3 : 2);
         const inBottomLeft =
-          kind === "insights"
-            ? false
-            : kind === "tulip"
-            ? fromLeft <= tulipBlWidth &&
-              fromBottom >= tulipBlLift &&
-              fromBottom <= tulipBlLift + tulipBlHeight
-            : fromLeft <= blExtent &&
-              fromBottom <= blExtent &&
-              bottomLeft <= blRadius;
+          kind !== "insights" &&
+          fromLeft <= blExtent &&
+          fromBottom <= blExtent &&
+          bottomLeft <= blRadius;
 
         if (!inTopRight && !inBottomLeft) {
           continue;
@@ -170,9 +155,7 @@ function buildMotif(width: number, height: number, kind: MotifKind): MotifCell[]
         const inTopRight = fromRight <= trWidth && fromTop <= 3;
         keep = inTopRight
           ? Math.max(0.34, 0.94 - (fromRight / trWidth) * 0.5)
-          : kind === "tulip"
-            ? Math.max(0.3, 0.92 - (fromLeft / tulipBlWidth) * 0.45)
-            : Math.max(0.28, 0.96 - (bottomLeft / blRadius) * 0.5);
+          : Math.max(0.28, 0.96 - (bottomLeft / blRadius) * 0.5);
       }
 
       if (noise(col * 0.5 + 13.7, row * 0.5 + 7.3) > keep) {
@@ -219,18 +202,11 @@ function buildMotif(width: number, height: number, kind: MotifKind): MotifCell[]
       return cells;
     }
 
-    const flowers =
-      kind === "tulip"
-        ? ([
-            [2, rows - 1 - tulipBlLift],
-            [10, rows - 1 - tulipBlLift],
-            [18, rows - 2 - tulipBlLift],
-          ] as const)
-        : ([
-            [2, rows - 3],
-            [5, rows - 2],
-            [4, rows - 5],
-          ] as const);
+    const flowers = [
+      [2, rows - 3],
+      [5, rows - 2],
+      [4, rows - 5],
+    ] as const;
 
     for (const [col, row] of flowers) {
       const cell = ensureCell(cells, col, row);
@@ -475,137 +451,6 @@ export function buildCorners(width: number, height: number): MotifCell[] {
 
 export function buildInsights(width: number, height: number): MotifCell[] {
   return buildMotif(width, height, "insights");
-}
-
-/**
- * Tulip hero — exact authored grids from the live OllyGarden reference (`o` + `s`).
- */
-export function buildTulip(width: number, height: number): MotifCell[] {
-  const designWidth = 1440;
-  const scale =
-    width <= designWidth
-      ? Math.min(1, Math.max(0.5, width / designWidth))
-      : Math.min(2, Math.max(1, Math.min(width / designWidth, height / 900)));
-
-  type TulipSpec = readonly [number, number, string, 0 | 1];
-  type TulipGrid = {
-    pitch: number;
-    cols: number;
-    rows: number;
-    cells: readonly TulipSpec[];
-    w?: number;
-    yOff?: number;
-    xOff?: number;
-    alpha: number;
-  };
-
-  const tr: TulipGrid = {
-    pitch: 46.3,
-    w: 400.6,
-    yOff: -7,
-    cols: 9,
-    rows: 4,
-    alpha: 1,
-    cells: [
-      [0, 0, "#34520B", 0],
-      [1, 0, "#D1D100", 0],
-      [3, 0, "#34520B", 0],
-      [6, 0, "#9CA703", 0],
-      [2, 1, "#9CA703", 1],
-      [4, 1, "#D1D100", 0],
-      [6, 1, "#D1D100", 0],
-      [5, 2, "#9CA703", 1],
-      [7, 2, "#D1D100", 0],
-      [8, 2, "#9CA703", 1],
-      [5, 3, "#9CA703", 0],
-    ],
-  };
-
-  const bl: TulipGrid = {
-    pitch: 46.3,
-    xOff: -17.5,
-    cols: 15,
-    rows: 4,
-    alpha: 0.7,
-    cells: [
-      [13, 0, "#2F4E0B", 0],
-      [14, 1, "#E3E270", 0],
-      [13, 1, "#D1D100", 0],
-      [11, 1, "#D1D100", 0],
-      [10, 1, "#9CA703", 0],
-      [4, 1, "#D1D100", 0],
-      [1, 2, "#9CA703", 0],
-      [2, 2, "#9CA703", 1],
-      [4, 2, "#9CA703", 0],
-      [6, 2, "#34520B", 0],
-      [7, 2, "#9CA703", 1],
-      [8, 2, "#D1D100", 0],
-      [10, 2, "#D1D100", 0],
-      [11, 2, "#9CA703", 1],
-      [12, 2, "#D1D100", 0],
-      [0, 3, "#D1D100", 0],
-      [2, 3, "#D1D100", 0],
-      [4, 3, "#D1D100", 0],
-      [5, 3, "#E3E270", 0],
-      [7, 3, "#D1D100", 0],
-      [9, 3, "#34520B", 0],
-      [13, 3, "#9CA703", 0],
-    ],
-  };
-
-  const cells: MotifCell[] = [];
-
-  function place(grid: TulipGrid, anchor: "tr" | "bl") {
-    const xs: number[] = [];
-    const ys: number[] = [];
-
-    if (anchor === "tr") {
-      const origin = width - (grid.w ?? 0) * scale;
-      for (let col = 0; col <= grid.cols; col++) {
-        xs.push(Math.round(origin + col * grid.pitch * scale));
-      }
-      for (let row = 0; row <= grid.rows; row++) {
-        ys.push(Math.round(((grid.yOff ?? 0) + row * grid.pitch) * scale));
-      }
-    } else {
-      const span = grid.rows * grid.pitch;
-      for (let col = 0; col <= grid.cols; col++) {
-        xs.push(Math.round(((grid.xOff ?? 0) + col * grid.pitch) * scale));
-      }
-      for (let row = 0; row <= grid.rows; row++) {
-        ys.push(Math.round(height - (span - row * grid.pitch) * scale));
-      }
-    }
-
-    grid.cells.forEach(([col, row, color, iconFlag], index) => {
-      const x0 = xs[col];
-      const x1 = xs[col + 1];
-      const y0 = ys[row];
-      const y1 = ys[row + 1];
-      if (x0 == null || x1 == null || y0 == null || y1 == null) {
-        return;
-      }
-      const size = x1 - x0;
-      cells.push({
-        x: (x0 + x1) / 2,
-        y: (y0 + y1) / 2,
-        col,
-        row,
-        color,
-        alpha:
-          0.35 *
-          (0.85 + frameHash(index * 7 + 3, index * 13 + 1) * 0.3) *
-          grid.alpha,
-        icon: iconFlag ? "flower" : null,
-        rotation: 0,
-        size,
-      });
-    });
-  }
-
-  place(tr, "tr");
-  place(bl, "bl");
-  return cells;
 }
 
 /** Lead form motif — exact grids from the live OllyGarden reference (`m` + `h`). */

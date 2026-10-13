@@ -1,13 +1,8 @@
 import Link from "next/link";
 
 type ComingSoonProps = {
-  badge?: string;
   title: string;
-  soon?: string;
   description?: string;
-  homeHref?: string;
-  homeLabel?: string;
-  fillViewport?: boolean;
 };
 
 const PIXELS = [
@@ -17,21 +12,9 @@ const PIXELS = [
   { className: "bottom-0 left-11 bg-bitmap-mid", key: "bl-b" },
 ] as const;
 
-export function ComingSoon({
-  badge,
-  title,
-  soon = "Coming soon",
-  description,
-  homeHref = "/",
-  homeLabel = "← Back to Home",
-  fillViewport = false,
-}: ComingSoonProps) {
+export function ComingSoon({ title, description }: ComingSoonProps) {
   return (
-    <div
-      className={`ph relative flex items-center justify-center overflow-hidden px-[clamp(1.5rem,7.25vw,6.5rem)] pt-[120px] pb-24 ${
-        fillViewport ? "min-h-dvh flex-1" : "min-h-full"
-      }`}
-    >
+    <div className="ph relative flex min-h-full items-center justify-center overflow-hidden px-[clamp(1.5rem,7.25vw,6.5rem)] pt-[120px] pb-24">
       <div className="ph-media pointer-events-none absolute inset-0 z-0" aria-hidden="true" />
       {PIXELS.map((pixel) => (
         <div
@@ -41,26 +24,21 @@ export function ComingSoon({
         />
       ))}
       <div className="ph-inner relative z-[2] flex max-w-[720px] flex-col items-center gap-6 text-center">
-        {badge ? (
-          <span className="inline-flex h-[52px] items-center bg-[#c8d99b] px-6 text-base font-bold text-[#00280e]">
-            {badge}
-          </span>
-        ) : null}
         <h1 className="text-[clamp(1.875rem,8.6vw,2.375rem)] leading-[1.12] font-bold tracking-[-0.02em] text-white min-[480px]:text-[3.75rem]">
           {title}
         </h1>
         <span className="surface-grain inline-flex items-center gap-2 rounded-full border border-white/14 bg-[#19321e] px-4 py-1 text-[13px] font-medium text-bitmap-highlight">
           <SoonChevrons />
-          {soon}
+          Coming soon
         </span>
         {description ? (
           <p className="text-lg leading-[1.55] text-mist/85">{description}</p>
         ) : null}
         <Link
-          href={homeHref}
+          href="/"
           className="inline-flex items-center justify-center gap-2.5 rounded-2xl bg-white px-[30px] py-4 text-base leading-none font-semibold text-black transition-[transform,box-shadow,background] duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-safe:hover:scale-[1.04] motion-safe:hover:shadow-[0_0_28px_rgba(227,226,112,0.4)]"
         >
-          {homeLabel}
+          ← Back to Home
         </Link>
       </div>
     </div>

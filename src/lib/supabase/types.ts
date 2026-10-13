@@ -21,6 +21,8 @@ export type Database = {
       };
       job_applications: {
         Row: {
+          cool_project: string | null;
+          motivation: string | null;
           email: string;
           full_name: string;
           github_url: string | null;
@@ -29,6 +31,8 @@ export type Database = {
           linkedin_url: string | null;
         };
         Insert: {
+          cool_project?: string | null;
+          motivation?: string | null;
           email: string;
           full_name: string;
           github_url?: string | null;
@@ -37,6 +41,8 @@ export type Database = {
           linkedin_url?: string | null;
         };
         Update: {
+          cool_project?: string | null;
+          motivation?: string | null;
           email?: string;
           full_name?: string;
           github_url?: string | null;
@@ -46,27 +52,24 @@ export type Database = {
         };
         Relationships: [];
       };
-      tulip_leads: {
+      rose_leads: {
         Row: {
-          company: string | null;
           email: string;
+          kind: string;
           name: string;
           notes: string | null;
-          support_tier: string;
         };
         Insert: {
-          company?: string | null;
           email: string;
+          kind: string;
           name: string;
           notes?: string | null;
-          support_tier: string;
         };
         Update: {
-          company?: string | null;
           email?: string;
+          kind?: string;
           name?: string;
           notes?: string | null;
-          support_tier?: string;
         };
         Relationships: [];
       };

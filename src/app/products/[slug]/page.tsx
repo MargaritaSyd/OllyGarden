@@ -2,8 +2,9 @@ import { notFound } from "next/navigation";
 import { ComingSoon } from "@/components/coming-soon";
 import { stubMetadata } from "@/lib/stub";
 
+// Polder is not announced yet. Re-enable when it launches.
 const titles: Record<string, string> = {
-  polder: "Polder",
+  // polder: "Polder",
 };
 
 export function generateStaticParams() {
@@ -38,7 +39,7 @@ export default async function ProductStubPage({
   return (
     <ComingSoon
       title={title}
-      description="Polder is coming soon."
+      description={`${title} is coming soon.`}
     />
   );
 }

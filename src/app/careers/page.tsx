@@ -10,7 +10,7 @@ import { careersGraph } from "@/lib/structured-data";
 
 export const metadata = createPageMetadata({
   title: careersMeta.title,
-  description: careersHero.lede,
+  description: careersMeta.description,
   path: careersMeta.path,
   absoluteTitle: true,
 });

@@ -13,7 +13,7 @@ export function HomeVoices() {
           <TulipMark />
           <h2
             id="voices-title"
-            className="mt-5 text-[clamp(2rem,4vw,2.875rem)] leading-[1.15] font-semibold tracking-[-0.02em] text-mist"
+            className="mt-5 text-[clamp(2rem,4vw,2.875rem)] leading-[1.15] font-bold tracking-[-0.02em] text-mist"
           >
             {homeVoices.title}
           </h2>

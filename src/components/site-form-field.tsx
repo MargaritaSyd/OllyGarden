@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ChangeEvent } from "react";
 
 export const siteFormFieldClass =
@@ -22,15 +23,20 @@ export function SiteFormField({
   autoComplete?: string;
   required?: boolean;
   type?: string;
-  value: string;
+  value?: string;
   error?: string;
-  onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onChange?: (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => void;
 }) {
   const errorId = `${id}-err`;
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-sm leading-none font-medium text-mist" htmlFor={id}>
+      <label
+        className="text-sm leading-none font-medium text-mist"
+        htmlFor={id}
+      >
         {label}
         {required ? (
           <span className="ml-0.5 text-sunflower" aria-hidden="true">
@@ -58,5 +64,17 @@ export function SiteFormField({
         </p>
       ) : null}
     </div>
+  );
+}
+
+export function FormPrivacyNotice() {
+  return (
+    <p className="text-xs leading-5 text-mist/60">
+      We use your details only to handle this request, as described in our{" "}
+      <Link href="/privacy-policy" className="underline hover:no-underline">
+        Privacy Policy
+      </Link>
+      .
+    </p>
   );
 }

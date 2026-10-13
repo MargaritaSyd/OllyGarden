@@ -1,8 +1,11 @@
+import { siteConfig } from "@/lib/site";
+
 export const insightsHero = {
   badge: "OllyGarden Insights",
   title: "Find your bad telemetry",
-  lede: "Insights analyzes your OpenTelemetry data to pinpoint where telemetry quality breaks down and show your team what needs attention first. Identify sensitive data leaks, noisy signals, incomplete instrumentation, and telemetry without clear ownership.",
+  lede: "Insights analyzes your OpenTelemetry® data to pinpoint where telemetry quality breaks down and show your team what needs attention first. Identify sensitive data leaks, noisy signals, incomplete instrumentation, and telemetry without clear ownership.",
   cta: "Get Started",
+  ctaHref: siteConfig.appUrl,
 } as const;
 
 export const insightsScore = {
@@ -89,7 +92,7 @@ export const insightsAction = {
 
 export const insightsLevels = {
   eyebrow: "From Overview to Insight Details",
-  title: "Understand telemetry quality at every level",
+  title: ["Understand telemetry", "quality at every level"],
   sub: "Start with a high-level view of telemetry health, then drill into the services, findings, and details behind each score.",
   cards: [
     {
@@ -140,22 +143,31 @@ export const insightsVoices = {
   ],
 } as const;
 
+/** Plan-card feature that links to the page explaining the score. */
+const scoreItem = {
+  label: "Instrumentation Score calculation",
+  href: "/resources/instrumentation-score",
+} as const;
+
 export const insightsPlans = {
   eyebrow: "Pricing",
   title: "Start measuring telemetry quality today",
   sub: "Start with our Free Plan - Full access to the Instrumentation Score and critical insights including PII leakage detection. No credit card required.",
+  href: scoreItem.href,
+  link: "How the Instrumentation Score works",
+  recommended: "Recommended",
   cards: [
     {
       tier: "Free",
       price: "$0",
-      suffix: "/mo",
+      suffix: "/month",
       note: "For small projects and getting started.",
       cta: "Start Free",
-      href: "/get-started",
+      href: siteConfig.appUrl,
+      recommended: false,
       items: [
-        "Instrumentation Score calculation",
+        scoreItem,
         "2 insights (incl. suspicious PII leaks)",
-        "100 requests/second per organization",
         "Unlimited seats",
         "Unlimited services",
         "Community support",
@@ -165,14 +177,14 @@ export const insightsPlans = {
     {
       tier: "Essentials",
       price: "$990",
-      suffix: "/mo",
+      suffix: "/month",
       note: "For teams shipping production telemetry.",
       cta: "Get Started",
-      href: "/get-started",
+      href: siteConfig.appUrl,
+      recommended: true,
       items: [
-        "Instrumentation Score calculation",
+        scoreItem,
         "All OllyGarden Insights",
-        "100 requests/second per organization",
         "Unlimited seats",
         "Unlimited services",
         "Priority email support",
@@ -186,10 +198,10 @@ export const insightsPlans = {
       note: "For scale, security, and governance.",
       cta: "Contact Sales",
       href: "/contact",
+      recommended: false,
       items: [
-        "Instrumentation Score calculation",
+        scoreItem,
         "All OllyGarden Insights",
-        "Custom rate limits",
         "Unlimited seats",
         "Unlimited services",
         "Slack/phone support",
@@ -197,6 +209,8 @@ export const insightsPlans = {
         "Custom SLA agreements",
         "Real-time notifications",
         "Custom rules (coming soon)",
+        "Telemetry sampling opt-out and custom retention",
+        "Zero data retention with AI providers (add-on)",
       ],
     },
   ],
@@ -205,11 +219,13 @@ export const insightsPlans = {
 export const insightsCta = {
   title: ["Start with your", "Instrumentation Score"],
   sub: "Get your first score, review your findings, and start improving telemetry quality across your OpenTelemetry services.",
-  primary: { label: "Get Started" },
+  primary: { label: "Get Started", href: siteConfig.appUrl },
   secondary: { label: "Book a Demo", href: "/contact" },
 } as const;
 
 export const insightsMeta = {
-  title: "OllyGarden Insights — Know your bad telemetry",
+  title: "OllyGarden Insights — Find your bad OpenTelemetry data",
+  description:
+    "OllyGarden Insights analyzes your OpenTelemetry data to find sensitive data leaks, noisy signals, and incomplete instrumentation, and shows what to fix first.",
   path: "/products/insights",
 } as const;

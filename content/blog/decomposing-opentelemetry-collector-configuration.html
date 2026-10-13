@@ -303,7 +303,8 @@ BACKEND_ENDPOINT=backend:4317 otelcol validate --config file:base.yaml --config 
       <span class="hljs-attr">processors:</span> [<span class="hljs-string">tail_sampling</span>]  <span class="hljs-comment"># processor under test</span>
       <span class="hljs-attr">exporters:</span> [<span class="hljs-string">debug</span>]
 </code></pre><pre><code class="hljs language-bash">otelcol validate --config file:test-harness.yaml --config file:processors/tail_sampling.yaml
-</code></pre><h2>Practical considerations</h2>
+</code></pre><!-- cta -->
+<h2>Practical considerations</h2>
 <p>The merge operation has limitations worth understanding. Arrays are not merged; the later source completely replaces the earlier source&#39;s array. This affects pipeline definitions: if <code>base.yaml</code> defines <code>processors: [a, b, c]</code> and an overlay defines <code>processors: [a, b]</code>, the result is <code>[a, b]</code>, not a combination. Plan your decomposition accordingly, keeping arrays that need to vary together in the same file.</p>
 <p>File paths in nested inclusions are relative to the working directory, not the file containing the inclusion. A <code>${file:policies/errors.yaml}</code> reference resolves relative to where the collector process runs, regardless of which configuration file contains the reference. This behavior can surprise when organizing configurations in subdirectories; consider using absolute paths or ensuring the working directory is set appropriately.</p>
 <p>Environment variable defaults (<code>${env:VAR:-default}</code>) only apply when the variable is unset. An empty string is not the same as unset; if <code>VAR=&quot;&quot;</code> is exported, the default is not used. For required variables without reasonable defaults, validate externally before starting the collector:</p>

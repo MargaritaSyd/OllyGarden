@@ -1,3 +1,4 @@
+import { CaseStudyProof } from "@/components/case-studies";
 import { FinancialHero } from "@/components/financial-hero";
 import { FinancialPains } from "@/components/financial-pains";
 import { FinancialProducts } from "@/components/financial-products";
@@ -12,12 +13,13 @@ import {
   enterpriseProducts,
   enterpriseStats,
 } from "@/lib/enterprise";
+import { solutionIndustries } from "@/lib/case-studies";
 import { createPageMetadata } from "@/lib/metadata";
 import { enterpriseGraph } from "@/lib/structured-data";
 
 export const metadata = createPageMetadata({
   title: enterpriseMeta.title,
-  description: enterpriseHero.lede,
+  description: enterpriseMeta.description,
   path: enterpriseMeta.path,
   absoluteTitle: true,
 });
@@ -29,6 +31,7 @@ export default function EnterpriseSoftwarePage() {
       <FinancialHero content={enterpriseHero} imageSrc="/images/solutions/enterprise/hero.svg" />
       <FinancialPains content={enterprisePains} glyph={enterprisePains.glyph} />
       <FinancialStats content={enterpriseStats} />
+      <CaseStudyProof industry={solutionIndustries.enterprise} />
       <FinancialProducts content={enterpriseProducts} glyph={enterpriseProducts.glyph} />
       <SiteCta content={enterpriseCta} />
     </>

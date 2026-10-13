@@ -1,51 +1,180 @@
+import { announcement } from "@/lib/announcement";
+import { siteConfig } from "@/lib/site";
+
 export const roseHero = {
   badge: "OllyGarden Rose",
-  titleLead: "Find and fix OpenTelemetry",
-  titleRest: "instrumentation at the source",
-  lede: "Rose is your personal AI engineer for observability and OpenTelemetry. It reviews your services, finds missing or low-value telemetry, and helps your team apply the right fix.",
-  cta: "Scan your Repo for Free!",
+  titleLead: "Your teams and their agents write the code.",
+  titleRest: "Rose gets the instrumentation right.",
+  lede: "OllyGarden Rose adds missing instrumentation, migrates vendor SDKs to OpenTelemetry®, reviews what’s already there for gaps and inconsistencies, and fixes the issues you select.",
+  scopeLead: "Across your repositories: ",
+  scopeStrong:
+    "autonomously in the background, locally on your machine, or inside your favorite coding agent.",
+  cta: "Scan Your Repo for Free",
+  ctaHref: siteConfig.appUrl,
+  secondaryCta: "Book a Demo",
+  secondaryHref: "/contact",
 } as const;
 
+export const roseProblem = {
+  eyebrow: "The problem",
+  title: "Why good instrumentation is so hard to get right",
+  body: "An observability engineer knows exactly what good instrumentation should look like. What they cannot do is sit with every team, in every repository, on every pull request.",
+  highlight: "Rose is the telemetry expert for all your teams.",
+  cards: [
+    {
+      title: "Inconsistent patterns",
+      body: "Different teams, frameworks and vendor SDKs lead to inconsistent instrumentation across your codebase.",
+      place: "tl",
+    },
+    {
+      title: "Low-value telemetry",
+      body: "Telemetry without business context makes it harder to understand and resolve issues.",
+      place: "bl",
+    },
+    {
+      title: "Missing instrumentation",
+      body: "New services and features often ship with little or no instrumentation.",
+      place: "tr",
+    },
+    {
+      title: "Agent-generated mistakes",
+      body: "AI coding agents can introduce gaps, duplication or other poor instrumentation practices.",
+      place: "br",
+    },
+  ],
+} as const;
+
+export const roseDoes = {
+  eyebrow: "Meet Rose",
+  title: "What Rose does",
+  cards: [
+    {
+      icon: "instrument",
+      title: "Instrument",
+      body: "Adds missing instrumentation and expands coverage in already instrumented services with targeted business context.",
+    },
+    {
+      icon: "migrate",
+      title: "Migrate",
+      body: "Moves vendor-specific or custom instrumentation to OpenTelemetry.",
+    },
+    {
+      icon: "review",
+      title: "Review",
+      body: "Continuously reviews the whole codebase in the background as your code evolves.",
+    },
+    {
+      icon: "fix",
+      title: "Fix",
+      body: "Turns selected findings into pull requests your team reviews and controls.",
+    },
+  ],
+} as const;
+
+export type RoseDoesIcon = (typeof roseDoes.cards)[number]["icon"];
+
 export const roseHow = {
+  eyebrow: "How Rose works",
+  title: "Instrumentation that improves with your code",
+  sub: "Rooted in OpenTelemetry. Curated by OllyGarden. Rose connects patterns across your services with OpenTelemetry standards, OllyGarden’s instrumentation expertise, and your organization’s context and skills.",
+  skillsLink: "Explore the open source skills behind Rose",
+  skillsHref: "/resources/agent-skills",
+  diagram: {
+    label: "How Rose fits your delivery loop",
+    nodes: {
+      rose: { title: "OllyGarden Rose", sub: "AI instrumentation agent" },
+      context: { title: "Org context & skills" },
+      service: { title: "Your service" },
+      collector: { title: "Collector", sub: "OpenTelemetry Collector" },
+      backend: { title: "Your observability backend" },
+      insights: { title: "OllyGarden Insights", tag: "Optional" },
+    },
+    edges: [
+      { n: "1", from: "context", to: "rose" },
+      { n: "2", from: "rose", to: "service", label: "open pull request" },
+      { n: "3", from: "service", to: "collector", label: "telemetry" },
+      { from: "collector", to: "backend", label: "telemetry" },
+      { from: "collector", to: "insights", label: "telemetry" },
+      { from: "insights", to: "rose" },
+    ],
+    /** Plain-language fallback for screen readers and reduced layouts. */
+    summary:
+      "Org context and skills feed OllyGarden Rose. Rose opens a pull request against your service. Your service sends telemetry to the OpenTelemetry Collector, which forwards it to your observability backend and, optionally, to OllyGarden Insights. Insights findings flow back into Rose.",
+  },
   steps: [
     {
       n: "1",
-      title: "Connect your repository",
-      body: "Create an OllyGarden account and connect Rose to your GitHub repository.",
-      image: "/images/rose/step-connect.svg",
-      imageAlt: "OllyGarden connected to a GitHub repository",
+      title: "Review",
+      body: "Rose reviews your code using your org context and skills, plus Insights findings from your telemetry when available.",
     },
     {
       n: "2",
-      title: "Get instrumentation findings",
-      body: "Rose surfaces telemetry gaps, inconsistencies, and improvement opportunities that need attention.",
-      image: "/images/rose/step-findings.png",
-      imageAlt: "Rose surrounded by instrumentation findings",
+      title: "Fix",
+      body: "Rose opens a pull request to fix the instrumentation at the source.",
+    },
+    {
+      n: "3",
+      title: "Merge",
+      body: "Your team reviews and merges it, new telemetry is sent, and the loop starts over.",
     },
   ],
-  apply: {
-    n: "3",
-    title: "Apply the fix",
-    body: "Use Rose’s recommendations in the workflow that fits your team.",
-    substeps: [
-      {
-        title: "Dashboard recommendations",
-        body: "Review findings, explanations, and recommended changes from the OllyGarden dashboard.",
-      },
-      {
-        title: "Pull requests",
-        body: "Let Rose prepare source-level improvements from the dashboard for developer review.",
-      },
-      {
-        title: "CLI + Coding Agents",
-        soon: true,
-        body: "Use Rose findings as context for your coding agent and apply OpenTelemetry improvements directly in your local workflow.",
-      },
+} as const;
+
+/**
+ * Minimum Viable Instrumentation announcement. Figma: hero strip 2371:32444, section 2371:31595.
+ * The launch post URL lives in `src/lib/announcement.ts`, shared with the site-wide bar.
+ */
+export const roseMvi = {
+  id: "mvi",
+  strip: {
+    title: "Minimum Viable Instrumentation (MVI)",
+    badge: "New",
+    body: "Rose can make your currently unobservable services observable.",
+    link: "See How it Works",
+  },
+  eyebrow: "New in Rose",
+  title: "Minimum Viable Instrumentation",
+  body: "For repositories with no instrumentation, Rose creates an OpenTelemetry baseline, combining zero-code instrumentation with the business context needed to investigate problems.",
+  steps: [
+    {
+      title: "Your repository",
+      body: "Point Rose at a repository with no instrumentation.",
+    },
+    {
+      title: "Rose adds MVI",
+      body: "One repository at a time, or many at once.",
+    },
+    {
+      title: "Pull request",
+      body: "Your team reviews it and decides what ships.",
+    },
+  ],
+  before: {
+    label: "Zero-code instrumentation",
+    lines: [
+      { text: "POST /orders", indent: 0, highlight: false },
+      { text: "↳ SELECT orders", indent: 1, highlight: false },
+      { text: "↳ POST payments-api", indent: 1, highlight: false },
+      { text: "↳ publish order.created", indent: 1, highlight: false },
     ],
-    issues: [
-      { title: "Dashboard issue" },
-      { title: "HTTP error" },
+    note: "You can see the request was slow, but not the checkout outcome, payment method, or number of items in the cart.",
+  },
+  after: {
+    label: "With business context",
+    lines: [
+      { text: "POST /orders", indent: 0, highlight: false },
+      { text: "↳ checkout.submit MANUAL", indent: 1, highlight: true },
+      { text: "↳ SELECT orders", indent: 2, highlight: false },
+      { text: "↳ POST payments-api", indent: 2, highlight: false },
+      { text: "↳ publish order.created", indent: 2, highlight: false },
     ],
+    attributes: ["checkout.result", "payment.method", "cart.item_count"],
+  },
+  band: {
+    title: "The difference is one span and its attributes, not a hundred more spans",
+    body: "Useful coverage and meaningful context, with less unnecessary telemetry.",
+    cta: "Read the Announcement",
+    announcementHref: announcement.href,
   },
 } as const;
 
@@ -60,39 +189,41 @@ export const roseAction = {
   },
 } as const;
 
-export const roseMatters = {
-  eyebrow: "Why Rose Matters",
-  title: "Instrumentation problems start in the code",
-  paragraphs: [
-    "As teams ship faster, instrumentation quality becomes harder to control. Developers, frameworks, and coding agents can repeat patterns that create noisy, incomplete, or misleading telemetry.",
-    "Rose helps teams review OpenTelemetry instrumentation directly in the codebase, so problems can be fixed where they begin.",
-  ],
+export const roseTeams = {
+  eyebrow: "Improve your team",
+  title: "What changes for your teams",
   cards: [
     {
-      title: "Missing telemetry",
-      body: "Important operations can ship without the spans, logs, or attributes needed for debugging.",
-      place: "tl",
+      icon: "chevrons",
+      title: "Resolve incidents faster",
+      body: "Telemetry that explains why, not just what.",
     },
     {
-      title: "Low-value instrumentation",
-      body: "Some telemetry adds volume without adding useful context.",
-      place: "bl",
+      icon: "sliders",
+      title: "OpenTelemetry expertise for every team",
+      body: "Every team gets expert-level instrumentation. Engineers stay in control.",
     },
     {
-      title: "Inconsistent patterns",
-      body: "Different teams and services instrument similar workflows in different ways.",
-      place: "tr",
-    },
-    {
-      title: "Agent-generated mistakes",
-      body: "Coding agents can reproduce bad instrumentation patterns unless they are guided by OpenTelemetry expertise.",
-      place: "br",
+      icon: "gauge",
+      title: "Pay for signal, not noise",
+      body: "Useful coverage without unnecessary telemetry.",
     },
   ],
+  stat: {
+    label: "Spans/sec",
+    from: "14",
+    to: "8",
+    quote:
+      "I reduced the span rate from 14 spans/sec to 8 spans/sec, lowering telemetry volume.",
+    name: "Marcin Siennicki",
+    role: "Advanced Software Engineer",
+  },
 } as const;
 
+export type RoseTeamsIcon = (typeof roseTeams.cards)[number]["icon"];
+
 export const roseClients = {
-  title: "Listen from our clients",
+  title: "What teams say about Rose",
   quotes: [
     {
       name: "Rob Chapman",
@@ -126,21 +257,46 @@ export const roseClients = {
   ],
 } as const;
 
-export const roseContext = {
-  eyebrow: "Context-Aware Analysis",
-  titleLead: "Rooted in OpenTelemetry",
-  titleRest: "Curated by OllyGarden",
-  paragraphs: [
-    "Rose understands your codebase, not just isolated changes. It connects patterns across services with OpenTelemetry standards, OllyGarden’s instrumentation expertise, and your organization’s preferences.",
-    "The result is practical, consistent recommendations that are easier for developers to apply and maintain.",
+export const roseSecurity = {
+  eyebrow: "We care about security",
+  title: "Security and control",
+  run: {
+    title: "Run Rose your way",
+    lines: [
+      "Works with any observability backend. We don’t replace your observability backend.",
+      "Tuned for Go, Java, JavaScript/TypeScript and Python, and runs on other languages too.",
+    ],
+    chips: ["Run locally", "Self-host", "Bring your own key"],
+  },
+  cards: [
+    {
+      icon: "shield",
+      title: "Isolated, credential-free sandbox",
+      body: "Every run happens in an environment created for that run and destroyed when it ends.",
+    },
+    {
+      icon: "branch",
+      title: "Never merges or writes to your default branch",
+      body: "Every change arrives as a pull request your team reviews and controls.",
+    },
+    {
+      icon: "copy",
+      title: "Never stores a copy of the repo",
+      body: "The sandbox is torn down with everything in it when the run finishes.",
+    },
   ],
-  nodes: [
-    { id: "tl", title: "OllyGarden", sub: "Knowledge Base" },
-    { id: "tr", title: "OTel Specs", sub: "Official standards" },
-    { id: "bl", title: "Codebase", sub: "Full context" },
-    { id: "br", title: "Your Organization", sub: "Learns across applications" },
-  ],
+  enterprise: {
+    title: "Enterprise",
+    body: "EU-only processing and zero data retention with AI providers are available as add-ons.",
+    cta: "Security and Data Handling",
+    href: "/security",
+  },
 } as const;
+
+export type RoseSecurityIcon = (typeof roseSecurity.cards)[number]["icon"];
+
+const roseFreeRepositories = 5;
+const roseExtraRepositoryPrice = "$5";
 
 export const rosePlans = {
   eyebrow: "Get Started",
@@ -150,14 +306,16 @@ export const rosePlans = {
     title: "Free",
     note: "No credit card required",
     cta: "Get Started",
-    href: "/get-started",
+    href: siteConfig.appUrl,
+    repositories: roseFreeRepositories,
+    extraRepositoryPrice: roseExtraRepositoryPrice,
     items: [
-      "Up to 5 repositories included",
+      `Up to ${roseFreeRepositories} repositories included`,
       "Weekly automatic instrumentation review",
       "Instrumentation dashboard",
       "REST API and CLI access",
       "Custom review instructions",
-      "Additional repositories for $5/month each",
+      `Additional repositories for ${roseExtraRepositoryPrice}/month each`,
     ],
   },
   enterprise: {
@@ -172,6 +330,7 @@ export const rosePlans = {
       "Agentic Instrumentation (MVI)",
       "Team integrations for Slack, Discord, and more",
       "Priority support with a dedicated channel",
+      "Zero data retention with AI providers (add-on)",
     ],
   },
   openSource: {
@@ -187,15 +346,57 @@ export const rosePlans = {
   },
 } as const;
 
+export const roseFaq = {
+  title: "Frequently Asked Questions",
+  sub: "Common questions about what Rose does, how it treats your code, and how it fits your observability stack.",
+  items: [
+    {
+      q: "What is Minimum Viable Instrumentation (MVI)?",
+      a: "For repositories with no instrumentation, Rose creates an OpenTelemetry baseline, combining zero-code instrumentation with the business context needed to investigate problems, and delivers it as a pull request.",
+    },
+    {
+      q: "Do I need OllyGarden Insights to use Rose?",
+      a: "No. Rose works on its own. With Insights, Rose also uses findings from your production telemetry.",
+    },
+    {
+      q: "Which languages does Rose support?",
+      a: "Rose is tuned for Go, Java, JavaScript/TypeScript and Python, and runs on other languages too.",
+    },
+    {
+      q: "Will Rose change my code without approval?",
+      a: "No. Rose never merges or writes to your default branch. Every change arrives as a pull request your team reviews.",
+    },
+    {
+      q: "What happens to my code?",
+      a: "Each run happens in an isolated, credential-free sandbox that is destroyed when the run ends. Rose never stores a copy of your repository.",
+    },
+    {
+      q: "Does Rose replace my observability backend?",
+      a: "No. Rose works with any observability backend and improves the telemetry you send to it.",
+    },
+  ],
+} as const;
+
 export const roseCta = {
+  title: ["Telemetry your teams and", "their agents can trust"],
+  sub: "Start with the right instrumentation. Improve what you already have.",
+  primary: { label: "Scan Your Repo for Free", href: siteConfig.appUrl },
+  secondary: { label: "Book a Demo", href: "/contact" },
+  buttonSize: "lg",
+  variant: "product",
+} as const;
+
+/** Closing CTA reused by resource pages that hand off to Rose. */
+export const roseScanCta = {
   title: "Start with a repository scan",
   sub: "Connect Rose to your repository and see where your OpenTelemetry instrumentation can be improved. Get actionable findings, review the recommendations, and help your team fix telemetry issues at the source.",
-  primary: { label: "Scan your Repo for Free!" },
+  primary: { label: "Scan Your Repo for Free", href: siteConfig.appUrl },
   secondary: { label: "Book a Demo", href: "/contact" },
 } as const;
 
 export const roseMeta = {
-  title: "OllyGarden Rose — Find and fix OpenTelemetry instrumentation at the source",
-  description: roseHero.lede,
+  title: "OllyGarden Rose — AI OpenTelemetry instrumentation review",
+  description:
+    "Rose is an AI engineer for OpenTelemetry. It reviews your services, finds missing or low-value telemetry, and helps your team apply the right fix.",
   path: "/products/rose",
 } as const;

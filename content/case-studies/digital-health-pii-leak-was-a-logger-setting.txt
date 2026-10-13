@@ -1,0 +1,47 @@
+[INTRO]
+BIANCA: [warmly] Hi, I'm Bianca.
+FLORIAN: And I'm Florian. You might know us from the OTel Drops podcast. Today we're telling another real story from OllyGarden's work.
+BIANCA: Anonymized, so no names. And this one is about what OllyGarden found, start to finish.
+FLORIAN: [curiously] Here's the setup. A European digital-health platform. A small engineering team, a fleet of Node.js and TypeScript microservices, and nobody owning observability full time.
+BIANCA: And security and privacy audits coming up. So personal data in logs was their top priority.
+FLORIAN: Their CTO put it well, and I'm paraphrasing: however careful a team is, it never feels sure it isn't leaking secrets or personal data.
+BIANCA: [thoughtfully] That's honest. And it's true for almost every team I know.
+
+[ONE SETTING]
+FLORIAN: So OllyGarden Insights looked at their staging samples every week. And in the very first one?
+BIANCA: Personal data in twelve of about seventy services. Roughly one in six.
+FLORIAN: [cautiously] That sounds like a lot of careless code.
+BIANCA: That's the interesting part. It wasn't. Most of it came from one shared ORM setting. It logged every SQL query, with its values, at INFO level.
+FLORIAN: [sigh] So every query, values included, went straight into the logs.
+BIANCA: On one service that handles clinician records, about sixty percent of the query logs touched personal data columns. Email, phone, full name, address.
+FLORIAN: And over a week?
+BIANCA: Roughly a hundred thousand log lines carrying personal data. From one service. And two more services used the same setting.
+FLORIAN: [dryly] So the fix isn't a training session for developers. It's one configuration.
+BIANCA: Exactly. Fix the setting, not the people.
+
+[TOKENS AND FALSE ALARMS]
+FLORIAN: Then Rose got connected to the repositories.
+BIANCA: And within about a day, it found authentication tokens being written to logs, inside HTTP request headers.
+FLORIAN: The customer's DevOps lead checked it against their own logs, confirmed it, and called it critical.
+BIANCA: [thoughtfully] I also like what OllyGarden didn't report. Several hits turned out to be false positives. Git SSH URLs, service-account addresses, and millisecond timestamps that looked like phone numbers.
+FLORIAN: [chuckles] A timestamp with a phone number's haircut.
+BIANCA: [laughs] Right. But a scanner that cries wolf gets ignored. So those were ruled out before they went into a report.
+
+[THE REST OF THE PICTURE]
+FLORIAN: Then the less dramatic, but very expensive, findings. Every single log record, in every sample, arrived with no severity.
+BIANCA: [curiously] None at all?
+FLORIAN: None. The bridge converting their logs to OTLP was dropping the level. That one cause was about seventy percent of all their open insights in the first week.
+BIANCA: And one collector transform would close almost all of them.
+FLORIAN: Then volume. One background worker wrote about sixty percent of all the logs, three weeks in a row.
+BIANCA: And a secrets-cache loop logged on every single check. That was most of their exact duplicates.
+FLORIAN: When metrics showed up, about forty percent of them were the monitoring stack watching itself.
+BIANCA: And tracing barely existed. A handful of services, and every trace was a single span.
+
+[OUTRO]
+FLORIAN: So, what would you check in your own telemetry after hearing this?
+BIANCA: First, look at shared settings before you blame anyone's code. ORM and HTTP logging can put personal data in every service at once.
+FLORIAN: Second, check that your log pipeline keeps severity. And third, find the one worker that writes most of your logs.
+BIANCA: And fourth, review your PII hits before acting on them. Not everything that looks like a phone number is one.
+FLORIAN: The full written story is on the OllyGarden website.
+BIANCA: [warmly] Thanks for listening.
+FLORIAN: Until next time.

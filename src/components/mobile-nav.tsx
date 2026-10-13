@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { MegaMenuItem } from "@/components/mega-menu";
-import { headerMenus } from "@/lib/nav";
+import { headerMenus, pricingLink } from "@/lib/nav";
 
 export function MobileNav() {
   const pathname = usePathname();
@@ -49,6 +49,18 @@ export function MobileNav() {
               </li>
             );
           })}
+          <li>
+            <Link
+              href={pricingLink.href}
+              className={`block rounded-lg px-3 py-2.5 text-base text-mist ${
+                selectedId === null && pathname === pricingLink.href
+                  ? "bg-mist/10"
+                  : "hover:bg-mist/10"
+              }`}
+            >
+              {pricingLink.label}
+            </Link>
+          </li>
         </ul>
       </nav>
 

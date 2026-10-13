@@ -1,7 +1,9 @@
 import { blogVideos } from "@/lib/blog";
 
 export const communityMeta = {
-  title: "Events — OllyGarden",
+  title: "Upcoming Events & Conferences — OllyGarden",
+  description:
+    "Where to meet the OllyGarden team next: OpenTelemetry and observability conferences, meetups, and community days.",
   path: "/resources/events",
 } as const;
 
@@ -13,9 +15,7 @@ export const communityHero = {
 
 export type CommunityEvent = {
   host: string;
-  hostLogos?: readonly { icon: "kubecon" | "cloudnativecon"; label: string }[];
   posterTitle: string;
-  highlight: string;
   note: string;
   date: string;
   place: string;
@@ -26,38 +26,9 @@ export type CommunityEvent = {
 
 export const communityEvents: readonly CommunityEvent[] = [
   {
-    host: "Signals Conf",
-    posterTitle: "Signals Berlin 2026",
-    highlight: "Gold Sponsor",
-    note: "Two days on reliability in the age of AI.",
-    date: "September 10–11, 2026",
-    place: "Berlin 🇩🇪",
-    title: "Signals Berlin 2026",
-    summary:
-      "Two days on reliability in the age of AI — a single track of practitioner talks about what actually breaks in production.",
-    href: "https://www.signalsconf.io/#tickets",
-  },
-  {
-    host: "Code Europe",
-    posterTitle: "Code Europe 2026",
-    highlight: "Attending",
-    note: "Three parallel tracks for senior engineers.",
-    date: "September 15, 2026",
-    place: "Warsaw 🇵🇱",
-    title: "Code Europe 2026",
-    summary:
-      "Three parallel tracks for senior engineers — AI engineering and data, cloud and platform engineering, and software architecture.",
-    href: "https://www.codeeurope.pl/tickets",
-  },
-  {
     host: "KubeCon + CloudNativeCon",
-    hostLogos: [
-      { icon: "kubecon", label: "KubeCon" },
-      { icon: "cloudnativecon", label: "CloudNativeCon" },
-    ],
-    posterTitle: "KubeCon + CloudNativeCon NA 2026",
-    highlight: "Sponsor",
-    note: "Four days of keynotes, sessions and co-located events.",
+    posterTitle: "KubeCon® + CloudNativeCon® North America 2026",
+    note: "OllyGarden will be there as a sponsor.",
     date: "November 9–12, 2026",
     place: "Salt Lake City 🇺🇸",
     title: "KubeCon + CloudNativeCon North America 2026",
@@ -73,6 +44,7 @@ export const communityWebinars = {
   sub: "Our live sessions and educational videos for you.",
   cta: "Check our YouTube",
   youtubeHref: "https://www.youtube.com/@OllyGardenInc",
+  pageSize: 3,
   videos: blogVideos,
 } as const;
 

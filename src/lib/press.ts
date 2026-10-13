@@ -1,5 +1,9 @@
+import type { SeoOverride } from "@/lib/metadata";
+
 export const pressMeta = {
   title: "Press Releases — OllyGarden",
+  description:
+    "News and announcements from OllyGarden, the company fixing bad OpenTelemetry telemetry, including product launches and partnerships.",
   path: "/resources/press-releases",
 } as const;
 
@@ -15,7 +19,7 @@ export const pressArticlePage = {
 
 export const pressCta = {
   title: ["Ready to take control", "of your telemetry?"],
-  sub: "Tell us about your financial services telemetry challenges and we’ll show you how OllyGarden can help.",
+  sub: "Tell us about your telemetry challenges and we’ll show you how OllyGarden can help.",
   primary: { label: "Talk to our Team", href: "/contact", arrow: true },
 } as const;
 
@@ -53,10 +57,133 @@ export type PressRelease = {
   location: string;
   partner?: string;
   notice?: PressNotice;
+  seo?: SeoOverride;
+  /** Keeps the release out of search indexes and the sitemap. */
+  noIndex?: boolean;
   body: readonly PressBlock[];
 };
 
+const aboutOllyGarden: PressBlock = {
+  type: "about",
+  kicker: "About",
+  title: "About OllyGarden",
+  body: "OllyGarden is building the standard for telemetry quality. Founded by OpenTelemetry contributors who helped shape the project, OllyGarden provides tools that help organizations assess, improve, and maintain the quality of their OpenTelemetry instrumentation. The company's products — Insights, Rose, and Tulip — work together to diagnose instrumentation problems, deliver automated fixes, and provide supported OpenTelemetry Collector operations, turning telemetry governance into a solved problem.",
+};
+
+const pressContact: PressBlock = {
+  type: "media",
+  title: "Press Contact",
+  sub: "Juraci Paixão Kröhling, CEO · Erika Hahn, Marketing",
+  emails: [{ label: "press@ollygarden.com", address: "press@ollygarden.com" }],
+};
+
+/** Company boilerplate and press contact, shown under the press release list. */
+export const pressKit: readonly PressBlock[] = [aboutOllyGarden, pressContact];
+
 export const pressReleases: readonly PressRelease[] = [
+  {
+    slug: "ollygarden-raises-4m-launches-minimum-viable-instrumentation",
+    title:
+      "OllyGarden turbo charges mission to fix bad telemetry with $4m raise and launch of “Minimum Viable Instrumentation”",
+    summary:
+      "OllyGarden raises $4m in VC funding from Next Frontier Capital, Grand Ventures, ACTAI, DIG Ventures, Datadog, Grafana Labs, and Dash0, and launches Minimum Viable Instrumentation (MVI) for its AI agent, Rose.",
+    dek: "OllyGarden has raised $4m in VC funding and launched Minimum Viable Instrumentation (MVI), which lets Rose, its AI OpenTelemetry Engineer, establish an instrumentation baseline where none exists yet.",
+    seo: {
+      title: "OllyGarden Raises $4M, Ships Minimum Viable Instrumentation",
+      description:
+        "OllyGarden raises $4m in VC funding and launches Minimum Viable Instrumentation, so its AI agent Rose can set an OpenTelemetry baseline where none exists.",
+    },
+    date: "2026-10-09",
+    location: "Berlin, Germany",
+    body: [
+      {
+        type: "lead",
+        text: "OllyGarden, the platform helping fix bad telemetry to give observability engineers data they can rely on, has raised $4m in VC funding to take its capabilities to the next level.",
+      },
+      {
+        type: "p",
+        text: "The round was backed by leading VCs including Next Frontier Capital, Grand Ventures and ACTAI. Existing investors DIG Ventures doubled down on the telemetry pioneers, as did observability leaders Datadog, Grafana Labs, and Dash0 who made further strategic investments into the platform.",
+      },
+      {
+        type: "p",
+        text: "Launched in 2025, OllyGarden is working with companies across retail, financial services and enterprise software to end noisy, messy, and expensive telemetry systems which are churning out higher volumes of bad or unreliable data.",
+      },
+      {
+        type: "p",
+        text: "OllyGarden helps companies move from firefighting to future-proofing. The platform continuously evaluates telemetry quality, identifies issues, and then turns findings into source-level fixes. This unlocks useful, cost-effective operations across organisations by stopping bad telemetry data from reaching observability backends in the first place.",
+      },
+      {
+        type: "p",
+        text: "In practice, it means engineers and AI agents can make decisions based on good, clear data and stop bad information from seeping into wider operations.",
+      },
+      {
+        type: "p",
+        text: "Over the past year, OllyGarden has helped companies identify volume reduction opportunities across up to 85% of their logs.",
+      },
+      {
+        type: "p",
+        text: "In addition to the new capital, OllyGarden is today also announcing the launch of its latest product innovation: Minimum Viable Instrumentation (MVI). Until now, OllyGarden’s AI OpenTelemetry Engineer, Rose, has been able to review existing instrumentation and make suggestions to improve it. Now, with the launch of MVI, Rose can also detect where no existing instrumentation exists and provide a path to establishing an instrumentation baseline.",
+      },
+      {
+        type: "p",
+        text: "This innovation enables best practice instrumentation to exist in every corner of an organisation: in every team, every repository, and across every pull request. Crucially, it keeps things at a minimum; calibrating what’s needed to provide a foundation teams can actually operate on, rather than creating more noise for engineers to battle through.",
+      },
+      {
+        type: "p",
+        text: "“More instrumentation is not better instrumentation,” comments OllyGarden founder, Juraci Paixão Kröhling. “It’s about surfacing only the information and data that’s useful and actionable: no more, no less. The dawn of AI generated code has, unfortunately, created a mirror effect across telemetry. Observability engineers and their AI agents are awash with high volumes of bad data they don’t need, whilst critical information gets missed in the noise. And they’re paying through the nose to store and query it all.",
+      },
+      {
+        type: "p",
+        text: "“That’s why OllyGarden was founded - to weed out bad telemetry and give engineers a clear, simple route to insight that can scale across an organisation. And that’s also why we wanted to push our product capabilities even further with the launch of MVI; making it possible to drive results across existing instrumentation and pinpoint where instrumentation doesn’t yet exist but needs to. It’s OpenTelemetry expertise, applied consistently across every codebase you own.",
+      },
+      {
+        type: "p",
+        text: "“OpenTelemetry is the industry standard for software telemetry. As a team of OpenTelemetry experts, we know what best practice looks like. Our knowledge is encoded in our products and can be deployed at scale across large organisations even when they only have a small number of observability engineers.”",
+      },
+      {
+        type: "p",
+        text: "Minimum Viable Instrumentation launches today and is available to all existing enterprise customers, with a free trial available to new customers.",
+      },
+      { type: "h2", text: "Investor quotes" },
+      {
+        type: "quote",
+        quote:
+          "Telemetry quality is a foundational enterprise problem that everyone has and nobody owns, and now AI has made it urgent. When the basics cannot be relied on, everything built above them breaks, and it breaks faster now because there is no human in the loop to catch it. Having backed Juraci and the team at OllyGarden's inception, we are excited to double down.",
+        attribution: "Rytis Vitkauskas, Partner at DIG Ventures",
+      },
+      {
+        type: "quote",
+        quote:
+          "Every wave of AI has needed someone to make its input data trustworthy before the wave could deliver on its promise. Agentic operations are at exactly that inflection point. OllyGarden is building the trust layer for the data AI agents to run on, and Juraci is the rare founder who helped create the open telemetry standards and who can now build a highly scalable business on top of it.",
+        attribution: "Amanda Terry, Managing Partner at ACTAI Ventures",
+      },
+      {
+        type: "quote",
+        quote:
+          "Every company is rebuilding its operations stack on the assumption that agents will run it. Almost nobody is asking what those agents will be reading. Telemetry has quietly become the data layer AI operates from, and it is the least governed data in the enterprise. OllyGarden is building the quality layer for it, and we have not seen a team better placed to do that.",
+        attribution: "Franz Kofler, Partner, Next Frontier Capital",
+      },
+      {
+        type: "quote",
+        quote:
+          "I spent years building telemetry pipelines, and the lesson is that you cannot filter your way out of bad instrumentation. It has to be fixed where it is written. OllyGarden is the first team to treat that as a product rather than as a code review, and they are doing it at the moment when agents, not people, became the primary consumers of the data.",
+        attribution: "Nathan Owen, Partner, Grand Ventures",
+      },
+      {
+        type: "about",
+        kicker: "Notes to Editors",
+        title: "About OllyGarden",
+        body: "OllyGarden helps teams find and fix bad telemetry before it reaches any observability backend, giving engineers and AI agents data they can rely on, from pull request to production. Its mission is to help every company confidently say it generates, collects and stores the telemetry it needs, without excess. Founded in 2025 by Juraci Paixão Kröhling, an OpenTelemetry Governance Committee member, OllyGarden is built by OpenTelemetry contributors who help shape the standard.",
+      },
+      { type: "p", text: "Learn more at ollygarden.com." },
+      {
+        type: "media",
+        title: "Press enquiries",
+        sub: "Contact us for interviews, images, and more.",
+        emails: [{ label: "press@ollygarden.com", address: "press@ollygarden.com" }],
+      },
+    ],
+  },
   {
     slug: "ollygarden-dash0-portel",
     title:
@@ -67,6 +194,7 @@ export const pressReleases: readonly PressRelease[] = [
     date: "2026-04-01",
     location: "Berlin, Germany & New York, USA",
     partner: "OllyGarden + Dash0",
+    noIndex: true,
     notice: {
       label: "Editorial note",
       text: "April Fools'! This press release was published on April 1, 2026 as an April Fools' Day joke. Portel is not a real product — no such effort exists (yet?). We're keeping this page for historical and entertainment purposes.",
@@ -74,7 +202,7 @@ export const pressReleases: readonly PressRelease[] = [
     body: [
       {
         type: "lead",
-        text: "OllyGarden, the company on a mission to fix bad telemetry, and Dash0, the billion-dollar OpenTelemetry-native observability platform, today announce Portel, the first and only observability solution purpose-built for portlet-based generative UI architectures. Portel enables engineering teams to instrument, track, and monitor AI-generated portlet fragments across distributed portal containers with full JSR-286 and JSR-362 lifecycle compliance.",
+        text: "OllyGarden, the company on a mission to fix bad telemetry, and Dash0, the billion-dollar observability platform built natively on OpenTelemetry®, today announce Portel, the first and only observability solution purpose-built for portlet-based generative UI architectures. Portel enables engineering teams to instrument, track, and monitor AI-generated portlet fragments across distributed portal containers with full JSR-286 and JSR-362 lifecycle compliance.",
       },
       {
         type: "p",
@@ -185,6 +313,11 @@ export const pressReleases: readonly PressRelease[] = [
     summary:
       "OllyGarden announces the general availability of Rose — an AI agent that analyzes OpenTelemetry instrumentation in source code and autonomously opens pull requests with fixes.",
     dek: "At KubeCon + CloudNativeCon Europe 2026, OllyGarden announces the general availability of Rose — an AI agent that analyzes OpenTelemetry instrumentation in source code and autonomously opens pull requests with fixes.",
+    seo: {
+      title: "Rose Is GA: AI Fixes for OpenTelemetry Instrumentation",
+      description:
+        "OllyGarden announces general availability of Rose, an AI agent that reviews OpenTelemetry instrumentation in source code and opens pull requests with fixes.",
+    },
     date: "2026-03-24",
     location: "Amsterdam, Netherlands",
     body: [
@@ -241,24 +374,16 @@ export const pressReleases: readonly PressRelease[] = [
         type: "p",
         text: "Rose is generally available starting March 24, 2026. OllyGarden will be demonstrating Rose at KubeCon + CloudNativeCon Europe 2026 in Amsterdam. To learn more or get started, visit ollygarden.com/rose.",
       },
-      {
-        type: "about",
-        kicker: "About",
-        title: "About OllyGarden",
-        body: "OllyGarden is building the standard for telemetry quality. Founded by OpenTelemetry contributors who helped shape the project, OllyGarden provides tools that help organizations assess, improve, and maintain the quality of their OpenTelemetry instrumentation. The company's products — Insights, Rose, and Tulip — work together to diagnose instrumentation problems, deliver automated fixes, and provide supported OpenTelemetry Collector operations, turning telemetry governance into a solved problem.",
-      },
+      aboutOllyGarden,
       { type: "p", text: "Learn more at ollygarden.com." },
-      {
-        type: "media",
-        title: "Press Contact",
-        sub: "Juraci Paixão Kröhling, CEO · Erika Hahn, Marketing",
-        emails: [
-          { label: "press@ollygarden.com", address: "press@ollygarden.com" },
-        ],
-      },
+      pressContact,
     ],
   },
 ];
+
+export const indexablePressReleases = pressReleases.filter(
+  (release) => !release.noIndex,
+);
 
 export function getPressRelease(slug: string) {
   return pressReleases.find((release) => release.slug === slug);

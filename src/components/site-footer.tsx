@@ -1,9 +1,12 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { AnalyticsPreferencesButton } from "@/components/analytics-preferences-button";
 import { BrandLogo } from "@/components/brand-logo";
 import { FooterMadeIn } from "@/components/footer-made-in";
+import { isExternalHref } from "@/lib/dom";
 import { footerColumns, type NavLink } from "@/lib/nav";
 import { siteConfig } from "@/lib/site";
+import { registerOpenTelemetry, trademarkNotice } from "@/lib/trademarks";
 
 const STRIP_REPEAT_IDS = [1, 2, 3, 4, 5] as const;
 const STRIP_COPIES = 16;
@@ -15,7 +18,7 @@ export function SiteFooter() {
         <div>
           <BrandLogo className="h-8" height={32} />
           <p className="mt-6 max-w-[300px] text-[15.5px] leading-[1.7] text-mist/55">
-            {siteConfig.tagline}
+            {registerOpenTelemetry(siteConfig.tagline)}
           </p>
           <ul className="mt-7 flex items-center gap-5 text-mist/55">
             <li>
@@ -54,8 +57,12 @@ export function SiteFooter() {
         </nav>
 
         <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-4 text-sm leading-normal text-mist/55 lg:col-span-2">
-          <p>©2026 OllyGarden, Inc. All rights reserved.</p>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <p>©2026 OllyGarden, Inc. All rights reserved.</p>
+            <AnalyticsPreferencesButton />
+          </div>
           <FooterMadeIn />
+          <p className="w-full max-w-4xl text-xs leading-relaxed text-mist/55">{trademarkNotice}</p>
         </div>
       </div>
 
@@ -98,7 +105,7 @@ function FooterLink({ item }: { item: NavLink }) {
   const className =
     "block text-[15.5px] leading-snug text-mist/55 transition-colors hover:text-sunflower";
 
-  if (item.hash) {
+  if (item.hash || isExternalHref(item.href)) {
     return (
       <a href={item.href} className={className}>
         {item.label}

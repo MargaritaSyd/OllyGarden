@@ -60,7 +60,7 @@ export function FinancialProducts({
           </p>
         </InView>
 
-        <div className="mx-auto grid grid-cols-1 gap-8 max-[720px]:max-w-[460px] min-[721px]:grid-cols-2 min-[721px]:gap-7 min-[1101px]:grid-cols-3 min-[1101px]:gap-10">
+        <div className="mx-auto grid grid-cols-1 gap-8 max-[720px]:max-w-[460px] min-[721px]:max-w-[920px] min-[721px]:grid-cols-2 min-[721px]:gap-7 min-[1101px]:gap-10">
           {content.cards.map((card, index) => (
             <InView
               key={card.href}

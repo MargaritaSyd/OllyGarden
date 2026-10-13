@@ -7,13 +7,13 @@ import { CompanyStory } from "@/components/company-story";
 import { CompanyTeam } from "@/components/company-team";
 import { JsonLd } from "@/components/json-ld";
 import { SiteCta } from "@/components/site-cta";
-import { companyHero, companyMeta } from "@/lib/company";
+import { companyMeta } from "@/lib/company";
 import { createPageMetadata } from "@/lib/metadata";
 import { companyGraph } from "@/lib/structured-data";
 
 export const metadata = createPageMetadata({
   title: companyMeta.title,
-  description: companyHero.ledes[0],
+  description: companyMeta.description,
   path: companyMeta.path,
   absoluteTitle: true,
 });

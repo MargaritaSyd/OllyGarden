@@ -52,6 +52,7 @@
 </tbody></table>
 <p>On a platform that prices per datapoint, this stream drops from 25.4 billion to 8.5 billion datapoints per month, and the egress savings apply regardless of vendor. Bytes fall less than datapoints because the surviving data still carries its resource metadata and compression already exploits repetition. The wire is the conservative measure, and it still halved.</p>
 <p>Worth repeating: this is a non-production environment. This organization pays for two-thirds of its metric stream to repeat unchanged values throughout the capture, before a single customer transaction is involved.</p>
+<!-- cta -->
 <h2>When not to touch the interval</h2>
 <p>Not every high-DPM metric is waste. Histograms almost always change between scrapes, so the thinning above excluded them. Counters that advance steadily carry signal at any interval. The question for them is whether anyone consumes the resolution. Any metric feeding a fast-evaluating alert needs an interval comfortably shorter than the alert window. The test is not only &quot;does this change often?&quot; It is also &quot;does anything downstream need it this often?&quot; Apply fixes series by series, with the consumers in view.</p>
 <h2>Make the interval a decision</h2>

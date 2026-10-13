@@ -101,6 +101,7 @@ export function FinancialHero({
           <GetStartedLink
             href={ctaHref}
             className="group motion-safe:hover:scale-[1.04] motion-safe:hover:shadow-[0_0_28px_rgba(227,226,112,0.4)]"
+            analytics={{ id: "page_hero_primary", section: "hero" }}
           >
             {content.cta}
             <CtaArrow />

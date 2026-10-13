@@ -1,0 +1,162 @@
+<p>The evening we first ran our personal-data detector against a customer&#39;s telemetry, I sent their platform lead a short message: &quot;I have your trust store password. So does SiloLogic.&quot; Nobody at that bank had typed the password into a log statement. A Java process had started with the password as a command-line flag, the OpenTelemetry Java agent had copied the full command line into a resource attribute, and from there it rode along on every span the service produced, all the way into SiloLogic, the bank&#39;s observability vendor. The story is real, but we anonymized it: SiloLogic is a fictional name, and we left out every detail that could identify the bank.</p>
+<p>Sensitive data in OpenTelemetry pipelines is more frequent than you might think, and more diverse in shape than you can imagine. Sensitive data in telemetry means any personal data, credential, or secret that ends up in a span, metric, or log record: a customer&#39;s email address, a national tax ID, an OAuth access token, a database password. Since then, we have found it at banks, fintechs, health platforms, and IoT companies, in traces, metrics, and logs alike. This post walks through what we found, why most of it is caused by misconfigured tools rather than careless developers, what the main data privacy frameworks allow and prohibit, and where to look in your own telemetry.</p>
+<h2>What we found in real OpenTelemetry pipelines</h2>
+<p>The table below lists findings from organizations we work with. We anonymized every one of them, and most came from staging or development environments, which matters for reasons we cover later.</p>
+<table>
+<thead>
+<tr>
+<th>What leaked</th>
+<th>Where it showed up</th>
+<th>What caused it</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Java trust store passwords</td>
+<td><code>process.command_line</code> resource attribute on every span</td>
+<td>Password passed as a <code>-D</code> flag, captured by the Java agent&#39;s process resource detector</td>
+</tr>
+<tr>
+<td>OAuth authorization codes, access tokens, and JSON Web Tokens (JWTs)</td>
+<td><code>url.query</code> and <code>url.full</code> span attributes, sometimes URL-encoded twice</td>
+<td>HTTP auto-instrumentation records the query string by default</td>
+</tr>
+<tr>
+<td>Authorization headers with bearer tokens</td>
+<td>Log records and span attributes</td>
+<td>HTTP header capture enabled for all headers</td>
+</tr>
+<tr>
+<td>Brazilian tax IDs: individual (CPF) and company (CNPJ) numbers</td>
+<td>Log messages, <code>url.full</code>, and metric attributes</td>
+<td>Developer log statements and identifiers in REST paths</td>
+</tr>
+<tr>
+<td>Email addresses</td>
+<td>Metric attributes, span attributes, and logs</td>
+<td>Identifiers chosen as dimensions, logged objects</td>
+</tr>
+<tr>
+<td>Names, emails, phone numbers, and street addresses of clinicians</td>
+<td>Log records</td>
+<td>An object-relational mapper (ORM) configured to log every SQL statement with its bound values</td>
+</tr>
+<tr>
+<td>Date of birth</td>
+<td>A span attribute</td>
+<td>Request object recorded as attributes</td>
+</tr>
+<tr>
+<td>Customer phone numbers</td>
+<td>Prometheus metric labels</td>
+<td>The phone number doubled as a money-transfer key</td>
+</tr>
+<tr>
+<td>Wi-Fi passwords</td>
+<td>Span attributes</td>
+<td>A decorator that recorded every method parameter</td>
+</tr>
+<tr>
+<td>Database connection strings with embedded credentials</td>
+<td>A span attribute on hundreds of thousands of spans</td>
+<td>Client library instrumentation recording the connection string</td>
+</tr>
+<tr>
+<td>Signed storage URLs</td>
+<td>Span attributes</td>
+<td>The signature in the URL granted 15 minutes of access to signed contracts</td>
+</tr>
+<tr>
+<td>Japanese tax numbers</td>
+<td>Logs</td>
+<td>Regional identifiers no existing redaction rule covered</td>
+</tr>
+</tbody></table>
+<p>Two things stand out. The first is how often the leak sits in a field nobody thinks about. Teams that review their log statements carefully never look at <code>process.command_line</code>, because nobody wrote it. The second is shape. A Brazilian CPF looks nothing like a JWT, which looks nothing like a street address, which looks nothing like a Wi-Fi password. A single regular expression, or a single list of forbidden attribute names, catches a fraction of it.</p>
+<h3>A password nobody logged</h3>
+<p>The trust store password is the story we tell most often, because we have seen it at more than one company. Java applications that talk to services over mutual Transport Layer Security (TLS) need a trust store, and the quickest way to configure one is <code>-Djavax.net.ssl.trustStorePassword=...</code> on the command line. The OpenTelemetry Java agent, like other process resource detectors, can record the full command line as <code>process.command_line</code> or <code>process.command_args</code>. Resource attributes are attached to every span, metric, and log the process emits, so one flag turns into millions of copies of the password in the backend.</p>
+<p>Someone might argue that anyone who can read a process&#39;s command line already owns the host. That is not true once the command line leaves the host. Telemetry backends have far broader access than production machines: developers, support engineers, vendors, and now AI agents can query them.</p>
+<h3>Tokens in the query string</h3>
+<p>Our most common finding is an OAuth token or authorization code in <code>url.query</code>. Every OAuth and OpenID Connect flow ends with a redirect back to the application, and that redirect often carries a <code>code</code>, an <code>access_token</code>, or an <code>id_token</code> in the query string. HTTP auto-instrumentation records the query string by default. The semantic conventions do ask instrumentations to redact query parameters by default, but the list covers signed cloud storage URLs: <code>AWSAccessKeyId</code>, <code>Signature</code>, <code>sig</code>, and <code>X-Goog-Signature</code>. An OAuth <code>code</code> is not on it.</p>
+<p>The sneakiest variant we found was a token inside a <code>redirect</code> parameter, URL-encoded inside another URL-encoded value. To read it, you have to decode the attribute twice. Most users we show this to do not remember that their login flow involves an OAuth exchange at all.</p>
+<h2>Most leaks come from tools, not careless developers</h2>
+<p>When teams find personal data in their telemetry, the first reaction is often to remind developers to be careful. In our experience, that is aimed at the wrong target. Most of what we find is a tool doing what it was configured to do.</p>
+<p>The Java agent records the command line because a resource detector is enabled. HTTP instrumentation records the query string because that is the default. At a European digital-health platform, one shared ORM setting logged every SQL query with its values at the INFO level, which produced about 100,000 log lines a week carrying clinicians&#39; personal data from a single service; we wrote about it in <a href="https://ollygarden.com/resources/case-studies/digital-health-pii-leak-was-a-logger-setting">a case study</a>. Header capture configured with a wildcard records <code>Authorization</code>. A log bridge that serializes whole request objects records whatever those objects contain. None of these required a developer to write the word &quot;password&quot; anywhere.</p>
+<p>Developers do make mistakes as well. We found a CPF in a log message that announced a successful &quot;CPF validation&quot;, Wi-Fi passwords recorded by a decorator that logged every method parameter, a customer email three levels deep inside a data transfer object whose <code>toString</code> method was logged, and a redaction rule that masked the field the team was worried about while an API key in the same log line went through untouched. These are real, but they are the minority. Fixing the shared setting removes far more personal data than asking each developer to review each log line.</p>
+<h2>Why your SIEM did not catch it</h2>
+<p>Some of these findings came from organizations that pay good money for specialized security information and event management (SIEM) tools, with teams whose job is finding this kind of leak. The tools were not broken. They were looking in places where OpenTelemetry data does not look like what they expect.</p>
+<p>SIEM tools are built around text logs. OpenTelemetry data travels as OpenTelemetry Protocol (OTLP) messages, usually Protocol Buffers, and it is structured: a value can sit in a resource attribute, a span attribute, an event, a metric data point attribute, or a log body. A SIEM rule that greps for <code>password=</code> never sees a resource attribute that was never written to a log file, and it does not decode a token that has been URL-encoded twice inside <code>url.full</code>. It also does not know that <code>url.query</code> is where OAuth redirects end up, or that <code>process.command_args</code> exists.</p>
+<p>We found these leaks because we know OpenTelemetry deeply. We know which instrumentation libraries record which attributes by default, which semantic conventions carry user input, and which resource detectors copy host details into every signal. Knowing where to look matters more than the sophistication of the pattern matching. That knowledge is what the Suspicious PII Leakage insight in <a href="https://ollygarden.com/products/insights">OllyGarden Insights</a> encodes: it checks attribute names and values across traces and logs, URL query strings included.</p>
+<h2>Where to look in your own telemetry</h2>
+<p>If you want to start a review today, these are the places that produced the most findings for us:</p>
+<ul>
+<li><code>process.command_line</code> and <code>process.command_args</code> resource attributes, especially on Java services</li>
+<li><code>url.query</code> and <code>url.full</code> span attributes, decoded at least twice</li>
+<li><code>http.request.header.*</code> and <code>http.response.header.*</code> attributes, especially <code>authorization</code>, <code>cookie</code>, and <code>set-cookie</code></li>
+<li><code>db.query.text</code> (formerly <code>db.statement</code>) and ORM or driver logs that include bound parameter values</li>
+<li><code>exception.message</code> and <code>exception.stacktrace</code>, which often embed the input that caused the error</li>
+<li>Log bodies from frameworks that serialize whole objects, such as request bodies, DTOs, and HTTP client debug logs</li>
+<li>Metric attributes, where an email address or tax ID also causes a cardinality problem</li>
+<li>Messaging payloads and generative AI prompts recorded as span attributes or events</li>
+</ul>
+<p>Attribute names help, but values matter more. A key called <code>customer.reference</code> can hold an email address, and a key called <code>id</code> can hold a tax ID.</p>
+<h2>What data privacy frameworks allow and prohibit</h2>
+<p>Privacy law does not ban personal data in telemetry. It requires that every piece of personal data you process has a reason, and that you process no more than that reason needs. The frameworks below are the ones our customers ask about most. This is a practitioner&#39;s summary, not legal advice; your privacy officer or counsel makes the call for your organization.</p>
+<table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>Where it applies</th>
+<th>What it says about data like this</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>General Data Protection Regulation (GDPR)</td>
+<td>European Union and European Economic Area</td>
+<td>Personal data needs a lawful basis (Article 6), must be limited to what is necessary (data minimisation, Article 5), kept no longer than needed, and secured. Health data is a special category (Article 9). Breaches must usually be reported within 72 hours (Article 33).</td>
+</tr>
+<tr>
+<td>UK GDPR and Data Protection Act 2018</td>
+<td>United Kingdom</td>
+<td>Keeps the EU GDPR&#39;s principles after Brexit: lawful basis, data minimisation, storage limitation, and security. Breaches go to the Information Commissioner&#39;s Office (ICO) within 72 hours. Fines reach £17.5 million or 4% of worldwide turnover, whichever is higher.</td>
+</tr>
+<tr>
+<td>Privacy Act 1988 and the Australian Privacy Principles (APPs)</td>
+<td>Australia</td>
+<td>Collect personal information only when reasonably necessary for your functions (APP 3), protect it and destroy or de-identify it when no longer needed (APP 11). Tax file numbers have their own rule that limits their use to tax purposes. The Notifiable Data Breaches scheme requires an assessment within 30 days. Penalties for serious interferences reach the greater of 50 million Australian dollars, three times the benefit gained, or 30% of adjusted turnover.</td>
+</tr>
+<tr>
+<td>Lei Geral de Proteção de Dados (LGPD)</td>
+<td>Brazil</td>
+<td>Modeled on the GDPR, with similar legal bases and necessity principle. A CPF is personal data. Fines reach 2% of revenue in Brazil, up to 50 million reais per infraction.</td>
+</tr>
+<tr>
+<td>California Consumer Privacy Act (CCPA), as amended by the CPRA</td>
+<td>California</td>
+<td>IP addresses and email addresses are personal information. Social Security numbers and account logins with passwords are &quot;sensitive personal information&quot;. Collection must be reasonably necessary and proportionate to its purpose.</td>
+</tr>
+<tr>
+<td>Health Insurance Portability and Accountability Act (HIPAA)</td>
+<td>United States health care</td>
+<td>Protected health information includes names, dates of birth, email addresses, and IP addresses linked to health data. The minimum necessary standard applies, and a vendor that stores it needs a business associate agreement.</td>
+</tr>
+<tr>
+<td>Payment Card Industry Data Security Standard (PCI DSS) 4.0</td>
+<td>Anyone handling payment cards</td>
+<td>Card verification codes and other sensitive authentication data must never be stored after authorization. Card numbers must be unreadable wherever they are stored, and a telemetry backend that holds them is in scope for the audit.</td>
+</tr>
+</tbody></table>
+<p>Credentials such as passwords, tokens, and connection strings are a separate category. They are rarely personal data, but every security standard and audit, from ISO 27001 to SOC 2, expects you to keep them out of logs. They are also the leak an attacker can use immediately.</p>
+<h3>Client IP addresses are fine, until you can tie them to a user</h3>
+<p>IP addresses are the most common debate we have with customers. Under the GDPR, and the UK GDPR that mirrors it, an IP address is usually personal data: the Court of Justice of the European Union ruled in 2016 (Breyer, C-582/14) that even a dynamic IP address is personal data when the site operator has legal means to identify the person behind it. The same regulation also recognizes network and information security as a legitimate interest (Recital 49). Keeping <code>client.address</code> on a span to investigate abuse, rate limiting, or an attack is usually easy to justify, especially with a short retention period.</p>
+<p>The picture changes when the same span, or the same trace, also carries <code>enduser.id</code>, an email address, or an account number. At that point the telemetry is a record of which known person did what, from where, and when. That record needs its own justification, and it is a much harder one to write.</p>
+<h3>Every piece of personal data needs a justification</h3>
+<p>Frameworks allow some personal data when it is necessary for the business operation. A payment service may need an account identifier to trace a failed transfer. A support team may need a customer ID to find a user&#39;s request. What they do not allow is personal data because it was convenient, or because nobody turned the default off. In practice, this means each personal attribute in your telemetry should have an answer to three questions: why it is there, who can see it, and how long it stays. If nobody can answer them, the attribute should go.</p>
+<p>There is also a timing aspect. A leak you do not know about is a problem. A leak you do know about, and leave in place, is a decision, and auditors treat it as one. Finding sensitive data creates an obligation to act on it.</p>
+<h2>We rarely see real sensitive data, and we do not need to</h2>
+<p>There is an irony in this work. We have found sensitive data at almost every organization we have worked with, but we have seen very little real sensitive data ourselves. We are happy to analyze staging data. We do not need production telemetry to find a production leak.</p>
+<p>If it looks like sensitive data, it might be sensitive data. A span attribute named <code>customer.name</code> with the value &quot;Jane Doe&quot; is clearly test data. The application that records it, though, will record real customer names the moment it runs in production. The same code path, the same instrumentation, and the same defaults produce the same attribute. A trust store password from a staging environment usually means the production deployment passes its own password the same way.</p>
+<p>This also means detection has to tolerate false positives. In one assessment, millisecond timestamps looked like phone numbers, and cloud service-account addresses looked like personal email addresses. Every hit needs a human or an agent to confirm it before anyone acts on it.</p>
+<!-- cta -->
+
+<h2>Summary</h2>
+<p>Sensitive data in OpenTelemetry pipelines is common and comes in many shapes: trust store passwords in resource attributes, OAuth tokens in query strings, tax IDs and email addresses in metric attributes, and personal data in SQL logs. Most of it comes from tools doing what they were configured to do, such as auto-instrumentation defaults, ORM logging, and header capture, and a smaller share from developer mistakes. SIEM tools tend to miss it because they read text logs, not structured OTLP data. Privacy frameworks such as the GDPR, the UK GDPR, the Australian Privacy Act, LGPD, CCPA, HIPAA, and PCI DSS allow personal data only when it is necessary and justified, and an IP address that can be tied to a user ID needs a stronger justification than one that cannot. Staging data is enough to find these leaks, because the same code records the same fields in production.</p>

@@ -24,14 +24,19 @@ export function HomeHero() {
             {homeHero.titleLead}
           </span>
           <span className="ov-blur-rise-slow block [animation-delay:0.72s]">
-            with <span className="text-sunflower">{homeHero.titleAccent}</span>
+            with{" "}
+            <span className="bg-linear-to-r from-[#d9e533] via-[#c4d336] via-55% to-[#7e9230] bg-clip-text text-transparent">
+              {homeHero.titleAccent}
+            </span>
           </span>
         </h1>
         <p className="ov-fade-up-slow max-w-[780px] text-[17px] leading-[1.65] text-mist/80 [animation-delay:1.1s]">
           {homeHero.lede}
         </p>
         <div className="ov-fade-up-slow [animation-delay:1.35s]">
-          <GetStartedLink />
+          <GetStartedLink analytics={{ id: "home_hero_primary", section: "hero" }}>
+            {homeHero.cta}
+          </GetStartedLink>
         </div>
       </div>
     </section>

@@ -6,12 +6,14 @@ export const enterpriseHero = {
     "— across thousands",
     "of repositories",
   ],
-  lede: "Enterprise software companies instrument thousands of services across multi-tenant platforms. OllyGarden helps you improve instrumentation quality at scale, run a supported Collector, and give every developer the guidance they need to ship clean telemetry.",
+  lede: "Enterprise software companies instrument thousands of services across multi-tenant platforms. OllyGarden helps you improve instrumentation quality at scale and give every developer the guidance they need to ship clean telemetry.",
   cta: "Talk to our Team",
 } as const;
 
 export const enterpriseMeta = {
-  title: "Enterprise Software — OllyGarden Solutions",
+  title: "Telemetry Quality for Enterprise Software — OllyGarden",
+  description:
+    "Improve OpenTelemetry instrumentation across thousands of services and repositories, fix telemetry at the source, and guide every developer.",
   path: "/solutions/enterprise-software",
 } as const;
 
@@ -86,7 +88,7 @@ export const enterpriseStats = {
 export const enterpriseProducts = {
   eyebrow: "Products & Services",
   title: "How OllyGarden helps",
-  sub: "Purpose-built tools to improve telemetry quality, manage your pipeline, and support your collectors.",
+  sub: "Purpose-built tools to measure telemetry quality and fix instrumentation at the source.",
   glyph: "/images/solutions/financial/target.svg",
   cards: [
     {
@@ -95,13 +97,6 @@ export const enterpriseProducts = {
       family: "OllyGarden Rose",
       title: "Rose",
       body: "AI-powered instrumentation guidance that scales across thousands of repositories, helping every developer ship better telemetry.",
-    },
-    {
-      href: "/products/tulip",
-      icon: "/images/solutions/financial/tulip.svg",
-      family: "OllyGarden Tulip",
-      title: "Tulip",
-      body: "Commercially supported Collector distribution with predictable releases, CVE backports, and patch guarantees — built for enterprise demands.",
     },
     {
       href: "/products/insights",

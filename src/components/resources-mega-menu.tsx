@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { isPlainLeftClick } from "@/components/mega-menu";
+import { isExternalHref, isPlainLeftClick } from "@/lib/dom";
 import {
   featuredResources,
   headerResourceLinks,
@@ -41,21 +41,14 @@ function ResourceMenuLink({ item }: { item: NavLink }) {
   const pathname = usePathname();
   const router = useRouter();
   const active = pathname === item.href;
+  const external = isExternalHref(item.href);
 
-  return (
-    <Link
-      href={item.href}
-      className={`group grid h-full w-full grid-cols-[20px_minmax(0,1fr)] items-start gap-x-2.5 rounded-lg px-3 pb-3 pt-2.5 text-left transition-colors hover:bg-mist/10 ${
-        active ? "bg-mist/10" : ""
-      }`}
-      onClick={(event) => {
-        if (!isPlainLeftClick(event)) {
-          return;
-        }
-        event.preventDefault();
-        router.push(item.href);
-      }}
-    >
+  const className = `group grid h-full w-full grid-cols-[20px_minmax(0,1fr)] items-start gap-x-2.5 rounded-lg px-3 pb-3 pt-2.5 text-left transition-colors hover:bg-mist/10 ${
+    active ? "bg-mist/10" : ""
+  }`;
+
+  const content = (
+    <>
       <span className="flex h-5 w-5 items-center justify-center text-sunflower">
         <ResourceLinkIcon href={item.href} />
       </span>
@@ -71,6 +64,31 @@ function ResourceMenuLink({ item }: { item: NavLink }) {
           {item.description}
         </span>
       ) : null}
+    </>
+  );
+
+  // Another origin: let the browser navigate rather than the App Router.
+  if (external) {
+    return (
+      <a href={item.href} className={className}>
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <Link
+      href={item.href}
+      className={className}
+      onClick={(event) => {
+        if (!isPlainLeftClick(event)) {
+          return;
+        }
+        event.preventDefault();
+        router.push(item.href);
+      }}
+    >
+      {content}
     </Link>
   );
 }
@@ -266,6 +284,8 @@ function SocialIconLink({
 
 function ResourceLinkIcon({ href }: { href: string }) {
   switch (href) {
+    case siteConfig.docsUrl:
+      return <BookIcon />;
     case "/resources/blog":
       return <NewspaperIcon />;
     case "/resources/webinars-conferences":
@@ -274,8 +294,18 @@ function ResourceLinkIcon({ href }: { href: string }) {
       return <CalendarIcon />;
     case "/resources/press-releases":
       return <MegaphoneIcon />;
+    case "/resources/case-studies":
+      return <QuoteIcon />;
+    case "/resources/telemetry-quality":
+      return <SproutIcon />;
+    case "/resources/instrumentation-score":
+      return <GaugeIcon />;
+    case "/resources/agent-skills":
+      return <CodeIcon />;
     case "/resources/faq":
       return <HelpCircleIcon />;
+    case "/otel-quiz":
+      return <ListChecksIcon />;
     default:
       return null;
   }
@@ -296,6 +326,17 @@ function StrokeIcon({ children }: { children: ReactNode }) {
     >
       {children}
     </svg>
+  );
+}
+
+function BookIcon() {
+  return (
+    <StrokeIcon>
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
+      <path d="M9 7h7" />
+      <path d="M9 11h5" />
+    </StrokeIcon>
   );
 }
 
@@ -339,12 +380,62 @@ function MegaphoneIcon() {
   );
 }
 
+function QuoteIcon() {
+  return (
+    <StrokeIcon>
+      <path d="M3 21c3 0 7-1 7-8V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h3c0 4-3 6-4 6" />
+      <path d="M14 21c3 0 7-1 7-8V5c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h3c0 4-3 6-4 6" />
+    </StrokeIcon>
+  );
+}
+
+function CodeIcon() {
+  return (
+    <StrokeIcon>
+      <path d="m16 18 6-6-6-6" />
+      <path d="m8 6-6 6 6 6" />
+    </StrokeIcon>
+  );
+}
+
+function SproutIcon() {
+  return (
+    <StrokeIcon>
+      <path d="M7 20h10" />
+      <path d="M10 20c5.5-2.5.8-6.4 3-10" />
+      <path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z" />
+      <path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z" />
+    </StrokeIcon>
+  );
+}
+
+function GaugeIcon() {
+  return (
+    <StrokeIcon>
+      <path d="m12 14 4-4" />
+      <path d="M3.34 19a10 10 0 1 1 17.32 0" />
+    </StrokeIcon>
+  );
+}
+
 function HelpCircleIcon() {
   return (
     <StrokeIcon>
       <circle cx="12" cy="12" r="10" />
       <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
       <path d="M12 17h.01" />
+    </StrokeIcon>
+  );
+}
+
+function ListChecksIcon() {
+  return (
+    <StrokeIcon>
+      <path d="m3 7 2 2 4-4" />
+      <path d="m3 17 2 2 4-4" />
+      <path d="M13 6h8" />
+      <path d="M13 12h8" />
+      <path d="M13 18h8" />
     </StrokeIcon>
   );
 }

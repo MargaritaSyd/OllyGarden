@@ -7,7 +7,6 @@ import {
   buildInsights,
   buildLead,
   buildSides,
-  buildTulip,
   CELL,
   GLOW_RADIUS,
   type MotifCell,
@@ -83,11 +82,9 @@ export function MotifField({ kind, className }: MotifFieldProps) {
             ? buildCorners(width, height)
             : kind === "insights"
               ? buildInsights(width, height)
-              : kind === "tulip"
-                ? buildTulip(width, height)
-                : kind === "lead"
-                  ? buildLead(width, height)
-                  : buildFrame(width, height);
+              : kind === "lead"
+                ? buildLead(width, height)
+                : buildFrame(width, height);
       if (reducedMotion) {
         paint();
       }
@@ -131,8 +128,7 @@ export function MotifField({ kind, className }: MotifFieldProps) {
         const base =
           kind === "lead" ||
           kind === "frame" ||
-          kind === "corners" ||
-          kind === "tulip"
+          kind === "corners"
             ? cell.alpha
             : cell.icon
               ? Math.max(cell.alpha, 0.75)

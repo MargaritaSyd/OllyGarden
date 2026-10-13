@@ -1,6 +1,5 @@
 import { InsightsMascot } from "@/components/insights-mascot";
 import { RoseMascot } from "@/components/rose-mascot";
-import { TulipMascot } from "@/components/tulip-mascot";
 import type { MenuIconName } from "@/lib/nav";
 
 export function MenuItemIcon({ name }: { name: MenuIconName }) {
@@ -11,18 +10,17 @@ export function MenuItemIcon({ name }: { name: MenuIconName }) {
       return <InsightsMascot className={className} viewBox="7.16 1.48 33 40" />;
     case "rose":
       return <RoseMascot className={className} viewBox="7.19 3.45 33 40" />;
-    case "tulip":
-      return <TulipMascot className={className} viewBox="9.73 3.66 33 40" />;
-    case "polder":
-      return (
-        <svg className={className} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-          <path d="M2.5104 5.00658C3.89686 5.00658 5.02081 3.88582 5.02081 2.50329C5.02081 1.12076 3.89686 0 2.5104 0C1.12395 0 0 1.12076 0 2.50329C0 3.88582 1.12395 5.00658 2.5104 5.00658Z" />
-          <path d="M17.4896 5.00658C18.8761 5.00658 20 3.88582 20 2.50329C20 1.12076 18.8761 0 17.4896 0C16.1031 0 14.9792 1.12076 14.9792 2.50329C14.9792 3.88582 16.1031 5.00658 17.4896 5.00658Z" />
-          <path d="M2.5104 20C3.89686 20 5.02081 18.8792 5.02081 17.4967C5.02081 16.1142 3.89686 14.9934 2.5104 14.9934C1.12395 14.9934 0 16.1142 0 17.4967C0 18.8792 1.12395 20 2.5104 20Z" />
-          <path d="M17.4896 20C18.876 20 20 18.8792 20 17.4967C20 16.1142 18.876 14.9934 17.4896 14.9934C16.1031 14.9934 14.9792 16.1142 14.9792 17.4967C14.9792 18.8792 16.1031 20 17.4896 20Z" />
-          <path d="M9.99798 14.9701C12.7602 14.9701 14.9995 12.7372 14.9995 9.98275C14.9995 7.22831 12.7602 4.9954 9.99798 4.9954C7.23571 4.9954 4.99646 7.22831 4.99646 9.98275C4.99646 12.7372 7.23571 14.9701 9.99798 14.9701Z" />
-        </svg>
-      );
+    // Polder is not announced yet. Re-enable with the "polder" MenuIconName when it launches.
+    // case "polder":
+    //   return (
+    //     <svg className={className} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+    //       <path d="M2.5104 5.00658C3.89686 5.00658 5.02081 3.88582 5.02081 2.50329C5.02081 1.12076 3.89686 0 2.5104 0C1.12395 0 0 1.12076 0 2.50329C0 3.88582 1.12395 5.00658 2.5104 5.00658Z" />
+    //       <path d="M17.4896 5.00658C18.8761 5.00658 20 3.88582 20 2.50329C20 1.12076 18.8761 0 17.4896 0C16.1031 0 14.9792 1.12076 14.9792 2.50329C14.9792 3.88582 16.1031 5.00658 17.4896 5.00658Z" />
+    //       <path d="M2.5104 20C3.89686 20 5.02081 18.8792 5.02081 17.4967C5.02081 16.1142 3.89686 14.9934 2.5104 14.9934C1.12395 14.9934 0 16.1142 0 17.4967C0 18.8792 1.12395 20 2.5104 20Z" />
+    //       <path d="M17.4896 20C18.876 20 20 18.8792 20 17.4967C20 16.1142 18.876 14.9934 17.4896 14.9934C16.1031 14.9934 14.9792 16.1142 14.9792 17.4967C14.9792 18.8792 16.1031 20 17.4896 20Z" />
+    //       <path d="M9.99798 14.9701C12.7602 14.9701 14.9995 12.7372 14.9995 9.98275C14.9995 7.22831 12.7602 4.9954 9.99798 4.9954C7.23571 4.9954 4.99646 7.22831 4.99646 9.98275C4.99646 12.7372 7.23571 14.9701 9.99798 14.9701Z" />
+    //     </svg>
+    //   );
     case "overview":
       return (
         <svg className={className} viewBox="0 0 40 40" fill="currentColor" aria-hidden="true">

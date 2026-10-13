@@ -1,12 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useId, useState, type CSSProperties } from "react";
 import { CareersApplyCta } from "@/components/careers-apply-cta";
 import { CareersCard } from "@/components/careers-card";
-import {
-  careersPositionUi,
-  type CareersPosition,
-} from "@/lib/careers";
+import { careersPositionUi, type CareersPosition } from "@/lib/careers";
 
 export function CareersJobCard({
   position,
@@ -99,9 +97,17 @@ export function CareersJobCard({
           aria-controls={detailsId}
           onClick={() => setExpanded((current) => !current)}
         >
-          {expanded ? careersPositionUi.collapseLabel : careersPositionUi.expandLabel}
+          {expanded
+            ? careersPositionUi.collapseLabel
+            : careersPositionUi.expandLabel}
           <ChevronIcon expanded={expanded} />
         </button>
+        <Link
+          href={position.href}
+          className="mt-2 inline-flex self-start text-sm font-semibold text-mist/70 hover:text-sunflower"
+        >
+          Read the full role →
+        </Link>
       </div>
     </CareersCard>
   );
@@ -120,9 +126,7 @@ function JobSection({
     <div>
       <h4
         className={`mb-2 text-xl leading-[1.3] font-bold tracking-[-0.01em] max-[767px]:text-lg ${
-          highlight
-            ? "flex items-center gap-2 text-sunflower"
-            : "text-mist"
+          highlight ? "flex items-center gap-2 text-sunflower" : "text-mist"
         }`}
       >
         {highlight ? <BonusStar /> : null}

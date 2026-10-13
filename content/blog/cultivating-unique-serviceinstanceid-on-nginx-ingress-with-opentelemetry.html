@@ -1,6 +1,7 @@
 <p>A task to set a unique <code>service.instance.id</code> on NGINX Ingress Controller using the OpenTelemetry should be simple, right? But as it turned out, the ingress controller doesn&#39;t expose all of NGINX’s OTel knobs out of the box, so I had to roll my own tweak garden.</p>
 <h2>Why should I care?</h2>
 <p>Without unique instance IDs, your tracing data looks like a tangled tangleweed—hard to trace, difficult to debug, and completely undermines what we’re trying to do with observability.</p>
+<!-- cta -->
 <h2>The solution</h2>
 <h3>Part 1 - Nginx Ingress Controller - Helm Chart</h3>
 <p>To get <code>POD_UID</code> injected into each trace, here’s the minimal yet powerful config snippet I landed on:</p>

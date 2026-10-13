@@ -35,13 +35,13 @@ export async function generateMetadata({
   }
 
   return createPageMetadata({
-    title: `${release.title} — OllyGarden`,
-    description: release.dek,
+    title: release.seo?.title ?? release.title,
+    description: release.seo?.description ?? release.dek,
     path: pressReleaseHref(release.slug),
     type: "article",
     publishedTime: release.date,
     modifiedTime: release.date,
-    absoluteTitle: true,
+    noIndex: release.noIndex,
   });
 }
 

@@ -1,11 +1,17 @@
 import Link from "next/link";
+import { linkedCardClassName } from "@/components/case-studies";
 import { CtaArrow } from "@/components/cta-arrow";
 import { PetalMark } from "@/components/blog-ui";
+import { PressBlockView } from "@/components/press-article";
 import {
   formatPressDate,
+  pressKit,
   pressReleaseHref,
   pressReleases,
 } from "@/lib/press";
+import { registerFirstTitle } from "@/lib/trademarks";
+
+const releases = registerFirstTitle(pressReleases);
 
 export function PressList() {
   return (
@@ -14,11 +20,11 @@ export function PressList() {
       aria-label="Press releases"
     >
       <div className="mx-auto flex max-w-[1232px] flex-col gap-[clamp(1.75rem,4vw,4rem)]">
-        {pressReleases.map((release) => (
+        {releases.map((release) => (
           <Link
             key={release.slug}
             href={pressReleaseHref(release.slug)}
-            className="group surface-grain relative block overflow-hidden rounded-3xl border border-sunflower/40 bg-[#00280e] p-[clamp(1.25rem,2.6vw,2rem)] transition-[border-color] duration-250 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-sunflower/60 after:pointer-events-none after:absolute after:inset-0 after:rounded-3xl after:bg-white/[0.06] after:opacity-0 after:transition-opacity after:duration-250 hover:after:opacity-100 max-[767px]:rounded-[20px]"
+            className={`block ${linkedCardClassName}`}
           >
             <PetalMark size={22} className="mb-5 block text-sunflower" />
             <time
@@ -39,6 +45,11 @@ export function PressList() {
             </span>
           </Link>
         ))}
+        <div className="flex flex-col gap-8 pt-[clamp(1rem,3vw,2.5rem)]">
+          {pressKit.map((block) => (
+            <PressBlockView key={block.type} block={block} />
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { BlogCard } from "@/components/blog-card";
+import { BlogCta } from "@/components/blog-cta";
 import { BlogEyebrow, BlogMeta, BlogTags } from "@/components/blog-ui";
 import { CtaArrow } from "@/components/cta-arrow";
 import { GetStartedLink } from "@/components/get-started-link";
 import {
-  blogAuthor,
+  blogAuthorLabel,
   blogCoverAlt,
   blogMeta,
   blogPostHref,
@@ -12,6 +13,8 @@ import {
   formatBlogDate,
   type BlogPost,
 } from "@/lib/blog";
+import { splitBlogCta } from "@/lib/blog-cta";
+import { registerFirstOpenTelemetry } from "@/lib/trademarks";
 
 export function BlogArticle({
   post,
@@ -26,6 +29,23 @@ export function BlogArticle({
   next?: BlogPost;
   related: readonly BlogPost[];
 }) {
+  const [before, after] = splitBlogCta(html);
+  const [title, excerpt, bodyBefore, ctaTitle, ctaBody, bodyAfter, ...relatedCopy] =
+    registerFirstOpenTelemetry(
+      post.title,
+      post.excerpt,
+      before,
+      post.cta.title,
+      post.cta.body,
+      after,
+      ...related.flatMap((item) => [item.title, item.excerpt]),
+    );
+  const relatedCards = related.map((item, index) => ({
+    ...item,
+    title: relatedCopy[index * 2],
+    excerpt: relatedCopy[index * 2 + 1],
+  }));
+
   return (
     <>
       <article className="px-[clamp(1.5rem,7.25vw,6.5rem)] pt-[clamp(8rem,15vw,13rem)] pb-[clamp(4.5rem,8vw,6rem)] max-[880px]:px-6">
@@ -43,14 +63,14 @@ export function BlogArticle({
           <header className="flex flex-col gap-8">
             <BlogMeta
               date={formatBlogDate(post.date, "long")}
-              suffix={`Author: ${blogAuthor}`}
+              suffix={blogAuthorLabel(post)}
             />
             <h1 className="text-[clamp(2rem,5.4vw,4rem)] leading-[1.125] font-bold tracking-[-0.02em] text-mist">
-              {post.title}
+              {title}
             </h1>
             <BlogTags tags={post.tags} size="md" />
             <p className="text-[clamp(1.125rem,1.6vw,1.25rem)] leading-[1.4] tracking-[0.02em] text-[#cdcdcd]">
-              {post.excerpt}
+              {excerpt}
             </p>
           </header>
 
@@ -65,7 +85,13 @@ export function BlogArticle({
             />
           </figure>
 
-          <div className="post-richtext" dangerouslySetInnerHTML={{ __html: html }} />
+          <div className="flex flex-col gap-[clamp(2rem,4vw,3rem)]">
+            <div className="post-richtext" dangerouslySetInnerHTML={{ __html: bodyBefore }} />
+            <BlogCta cta={{ ...post.cta, title: ctaTitle, body: ctaBody }} />
+            {bodyAfter.trim() ? (
+              <div className="post-richtext" dangerouslySetInnerHTML={{ __html: bodyAfter }} />
+            ) : null}
+          </div>
 
           {prev || next ? (
             <nav className="mt-2 flex items-stretch justify-between gap-4" aria-label="Post navigation">
@@ -124,7 +150,7 @@ export function BlogArticle({
               </GetStartedLink>
             </div>
             <div className="grid grid-cols-1 gap-10 max-[720px]:mx-auto max-[720px]:max-w-[400px] min-[721px]:grid-cols-2 min-[1101px]:grid-cols-3">
-              {related.map((item) => (
+              {relatedCards.map((item) => (
                 <BlogCard key={item.slug} post={item} />
               ))}
             </div>

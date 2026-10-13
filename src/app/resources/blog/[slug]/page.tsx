@@ -4,7 +4,7 @@ import { BlogTrending } from "@/components/blog-trending";
 import { JsonLd } from "@/components/json-ld";
 import { SiteCta } from "@/components/site-cta";
 import {
-  blogAuthor,
+  blogPostAuthors,
   blogPostHref,
   blogPosts,
   getAdjacentPosts,
@@ -39,15 +39,13 @@ export async function generateMetadata({
   }
 
   return createPageMetadata({
-    title: `${post.title} — OllyGarden`,
-    description: post.excerpt,
+    title: post.seo?.title ?? post.title,
+    description: post.seo?.description ?? post.excerpt,
     path: blogPostHref(post.slug),
     type: "article",
-    image: post.image,
     publishedTime: post.date,
-    modifiedTime: post.date,
-    authors: [blogAuthor],
-    absoluteTitle: true,
+    modifiedTime: post.updated ?? post.date,
+    authors: blogPostAuthors(post).map((author) => author.name),
   });
 }
 

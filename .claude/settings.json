@@ -1,0 +1,36 @@
+{
+  "extraKnownMarketplaces": {
+    "opentelemetry-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "ollygarden/opentelemetry-agent-skills",
+        "ref": "v1.0.0"
+      }
+    },
+    "growlight": {
+      "source": {
+        "source": "github",
+        "repo": "ollygarden/growlight"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "og-image@growlight": true,
+    "ollygarden-brand-guidelines@growlight": true,
+    "otel-semantic-conventions@opentelemetry-agent-skills": true,
+    "otel-collector@opentelemetry-agent-skills": true,
+    "otel-ottl@opentelemetry-agent-skills": true
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

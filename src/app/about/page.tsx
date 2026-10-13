@@ -8,6 +8,7 @@ export const metadata = createPageMetadata({
   title: "About",
   description: `Learn what ${siteConfig.name} is and how this starter approaches technical SEO in Next.js.`,
   path: "/about",
+  noIndex: true,
 });
 
 export default function AboutPage() {

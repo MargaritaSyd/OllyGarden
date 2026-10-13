@@ -1,0 +1,98 @@
+# Operations — Wicket
+
+Operational characteristics of the OllyGarden marketing website. Read this before diagnosing
+production behavior.
+
+## Runtime shape
+
+- **Business role:** Public marketing, product, company, and resource website.
+- **Deployment:** Next.js 16 application configured for Netlify. `NEXT_PUBLIC_SITE_URL` defines the
+  canonical production origin at build time.
+- **Hot path:** Server-rendered and statically generated pages, with client-side navigation after
+  hydration.
+- **State:** Page content is built into the deployment. Visitor analytics consent is stored for one
+  year in browser local storage under `ollygarden-cookie-consent`.
+
+## Failure scenarios
+
+| Scenario                                             | Status       | Symptom                                                                    | Likely cause                                                                                                                    | Covering telemetry                                                                                                      |
+| ---------------------------------------------------- | ------------ | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Website traffic is absent from PostHog               | hypothesized | `$pageview` stops after a deploy                                           | Missing `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` (or legacy `VITE_POSTHOG_API_KEY`) at build time, invalid host, or blocked requests | Browser network requests and the PostHog Website project's live events                                                  |
+| A published or legacy URL returns 404                | hypothesized | Visitor sees the not-found page                                            | Missing page or redirect                                                                                                        | PostHog's **Page not found** action, plus `page_not_found` with `page_path`, `current_url`, and `referrer`              |
+| A key call to action attracts no engagement          | hypothesized | Visitors view a page but do not click its primary actions                  | Broken link, unclear offer, or page-specific friction                                                                           | `cta_clicked` with `button_id`, `button_text`, `section`, `page_path`, and `current_url`                                |
+| Client-side code fails                               | hypothesized | Interaction stops or page behavior degrades                                | Browser exception or rejected promise                                                                                           | `client_side_error` and `unhandled_promise_rejection`                                                                   |
+| A lead or application is not persisted               | hypothesized | Form keeps the entered values and shows an error                           | Supabase configuration, validation, policy, or database failure                                                                 | `form_submission_failed` with `failure_type=persistence`                                                                |
+| A persisted submission does not notify the team      | hypothesized | Visitor sees success, but the notification Edge Function fails             | Edge Function or email-provider failure                                                                                         | `form_notification_failed` with `failure_type=notification`; the database record remains authoritative                  |
+| Agent clients receive HTML or stale API instructions | hypothesized | A Markdown request returns HTML, or `/openapi.json` disagrees with the API | Netlify content negotiation or upstream OpenAPI failure                                                                         | HTTP probes for the discovery resources, representative HTML routes with `Accept: text/markdown`, and the OpenAPI proxy |
+
+## Telemetry inventory
+
+| Signal                                                                                                                                                                                   | Type   | Source / backend                               | Exposes which scenario                                             | Gap notes                                                                                                                           |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ---------------------------------------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `$pageview` and `$pageleave`                                                                                                                                                             | event  | PostHog Website project (57287)                | Traffic, navigation, and acquisition analysis                      | No automated alert for an ingestion outage                                                                                          |
+| **Page not found**                                                                                                                                                                       | action | PostHog Website project (57287), action 157363 | Broken inbound links and missing redirects                         | Classifies `$pageview` events by the verified not-found page title                                                                  |
+| `page_not_found`                                                                                                                                                                         | event  | PostHog Website project (57287)                | Broken inbound links and missing redirects                         | Only emitted after consent                                                                                                          |
+| `cta_clicked`                                                                                                                                                                            | event  | PostHog Website project (57287)                | Intent from header sign-in, hero, pricing, and closing CTAs        | Only emitted after consent                                                                                                          |
+| `client_side_error`                                                                                                                                                                      | event  | PostHog Website project (57287)                | Browser exceptions                                                 | Client event only; no source maps configured here                                                                                   |
+| `unhandled_promise_rejection`                                                                                                                                                            | event  | PostHog Website project (57287)                | Unhandled async failures                                           | Client event only; no source maps configured here                                                                                   |
+| `$web_vitals`                                                                                                                                                                            | event  | PostHog Website project (57287)                | Browser performance regressions                                    | Explicitly enabled in the SDK; LCP, FCP, INP and CLS arrive independently                                                                    |
+| `form_started`, `form_submission_attempted`, `form_submitted`, `form_submission_failed`, `form_notification_failed`                                                                                                   | event  | PostHog Website project (57287)                | Contact, job application, and Rose open-source form funnels | Properties identify the form, page, and safe failure class; never names, email addresses, repository URLs, free text, or raw errors |
+| `lead_generated`, `job_application_form_opened`, `job_application_submitted`, `rose_oss_apply_opened`, `rose_oss_apply_submitted`                         | event  | PostHog Website project (57287)                | Product- and workflow-specific conversion analysis                 | These compatibility events retain the established funnel names without PII                                                          |
+| `quiz_started`, `quiz_question_answered`, `quiz_explanation_viewed`, `quiz_completed`, `quiz_results_viewed`, `quiz_abandoned`, `quiz_retake`, `quiz_shared`, `quiz_product_cta_clicked` | event  | PostHog Website project (57287)                | OpenTelemetry quiz progression and product intent                  | Question IDs, topics, correctness, score, and channel are safe; the quiz collects no lead data                                      |
+
+The website also captures `app_handoff_opened`, `app_handoff_confirmed`,
+`app_handoff_cancelled`, `page_engaged`, `outbound_link_clicked`, `file_download_clicked`, and
+`navigation_clicked`. App handoffs and resource clicks measure intent, not completed signups or
+downloads. Engagement requires 30 visible seconds and half-page depth.
+
+Session recording is disabled in the browser SDK. Capture and PostHog persistence start opted out;
+accepting analytics enables them and immediately records the current page, while declining keeps
+the browser opted out. The footer's **Cookie settings** control opts capture out and reopens the
+choice so consent can be withdrawn or changed.
+
+**Uncovered scenarios:** There is no automatic alert when the site stops sending analytics, and no
+server-side request telemetry for failures that occur before a page reaches the browser. OpenAPI
+proxy and Markdown negotiation failures are covered by release-time probes rather than continuous
+monitoring.
+
+## Production analysis hints
+
+- **Where telemetry lives:** Use the PostHog skill against the Website project (ID 57287). Its primary
+  dashboard is [Website outcomes and quality](https://eu.posthog.com/project/57287/dashboard/950305);
+  the legacy overview remains at 157068. Event contracts and report definitions are in
+  [doc/analytics.md](doc/analytics.md). Never put the project token in queries, documentation, or source code.
+- **Configuration:** Set `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` and, normally,
+  `NEXT_PUBLIC_POSTHOG_HOST=https://eu.i.posthog.com` in the build environment. The legacy
+  `VITE_POSTHOG_API_KEY` remains a temporary token fallback for deployment continuity.
+  `NEXT_PUBLIC_POSTHOG_TOKEN` is not supported. Netlify's values are remote and must include Build
+  scope; `netlify.toml` only controls the public-value secret-scanner allowlist. Netlify builds fail
+  before `next build` when neither supported token variable is present.
+- **Version attribution:** Match the active Netlify deploy commit to the Git commit under analysis.
+- **Empty is not zero:** Empty PostHog results can mean no visitors or no event ingestion. Check live
+  events and browser requests before treating an empty query as zero traffic.
+- **Deployment verification:** After deploy, load a page with analytics accepted, click one
+  instrumented CTA, navigate once client-side, and request a deliberately nonexistent path.
+  Confirm `$pageview`, `cta_clicked`, and `page_not_found` arrive with the expected properties,
+  then use actual broken path data to add redirects rather than retaining the synthetic event.
+- **Agent readiness:** Probe `/llms.txt`, `/developers.md`, `/cli.md`, `/api-docs.md`,
+  `/api-versioning.md`, and `/openapi.json` for their expected content types. Request `/`, one
+  product page, one canonical blog post, and a missing path with `Accept: text/markdown`; repeat
+  `GET` and `HEAD` with Markdown first and HTML first to detect cache-key errors, including
+  `Accept: text/markdown;q=0`. The `Vary` header must retain Next.js router fields, `Accept`, and
+  `Accept-Encoding`.
+- **Form verification:** Use non-production data in deploy previews. In production, verify form
+  persistence only with an explicitly authorized controlled write, then locate the database record
+  before interpreting notification events. Never submit real applicant or customer details as test
+  data.
+- **Careers optional answers:** Deploy the optional project and motivation fields only after
+  `public.job_applications` has nullable text columns `cool_project` and `motivation`; the SQL is
+  in [doc/supabase.md](doc/supabase.md). The insert includes both columns even for blank answers.
+  Local Server Action tests proved trimming, blank-to-null normalization, preserved internal line
+  breaks, and forwarding to the notification payload against an in-process Supabase stand-in.
+  Desktop and narrow Chromium checks proved visible optional textareas and a reachable submit
+  button. These checks do not establish production schema compatibility or email delivery.
+  Update the external email template to display escaped answers, then verify preview persistence
+  and notification contents before release. Production schema and email checks remain pending.
+- **Security headers:** Probe a representative HTML page, Markdown representation, static discovery
+  document, and `/openapi.json` for the CSP, HSTS, referrer policy, `nosniff`, and clickjacking
+  protection. Browser-check PostHog and Supabase connections after any CSP change.

@@ -1,5 +1,7 @@
 export const careersMeta = {
-  title: "Careers — OllyGarden",
+  title: "Careers at OllyGarden — Join the Team",
+  description:
+    "Join OllyGarden and help engineering teams get reliable OpenTelemetry data. See our open roles and how we work.",
   path: "/careers",
 } as const;
 
@@ -15,7 +17,7 @@ export const careersHero = {
 export const careersJoin = {
   eyebrow: "Become an OllyGardener",
   title: "Join OllyGarden",
-  lede: "Join a remote-first team working on meaningful challenges in telemetry, observability, and OpenTelemetry.",
+  lede: "Join a remote-first team working on meaningful challenges in telemetry, observability, and OpenTelemetry®.",
   openApp: {
     title: "Don’t see a matching position?",
     body: "We’re always interested in connecting with talented people who care about observability, OpenTelemetry, and building better telemetry for engineering teams. If that sounds like you, send us an open application.",
@@ -46,35 +48,189 @@ export type CareersPosition = {
   lookingFor: string[];
   youWillDo: string[];
   bonusPoints: string[];
+  href: string;
 };
+
+/** A role with its own page under `/careers/<id>`. */
+export type CareersRole = CareersPosition & {
+  datePosted: string;
+  /** schema.org JobPosting employment types, e.g. FULL_TIME or PART_TIME. */
+  employmentType: string[];
+  /** Country applicants must be in; omit when the role is open to any location. */
+  applicantCountry?: string;
+  /** Location line in the page hero. */
+  locationLine: string;
+  intro: string;
+  outcomes: string[];
+  interviewTitle: string;
+  interviewLede: string;
+  interview: string[];
+  closingTitle: string;
+};
+
+export const enterpriseAccountExecutive = {
+  id: "founding-enterprise-account-executive",
+  active: true,
+  title: "Founding Enterprise Account Executive",
+  location: "United States",
+  time: "Full-time",
+  description:
+    "Build OllyGarden’s first enterprise sales motion, personally source and close technical deals, and turn what works into a repeatable playbook.",
+  lookingFor: [
+    "A quantified record of personally sourcing and closing complex B2B infrastructure or developer-tool deals",
+    "Credibility with observability, SRE, platform, and engineering buyers",
+    "Experience building pipeline without depending on a mature SDR, marketing, or RevOps organization",
+    "US-based, with practical access to buyers and relevant observability and infrastructure communities",
+  ],
+  youWillDo: [
+    "Own prospecting, discovery, technical evaluations, proof-of-value conversion, negotiation, procurement, and closing",
+    "Refine our ICP, messaging, qualification criteria, forecasting, and objection handling with the founders",
+    "Build the lightweight systems and operating rhythm that future sellers can reuse",
+    "Hand closed customers cleanly to Customer Success while engineering owns deep technical implementation",
+  ],
+  bonusPoints: [
+    "OpenTelemetry® familiarity and an existing network among observability or infrastructure buyers",
+    "Experience working directly with a technical founder",
+  ],
+  href: "/careers/founding-enterprise-account-executive",
+  datePosted: "2026-08-31",
+  employmentType: ["FULL_TIME"],
+  applicantCountry: "United States",
+  locationLine: "United States · Remote · Full-time",
+  intro:
+    "This is a founding role with direct access to the CEO and broad ownership across the entire enterprise sales cycle. You will prove the motion yourself before helping us scale it.",
+  outcomes: [
+    "Build qualified pipeline with US observability, platform, SRE, and engineering leaders",
+    "Lead technical discovery and evaluations that connect telemetry quality to measurable customer outcomes",
+    "Close initial enterprise customers and document a repeatable, evidence-based sales playbook",
+    "Establish trustworthy qualification, forecasting, procurement, and founder collaboration rhythms",
+  ],
+  interviewTitle: "Show us how you sell",
+  interviewLede:
+    "The process is practical and evidence-led. We want to understand how you create demand, earn technical trust, move complex deals, and learn with a small founding team.",
+  interview: [
+    "A conversation about the markets you know, the deals you personally sourced and closed, and why OllyGarden interests you",
+    "A practical working session using a real account to show how you research, qualify, and open a technical enterprise opportunity",
+    "A discovery and deal-strategy exercise with the founders, including how you handle technical proof, objections, and procurement",
+    "Reference conversations focused on ownership, forecast accuracy, collaboration, and customer trust",
+  ],
+  closingTitle: "Ready to build the motion?",
+} satisfies CareersRole;
+
+export const executiveAssistant = {
+  id: "executive-assistant",
+  active: true,
+  title: "Executive Assistant",
+  location: "Remote, CET hours",
+  time: "Full-time",
+  description:
+    "Keep OllyGarden’s operations running: scheduling, finance operations, company events, and paperwork, working closely with our CEO and alongside AI agents.",
+  lookingFor: [
+    "Experience as an executive assistant or in operations at a startup or small company, without a large admin team behind you",
+    "Fluent English and Brazilian Portuguese, required for regular communication with Portuguese-speaking customers, partners, and team members in Brazil",
+    "Availability during agreed Central European working hours, with some regular afternoon overlap with the Americas",
+    "Hands-on use of startup finance tools (Mercury, Brex, Expensify, Remote.com, or similar) and corporate travel tools (Navan or similar)",
+    "Comfort working inside an AI-assisted workflow: you act on the drafts and queues agents prepare instead of redoing them by hand",
+    "Discretion with confidential information, including compensation, investor, and legal matters",
+  ],
+  youWillDo: [
+    "Coordinate scheduling across time zones for company meetings, customer calls, and the CEO’s calendar, resolving conflicts and protecting focus time",
+    "Organize team offsites, conferences, and community events, including travel, sponsor and speaker paperwork, attendee lists, venues, and restaurant bookings",
+    "Run finance operations: match receipts to expenses, schedule contractor payments, chase failed vendor payments, and prepare document handoffs to our accountants",
+    "Coordinate legal, board, and investor logistics: collect signatures and documents, track deadlines with counsel, and prepare materials for investor updates",
+    "Send and follow up on what the team and our AI agents have prepared, and keep HubSpot and Linear current",
+    "Answer or route administrative email and requests, closing the long tail of small tasks that keep a company running",
+  ],
+  bonusPoints: [
+    "German language skills",
+    "Experience with HubSpot and Linear",
+    "Experience working closely with a founder or a small leadership team",
+    "A background in event or conference logistics",
+  ],
+  href: "/careers/executive-assistant",
+  datePosted: "2026-10-05",
+  employmentType: ["FULL_TIME"],
+  locationLine: "Remote · CET hours · Full-time",
+  intro:
+    "OllyGarden runs lean, with AI agents doing much of our information work. This role owns what still needs a person: the execution and follow-through that keep the company running, from scheduling and finance operations to company events and paperwork. You will work closely with our CEO, Juraci Paixão Kröhling, and support the whole team.",
+  outcomes: [
+    "No admin task sits overdue, and admin email gets an answer or a clear owner within one business day",
+    "Company events and offsites run smoothly, from the first booking to the last receipt",
+    "Meetings land on the right days, so the team’s deep-work time stays protected",
+    "Drafts, follow-ups, and invoices go out on time, and our CRM and task tracker reflect reality",
+  ],
+  interviewTitle: "Show us how you work",
+  interviewLede:
+    "The process is short and practical. We want to see how you prioritize, communicate, and follow through when many small things compete for attention.",
+  interview: [
+    "A conversation about the teams and people you have supported, the tools you use, and why OllyGarden interests you",
+    "A practical exercise with a realistic week of requests: scheduling conflicts across time zones, a team offsite to organize, receipts to match, and drafts waiting to go out",
+    "A working session with Juraci Paixão Kröhling on written communication, in English and Portuguese",
+    "Reference conversations focused on reliability, discretion, and follow-through",
+  ],
+  closingTitle: "Ready to keep things moving?",
+} satisfies CareersRole;
+
+export const aiSoftwareEngineer = {
+  id: "ai-software-engineer",
+  active: true,
+  title: "AI Software Engineer",
+  location: "Remote, Europe or Latin America",
+  time: "Full-time",
+  description:
+    "Build Rose, our AI agent for OpenTelemetry instrumentation, and own the open source agent skills that give coding agents accurate OpenTelemetry knowledge.",
+  lookingFor: [
+    "Senior engineering experience, including an LLM agent or AI-assisted product you shipped to production and kept running",
+    "Strong TypeScript and backend skills: APIs, webhooks, durable workflows, and Postgres",
+    "Evidence that you measured LLM quality with evals, golden sets, or production signals, and changed course based on the results",
+    "Comfort reading and safely changing code in languages you don’t write every day",
+    "Clear writing and an async-first way of working: design docs, PR descriptions, and summaries",
+    "Based in Europe or Latin America",
+  ],
+  youWillDo: [
+    "Build Rose features from spec to production, starting with GitLab support and a flow that turns findings from our telemetry analysis into fixes across a customer’s repositories",
+    "Make agent runs reliable: structured output, retries, long-running sandbox jobs, and stable findings from one run to the next",
+    "Build the evaluations that tell us whether a prompt or model change made Rose better, and what it cost",
+    "Engineer context for agents that review and change Go, Java, Kotlin, TypeScript, Python, and .NET code",
+    "Maintain our open source agent skills: keep them current with each OpenTelemetry release, review community contributions, and require evals showing that each change helps agents",
+    "Work with customer engineers when a delivery needs it, together with our Customer Success team",
+  ],
+  bonusPoints: [
+    "Experience instrumenting services with OpenTelemetry, or working on observability tooling",
+    "Experience maintaining an open source project, especially in the OpenTelemetry ecosystem",
+    "Experience writing agent skills, plugins, or MCP servers for coding agents",
+    "GitHub App or GitLab integrations, sandboxed code execution, Cloudflare Workers, or Bun",
+    "Enthusiasm for sharing your work in public, from blog posts to conference talks",
+  ],
+  href: "/careers/ai-software-engineer",
+  datePosted: "2026-10-09",
+  employmentType: ["FULL_TIME"],
+  locationLine: "Europe or Latin America · Remote · Full-time",
+  intro:
+    "Rose is our AI agent for OpenTelemetry® instrumentation. It reviews customer code for instrumentation problems, opens pull requests that fix them, adds baseline instrumentation where there is none, and migrates services off proprietary agents. We also publish open source agent skills, used by Rose and by coding agents everywhere, that give agents accurate, current OpenTelemetry knowledge. You will build Rose with a small team in a TypeScript codebase spanning a Cloudflare Workers control plane, sandboxed agent runs, and our own agent harness, and you will own those skills.",
+  outcomes: [
+    "Customers who use GitLab can run Rose on their repositories",
+    "Every prompt or model change to Rose comes with evaluation results for quality and cost",
+    "Our open source skills keep pace with OpenTelemetry releases, and community contributions get a timely, well-reasoned review",
+    "Rose delivery work runs without pulling the rest of the team off product work",
+  ],
+  interviewTitle: "Show us what you built",
+  interviewLede:
+    "The process is practical. We want to see agent systems you have shipped, how you knew they worked, and how you think about a real problem from our codebase.",
+  interview: [
+    "A conversation with an engineer from the Rose team about your background and why OllyGarden interests you",
+    "A technical deep dive into an agent system you shipped: architecture, failure modes, and how you measured quality",
+    "A paid, self-contained exercise based on a real Rose problem, such as adding an evaluation or sketching a source-control integration",
+    "A conversation with our CEO, Juraci Paixão Kröhling, followed by reference calls",
+  ],
+  closingTitle: "Ready to build better agents?",
+} satisfies CareersRole;
 
 /** Toggle `active` to show/hide a role without deleting its copy. See doc/careers.md. */
 export const careersOpenPositions: CareersPosition[] = [
-  {
-    id: "founding-enterprise-account-executive",
-    active: true,
-    title: "Founding Enterprise Account Executive",
-    location: "United States",
-    time: "Full-time",
-    description:
-      "Build OllyGarden’s first enterprise sales motion, personally source and close technical deals, and turn what works into a repeatable playbook.",
-    lookingFor: [
-      "A quantified record of personally sourcing and closing complex B2B infrastructure or developer-tool deals",
-      "Credibility with observability, SRE, platform, and engineering buyers",
-      "Experience building pipeline without depending on a mature SDR, marketing, or RevOps organization",
-      "US-based, with practical access to buyers and relevant observability and infrastructure communities",
-    ],
-    youWillDo: [
-      "Own prospecting, discovery, technical evaluations, proof-of-value conversion, negotiation, procurement, and closing",
-      "Refine our ICP, messaging, qualification criteria, forecasting, and objection handling with the founders",
-      "Build the lightweight systems and operating rhythm that future sellers can reuse",
-      "Hand closed customers cleanly to Customer Success while engineering owns deep technical implementation",
-    ],
-    bonusPoints: [
-      "OpenTelemetry familiarity and an existing network among observability or infrastructure buyers",
-      "Experience working directly with a technical founder",
-    ],
-  },
+  aiSoftwareEngineer,
+  enterpriseAccountExecutive,
+  executiveAssistant,
 ];
 
 export function getActiveCareersPositions() {
@@ -144,6 +300,14 @@ export const careersApplyForm = {
       label: "GitHub",
       placeholder: "https://github.com/you",
     },
+    coolProject: {
+      label: "Tell us something cool you built:",
+      placeholder: "A project, a tool, or anything you’re proud of.",
+    },
+    motivation: {
+      label: "Why do you want to become an OllyGardener?",
+      placeholder: "Tell us why you want to become a gardener",
+    },
   },
   errors: {
     fullName: "Please enter your full name.",
@@ -167,33 +331,33 @@ export const careersWhy = {
   cards: [
     {
       key: "remote",
-      title: "Remote-First Culture",
-      body: "Work from wherever you do your best work. Our distributed team values trust, flexibility, and clear communication.",
+      title: "Remote-First, Equal Benefits",
+      body: "Work from wherever you do your best work. Employees and contractors receive exactly the same benefits.",
     },
     {
-      key: "tech",
-      title: "Cutting-Edge Technology",
-      body: "Use modern tools to solve complex problems in observability, OpenTelemetry, telemetry quality, and AI-assisted engineering workflows.",
+      key: "timeOff",
+      title: "30 Days of Paid Time Off",
+      body: "Thirty business days a year on top of your local public holidays, plus your birthday off. We recommend at least five days off every quarter, and sick leave never counts against your PTO.",
     },
     {
       key: "comp",
       title: "Competitive Compensation",
-      body: "We offer competitive salary, equity options, and benefits that support your work and wellbeing.",
+      body: "We offer competitive salary and equity options.",
     },
     {
-      key: "collab",
-      title: "Collaborative Environment",
-      body: "Work with a team that values collaboration, thoughtful communication, and shared ownership across functions and time zones.",
+      key: "learning",
+      title: "$1,500 Yearly Learning Budget",
+      body: "Spend it on courses, certifications, workshops, books, or conference tickets. OpenTelemetry training from Telemetry Drops and Dose de Telemetria is covered separately.",
     },
     {
-      key: "balance",
-      title: "Work-Life Balance",
-      body: "We respect people’s time and believe good work requires focus, flexibility, and time to recharge.",
+      key: "speaking",
+      title: "Conference Speaking, Covered",
+      body: "Get a talk accepted at KubeCon + CloudNativeCon, Open Source Summit, or OTel Community Day, or become an OpenTelemetry approver, and we cover flights, hotel, tickets, and time to prepare.",
     },
     {
-      key: "growth",
-      title: "Professional Growth",
-      body: "Grow through meaningful projects, open-source collaboration, and opportunities to take ownership.",
+      key: "setup",
+      title: "$3,000 Home-Office Setup",
+      body: "Choose the laptop, monitor, desk, and chair that work for you, and use a company card for the tools you want to try.",
     },
   ],
 } as const;
@@ -215,8 +379,6 @@ export const careersIcons = {
     "M41.3332 33.3333L48.2972 37.976C48.3976 38.0428 48.5142 38.0811 48.6347 38.0869C48.7551 38.0927 48.8749 38.0656 48.9812 38.0087C49.0875 37.9518 49.1764 37.8671 49.2384 37.7637C49.3003 37.6602 49.3331 37.5419 49.3332 37.4213V26.4933C49.3332 26.376 49.3023 26.2608 49.2435 26.1593C49.1848 26.0577 49.1003 25.9735 48.9986 25.9151C48.8969 25.8566 48.7815 25.8261 48.6642 25.8265C48.5469 25.8269 48.4318 25.8582 48.3305 25.9173L41.3332 30M25.3332 24H38.6665C40.1393 24 41.3332 25.1939 41.3332 26.6667V37.3333C41.3332 38.8061 40.1393 40 38.6665 40H25.3332C23.8604 40 22.6665 38.8061 22.6665 37.3333V26.6667C22.6665 25.1939 23.8604 24 25.3332 24Z",
   tech: "M35.9998 42.667V45.3337M35.9998 18.667V21.3337M42.6665 42.667V45.3337M42.6665 18.667V21.3337M22.6665 32.0003H25.3332M22.6665 38.667H25.3332M22.6665 25.3337H25.3332M46.6665 32.0003H49.3332M46.6665 38.667H49.3332M46.6665 25.3337H49.3332M29.3332 42.667V45.3337M29.3332 18.667V21.3337M27.9998 21.3337H43.9998C45.4726 21.3337 46.6665 22.5276 46.6665 24.0003V40.0003C46.6665 41.4731 45.4726 42.667 43.9998 42.667H27.9998C26.5271 42.667 25.3332 41.4731 25.3332 40.0003V24.0003C25.3332 22.5276 26.5271 21.3337 27.9998 21.3337ZM31.9998 26.667H39.9998C40.7362 26.667 41.3332 27.2639 41.3332 28.0003V36.0003C41.3332 36.7367 40.7362 37.3337 39.9998 37.3337H31.9998C31.2635 37.3337 30.6665 36.7367 30.6665 36.0003V28.0003C30.6665 27.2639 31.2635 26.667 31.9998 26.667Z",
   comp: "M35.9998 40H25.3332C24.6259 40 23.9476 39.719 23.4476 39.219C22.9475 38.7189 22.6665 38.0406 22.6665 37.3333V26.6667C22.6665 25.9594 22.9475 25.2811 23.4476 24.781C23.9476 24.281 24.6259 24 25.3332 24H46.6665C47.3737 24 48.052 24.281 48.5521 24.781C49.0522 25.2811 49.3332 25.9594 49.3332 26.6667V33.3333M43.9998 32H44.0132M45.3332 45.3333V37.3333M41.3332 41.3333L45.3332 37.3333L49.3332 41.3333M27.9998 32H28.0132M38.6665 32C38.6665 33.4728 37.4726 34.6667 35.9998 34.6667C34.5271 34.6667 33.3332 33.4728 33.3332 32C33.3332 30.5272 34.5271 29.3333 35.9998 29.3333C37.4726 29.3333 38.6665 30.5272 38.6665 32Z",
-  collab:
-    "M36.5452 23.7649L32.7812 27.4475C32.2812 27.9476 32.0004 28.6258 32.0004 29.3329C32.0004 30.04 32.2812 30.7181 32.7812 31.2182C33.2812 31.7181 33.9594 31.999 34.6665 31.999C35.3736 31.999 36.0518 31.7181 36.5518 31.2182L38.8318 28.9382C39.1302 28.6397 39.4845 28.4029 39.8745 28.2413C40.2644 28.0797 40.6824 27.9965 41.1045 27.9965C41.5266 27.9965 41.9446 28.0797 42.3345 28.2413C42.7245 28.4029 43.0788 28.6397 43.3772 28.9382L45.8852 31.4475C46.3851 31.9476 46.6659 32.6258 46.6659 33.3329C46.6659 34.04 46.3851 34.7181 45.8852 35.2182C47.9998 33.1035 49.3332 31.3329 49.3332 28.6662C49.3331 27.1825 48.883 25.7337 48.0423 24.5111C47.2016 23.2885 46.0098 22.3498 44.6244 21.8187C43.2389 21.2877 41.725 21.1895 40.2825 21.5369C38.84 21.8844 37.5369 22.6612 36.5452 23.7649ZM45.8852 35.2182C45.6222 35.4812 45.31 35.6899 44.9664 35.8322C44.6227 35.9746 44.2544 36.0478 43.8825 36.0478C43.5106 36.0478 43.1423 35.9746 42.7987 35.8322C42.499 35.7081 42.2232 35.5335 41.9831 35.3164M36.5452 23.7649C36.3973 23.903 36.2025 23.98 36.0001 23.9802C35.7977 23.9805 35.6028 23.904 35.4545 23.7662C34.4629 22.6627 33.1599 21.8858 31.7175 21.5383C30.2752 21.1908 28.7613 21.289 27.3759 21.8198C25.9905 22.3507 24.7987 23.2893 23.9579 24.5116C23.1171 25.734 22.6668 27.1826 22.6665 28.6662C22.6665 31.7329 24.6665 33.9995 26.6665 35.9995L34.0465 43.1489C34.2906 43.4113 34.585 43.6218 34.9122 43.7679C35.2395 43.914 35.5928 43.9926 35.9511 43.9991C36.3094 44.0056 36.6654 43.9398 36.9977 43.8056C37.33 43.6714 37.6318 43.4717 37.8852 43.2182C38.1477 42.9553 38.3558 42.6433 38.4976 42.2999C38.6394 41.9566 38.7122 41.5886 38.7117 41.2171C38.7112 40.8456 38.6374 40.4778 38.4947 40.1349C38.3709 39.8374 38.1973 39.5636 37.9817 39.3251M37.9817 39.3251C37.9487 39.2886 37.9148 39.253 37.8798 39.2182C37.9129 39.2548 37.9469 39.2904 37.9817 39.3251ZM37.9817 39.3251C38.2182 39.5607 38.4948 39.7529 38.7988 39.8925C39.1477 40.0527 39.5255 40.1402 39.9093 40.1499C40.293 40.1595 40.6747 40.091 41.0312 39.9486C41.3877 39.8062 41.7115 39.5927 41.9829 39.3213C42.2544 39.0499 42.4678 38.7261 42.6102 38.3696C42.7527 38.0131 42.8211 37.6314 42.8115 37.2476C42.8019 36.8639 42.7143 36.4861 42.5541 36.1372C42.4138 35.8316 42.2203 35.5537 41.9831 35.3164M41.9831 35.3164C41.9495 35.2828 41.9151 35.2501 41.8798 35.2182C41.9135 35.2518 41.9479 35.2846 41.9831 35.3164Z",
   balance:
     "M36.6668 30.8454L44.2614 44.0001M48.0001 44.0001H24.0001M47.2334 23.0654C45.1892 20.7966 42.4281 19.2984 39.4117 18.8211C36.3954 18.3438 33.3066 18.9165 30.6618 20.4433C28.0169 21.9702 25.9764 24.3586 24.8813 27.2094C23.7863 30.0602 23.703 33.2006 24.6454 36.1054C24.8894 36.8561 25.7694 37.1374 26.4521 36.7427L46.8801 24.9481C47.5628 24.5534 47.7614 23.6521 47.2334 23.0654Z",
   proGrowth:

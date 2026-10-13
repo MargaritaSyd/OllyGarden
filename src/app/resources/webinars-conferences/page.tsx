@@ -4,12 +4,12 @@ import { WebinarsHero } from "@/components/webinars-hero";
 import { WebinarsSessions } from "@/components/webinars-sessions";
 import { WebinarsStage } from "@/components/webinars-stage";
 import { createPageMetadata } from "@/lib/metadata";
-import { webinarsHero, webinarsMeta } from "@/lib/webinars";
+import { webinarsMeta } from "@/lib/webinars";
 import { resourcesWebinarsGraph } from "@/lib/structured-data";
 
 export const metadata = createPageMetadata({
   title: webinarsMeta.title,
-  description: webinarsHero.lede,
+  description: webinarsMeta.description,
   path: webinarsMeta.path,
   absoluteTitle: true,
 });

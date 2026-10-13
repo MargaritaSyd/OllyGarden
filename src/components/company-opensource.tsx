@@ -1,3 +1,4 @@
+import { ArrowLinks } from "@/components/blog-ui";
 import { InView } from "@/components/in-view";
 import { companyOpenSource } from "@/lib/company";
 
@@ -29,6 +30,7 @@ export function CompanyOpenSource() {
             {companyOpenSource.title}
           </h2>
           <p className="text-base leading-[1.4] text-mist">{companyOpenSource.lede}</p>
+          <ArrowLinks links={companyOpenSource.community} />
         </header>
 
         <article className="os-card flex flex-col items-start justify-between gap-8 rounded-2xl border border-sunflower/32 bg-[#002810] p-8 min-[881px]:flex-row min-[881px]:items-center">
@@ -64,7 +66,7 @@ export function CompanyOpenSource() {
   );
 }
 
-function GitHubMark() {
+export function GitHubMark() {
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
       <path

@@ -29,7 +29,12 @@ export function InsightsHero() {
             {insightsHero.lede}
           </p>
           <div className="ih-fx ih-fx-4 mt-8">
-            <GetStartedLink>{insightsHero.cta}</GetStartedLink>
+            <GetStartedLink
+              href={insightsHero.ctaHref}
+              analytics={{ id: "insights_hero_primary", section: "hero" }}
+            >
+              {insightsHero.cta}
+            </GetStartedLink>
           </div>
         </div>
 

@@ -26,6 +26,7 @@
 <p>Different languages should use consistent attribute names so you can query across services. Semantic conventions define those names. Auto-instrumentation already follows them. You only care about semantic conventions when you add custom instrumentation or query data across polyglot services.</p>
 <p>Large organizations find that different teams instrument the same concepts differently. &quot;team&quot; versus &quot;squad&quot;, &quot;org&quot; versus &quot;organization&quot;, &quot;cluster.name&quot; versus &quot;cluster_name&quot;. Weaver lets you define and enforce your own conventions. If you have three services and five engineers, you do not need Weaver.</p>
 <p>Each component is an answer to a question. If you are not asking the question, you do not need the answer.</p>
+<!-- cta -->
 <h2>Why OpenTelemetry cannot be smaller</h2>
 <p>Some specialized tools are simpler because they make decisions OpenTelemetry cannot make. The Prometheus client library, for example, has excellent performance for metrics. But using it commits you to Prometheus-compatible backends at instrumentation time. You also need a separate solution for traces.</p>
 <p>OpenTelemetry optimizes for flexibility. Some backends expect cumulative metrics, others expect deltas. Some thrive on high-cardinality data, others choke on it. OpenTelemetry works with all of them. The cost of that flexibility is that OpenTelemetry cannot take shortcuts that assume a specific backend.</p>

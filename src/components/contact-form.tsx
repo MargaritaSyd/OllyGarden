@@ -2,8 +2,14 @@
 
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { GetStartedLink } from "@/components/get-started-link";
-import { SiteFormField, siteFormFieldClass } from "@/components/site-form-field";
+import {
+  FormPrivacyNotice,
+  SiteFormField,
+  siteFormFieldClass,
+} from "@/components/site-form-field";
 import { contactForm } from "@/lib/contact";
+import { captureFormEvent, useFormStarted } from "@/lib/form-analytics";
+import { capturePostHogEvent } from "@/lib/posthog";
 import { submitContactMessage } from "@/lib/supabase/submissions";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -12,6 +18,7 @@ type Status = "idle" | "submitting" | "success" | "error";
 type FieldName = "name" | "email" | "message";
 type Values = Record<FieldName, string>;
 type Errors = Partial<Record<"name" | "email", string>>;
+const FORM_NAME = "contact_form";
 
 export function ContactForm() {
   const [values, setValues] = useState<Values>({
@@ -21,8 +28,11 @@ export function ContactForm() {
   });
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<Status>("idle");
+  const markStarted = useFormStarted(FORM_NAME);
 
-  function onChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+  function onChange(
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) {
     const { name, value } = event.target;
     const field = name as FieldName;
     setValues((current) => ({ ...current, [field]: value }));
@@ -48,9 +58,14 @@ export function ContactForm() {
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    markStarted();
+    captureFormEvent("form_submission_attempted", FORM_NAME);
     const next = validate(values);
     setErrors(next);
     if (Object.keys(next).length) {
+      captureFormEvent("form_submission_failed", FORM_NAME, {
+        failure_type: "validation",
+      });
       const first = (["name", "email"] as const).find((key) => next[key]);
       if (first) {
         document.getElementById(`ct-${first}`)?.focus();
@@ -60,13 +75,27 @@ export function ContactForm() {
 
     setStatus("submitting");
     try {
-      await submitContactMessage({
+      const result = await submitContactMessage({
         name: values.name.trim(),
         email: values.email.trim(),
         message: values.message.trim(),
       });
+      captureFormEvent("form_submitted", FORM_NAME);
+      capturePostHogEvent("lead_generated", {
+        form_name: FORM_NAME,
+        signup_method: FORM_NAME,
+        page_path: window.location.pathname,
+      });
+      if (result.notification === "failed") {
+        captureFormEvent("form_notification_failed", FORM_NAME, {
+          failure_type: "notification",
+        });
+      }
       setStatus("success");
     } catch {
+      captureFormEvent("form_submission_failed", FORM_NAME, {
+        failure_type: "persistence",
+      });
       setStatus("error");
     }
   }
@@ -77,7 +106,10 @@ export function ContactForm() {
         {contactForm.title}
       </h2>
       {status === "success" ? (
-        <div className="flex max-w-[520px] flex-col items-start gap-3.5" role="status">
+        <div
+          className="flex max-w-[520px] flex-col items-start gap-3.5"
+          role="status"
+        >
           <span
             className="grid size-12 place-items-center rounded-full bg-sunflower"
             aria-hidden="true"
@@ -87,7 +119,9 @@ export function ContactForm() {
           <h3 className="text-[22px] leading-[1.25] font-bold tracking-[-0.01em] text-mist">
             {contactForm.successTitle}
           </h3>
-          <p className="text-base leading-[1.5] text-mist/75">{contactForm.successBody}</p>
+          <p className="text-base leading-[1.5] text-mist/75">
+            {contactForm.successBody}
+          </p>
           <GetStartedLink
             href="/"
             variant="secondary"
@@ -97,7 +131,12 @@ export function ContactForm() {
           </GetStartedLink>
         </div>
       ) : (
-        <form className="flex flex-col gap-5" noValidate onSubmit={onSubmit}>
+        <form
+          className="flex flex-col gap-5"
+          noValidate
+          onChangeCapture={markStarted}
+          onSubmit={onSubmit}
+        >
           {status === "error" ? (
             <p
               className="rounded-lg border border-[#e98b7d]/40 bg-[#e98b7d]/12 px-4 py-3.5 text-sm leading-[1.45] text-[#f0a99e]"
@@ -130,7 +169,10 @@ export function ContactForm() {
             onChange={onChange}
           />
           <div className="flex flex-col gap-2">
-            <label className="text-sm leading-none font-medium text-mist" htmlFor="ct-message">
+            <label
+              className="text-sm leading-none font-medium text-mist"
+              htmlFor="ct-message"
+            >
               {contactForm.fields.message.label}
             </label>
             <textarea
@@ -143,12 +185,15 @@ export function ContactForm() {
               className={`${siteFormFieldClass} min-h-[162px] resize-y`}
             />
           </div>
+          <FormPrivacyNotice />
           <button
             type="submit"
             disabled={status === "submitting"}
             className="mt-1 inline-flex h-12 w-full items-center justify-center self-start rounded-xl bg-mist px-6 text-base font-semibold text-forest transition-[transform,box-shadow] duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-safe:hover:scale-[1.04] motion-safe:hover:shadow-[0_0_28px_rgba(227,226,112,0.4)] disabled:cursor-default disabled:opacity-60 disabled:hover:scale-100 disabled:hover:shadow-none sm:w-auto"
           >
-            {status === "submitting" ? contactForm.submitting : contactForm.submit}
+            {status === "submitting"
+              ? contactForm.submitting
+              : contactForm.submit}
           </button>
         </form>
       )}
@@ -158,7 +203,13 @@ export function ContactForm() {
 
 function SuccessCheck() {
   return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
       <path
         d="M20 6 9 17l-5-5"
         stroke="#00280E"

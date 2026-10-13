@@ -1,0 +1,41 @@
+[INTRO]
+BIANCA: [warmly] Hi, I'm Bianca.
+FLORIAN: And I'm Florian. You might know us from the OTel Drops podcast. Today we're telling another real story from OllyGarden's work.
+BIANCA: Anonymized, so no names. And it's about what OllyGarden found in one company's telemetry.
+FLORIAN: [curiously] Here's the setup. A large enterprise software company. Mostly Java, plus Python, Node.js, and PHP, on a multi-region internal Kubernetes platform.
+BIANCA: And one central team paying for all the telemetry, with no chargeback. OllyGarden Insights looked at their staging telemetry, across about five hundred services.
+
+[NO NAME]
+FLORIAN: So, the biggest finding. Forty-five percent of all spans came from one service.
+BIANCA: [curiously] Which one?
+FLORIAN: [deadpan] It was called C-L-I. The tracer's default name. A PHP background worker on two clusters.
+BIANCA: [sigh] So the biggest trace producer in the whole fleet had no real identity. Nobody could tell from the telemetry who owned it.
+FLORIAN: And its traces showed why it was so busy. Every queued message made about fourteen spans. Including a brand new database connection, for every single message.
+BIANCA: Plus about six cache loads and four queries. Reuse the connection, and you cut latency and span volume at the same time.
+FLORIAN: And the spans were concentrated. Five services on a vendor tracer made forty-seven percent of all spans. The three hundred forty-three services on OpenTelemetry SDKs made thirty-eight.
+
+[THE LOGS]
+BIANCA: Now the logs. Thirty-two percent of log records were exact duplicates.
+FLORIAN: And once you normalize the IDs and numbers, about sixty percent collapse into repeating patterns.
+BIANCA: About a third of all logs were HTTP access logs. One service's ingress logs alone were sixteen and a half percent.
+FLORIAN: [dryly] Request rate, errors, and latency by route. That's a metric. It's always been a metric.
+BIANCA: [chuckles] And thirteen percent were health checks, readiness checks, and pings.
+FLORIAN: Here's my favorite one. Every week, four and a half percent of all logs were the Collector printing records it had already shipped.
+BIANCA: [curiously] And then?
+FLORIAN: And then those got collected and shipped again. The more it exports, the more it logs.
+BIANCA: [laughs] A Collector that talks about its work, and then ships the transcript.
+
+[ATTRIBUTION]
+FLORIAN: Then attribution. Twenty-six percent of log records had no service name at all.
+BIANCA: So no team to charge it back to. And forty-three percent of log bodies were unparsed JSON. INFO was spelled three different ways.
+FLORIAN: Only nine percent of services set a deployment environment.
+BIANCA: And thirty-five percent of traces were single spans. Only about five percent crossed a service boundary.
+FLORIAN: [cautiously] There were also pattern matches for bearer tokens and email addresses in a few services. Those still need a human review, so treat them as suspects for now.
+
+[OUTRO]
+BIANCA: So, what would you check in your own telemetry after hearing this?
+FLORIAN: First, give every process a real service name. Defaults hide your biggest producers.
+BIANCA: Second, look at what your background workers do per message.
+FLORIAN: Third, turn access logs into metrics. And fourth, check whether your Collector is shipping its own logs twice.
+BIANCA: [warmly] The full written story is on the OllyGarden website. Thanks for listening.
+FLORIAN: Until next time.

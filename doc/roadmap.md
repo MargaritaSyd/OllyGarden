@@ -77,7 +77,6 @@ Preview nav: Home · Products · Solutions · Resources · Company · Get Starte
 | `/` | Home |
 | `/products/insights` | Product + Insights pricing (Free / Essentials / Enterprise) |
 | `/products/rose` | Product |
-| `/products/tulip` | Product |
 | `/solutions/overview` | Solutions hub |
 | `/solutions/financial-services` | Vertical |
 | `/solutions/retail-ecommerce` | Vertical |
@@ -85,6 +84,7 @@ Preview nav: Home · Products · Solutions · Resources · Company · Get Starte
 | `/company` | About + Press (preview folds Press into this page) |
 | `/careers` | Careers |
 | `/contact` | Contact |
+| `/resources` | Resources hub linking every resource section |
 | `/resources/blog` | Blog index |
 | `/resources/blog/[slug]` | Article (~23 posts in the SPA, not ~15) |
 
@@ -96,9 +96,7 @@ Keep the links. Do **not** invent full pages. Use a small “coming soon” temp
 
 | Route | Preview state | MVP |
 | --- | --- | --- |
-| `/get-started` | “Full get-started page coming soon” | Stub (or send the header CTA to `/contact` / `/get-started` stub — match preview) |
 | `/products/polder` | Mega-menu “Coming soon!” — no Figma frame found | Stub |
-| `/resources` | “Full resources page coming soon” | Stub (Docs hub) |
 | OTel Quiz | Mega-menu item; no dedicated route (falls through toward `/resources`) | Same as preview: do not add `/quiz` |
 | Community | Mega-menu item; no dedicated route | Same as preview |
 | Legal: Terms, Rose ToS, Privacy | `href="#"` | Minimal indexable pages **only if** copy exists; otherwise leave as `#` or a one-pager. No Figma-only Ethics/Manifesto |
@@ -117,6 +115,7 @@ Keep the links. Do **not** invent full pages. Use a small “coming soon” temp
 | `/about` | `/company` |
 | `/blog` | `/resources/blog` |
 | `/blog/:slug` | `/resources/blog/:slug` if old slugs exist |
+| `/get-started` | `https://ollygarden.app` (signup CTAs link there directly) |
 
 ---
 
@@ -126,7 +125,7 @@ Keep the links. Do **not** invent full pages. Use a small “coming soon” temp
 - Reuse `buildPageMetadata` / JSON-LD / sitemap / OG helpers in `src/lib/seo`.
 - **Copy and section order:** preview. **Look:** Figma brand.
 - **Videos:** take files from the preview (`/videos/how-ollygarden-works.webm`, Rose demo).
-- Replace the current `src/lib/content/*` marketing copy. Insights / Rose / Tulip must match the preview (instrumentation score, AI agent PRs, supported collector) — not generic “pipeline visibility / transform” text.
+- Replace the current `src/lib/content/*` marketing copy. Insights / Rose must match the preview (instrumentation score, AI agent PRs) — not generic “pipeline visibility / transform” text.
 
 ```mermaid
 flowchart LR
@@ -149,7 +148,7 @@ flowchart LR
    - Hero: “Observability starts with good telemetry” + single **Get Started** CTA
    - Why / bad telemetry (4 cards: noisy, missing context, PII, unreliable AI)
    - Voices
-   - How it works: **Ingest → Analyze → Score → Fix** + Rose / Tulip / Insights
+   - How it works: **Ingest → Analyze → Score → Fix** + Rose / Insights
    - Final CTA
 7. Home **desktop and mobile**. Figma is mobile-first; do not defer home mobile to Stage 3.
 8. Metadata + Organization/WebSite JSON-LD.
@@ -157,7 +156,7 @@ flowchart LR
 
 **Out of scope for this stage:** hero WebGL canvas, fine parallax, remaining pages, FAQ on home, Figma second hero CTA.
 
-**Done:** desktop + mobile home matches preview structure and Figma brand; nav points at real or stub routes; `npm run build` passes.
+**Done:** desktop + mobile home matches preview structure and Figma brand; nav points at real or stub routes; `bun run build` passes.
 
 ---
 
@@ -169,7 +168,7 @@ Reusable templates: page hero, bento/cards, how-it-works, pricing, FAQ, CTA band
 
 | Route | Notes |
 | --- | --- |
-| Insights / Rose / Tulip | Long pages from the preview. Include video/demo **from the preview**. Insights pricing: Free / Essentials ($990/mo) / Enterprise — numbers from preview |
+| Insights / Rose | Long pages from the preview. Include video/demo **from the preview**. Insights pricing: Free / Essentials ($990/mo) / Enterprise — numbers from preview |
 | Polder | Coming-soon stub only |
 | Solutions × 4 | Overview + 3 verticals |
 | `/company` | About Us; Press lives here (as in the preview), not a separate Figma Press page |
@@ -185,8 +184,8 @@ Reusable templates: page hero, bento/cards, how-it-works, pricing, FAQ, CTA band
 **Goal:** parity with the preview **and** better crawlability than the SPA.
 
 1. **Blog:** port **all posts** from the preview (`/resources/blog` + slugs), RSS, per-article OG. Replace any starter list (e.g. `src/lib/posts.ts`). Use **one** blog listing layout — pick the preview’s, styled with Figma brand (ignore the three Figma listing variants unless product reopens that).
-2. **`/contact` and `/careers`:** client validation; insert into Supabase (`contact_submissions` / `job_applications`), then optional Edge Functions for email. See [`supabase.md`](supabase.md). Keep `/get-started` as a stub until product supplies a real flow.
-3. **`/resources`:** Docs hub stub or external docs URL — match preview.
+2. **`/contact` and `/careers`:** client validation; insert into Supabase (`contact_submissions` / `job_applications`), then optional Edge Functions for email. See [`supabase.md`](supabase.md). The `/get-started` stub is gone: the route now redirects (307) to the product app, and every CTA links to the app (or `/products/rose` from the home hero) directly.
+3. **`/resources`:** resolved — an indexable hub (`src/lib/resources.ts`) that links every resource section and the latest posts. Documentation stays external: the header's Resources menu and the footer's Resources column both link "Docs" to `siteConfig.docsUrl` (<https://docs.ollygarden.com>).
 4. **Legal** only if copy exists; otherwise leave footer hashes.
 5. **Motion:** only what is needed for preview parity (card hover, mega-menu, voices in-view). Hero canvas / heavy parallax only if product still wants it after visual QA against Figma brand. Do not add Figma-unspecified motion.
 6. **SEO on every real route:** `sitemap.ts` (exclude stubs), `robots.ts`, canonicals, redirects, Product/FAQPage/Article JSON-LD, Core Web Vitals.

@@ -14,19 +14,9 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: siteConfig.language,
     icons: [
       {
-        src: "/icon.svg",
+        src: "/favicon.ico",
         sizes: "any",
-        type: "image/svg+xml",
-      },
-      {
-        src: "/icon",
-        sizes: "192x192",
-        type: "image/png",
-      },
-      {
-        src: "/apple-icon",
-        sizes: "180x180",
-        type: "image/png",
+        type: "image/x-icon",
       },
     ],
   };

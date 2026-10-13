@@ -1,8 +1,10 @@
 "use server";
 
+import { normalizeGitHubRepositoryUrl } from "@/lib/github-repository-url";
 import { getSupabase, supabaseSendEmail } from "./client";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export type SubmissionResult = { notification: "sent" | "skipped" | "failed" };
 
 class SupabaseSubmitError extends Error {
   constructor(message: string) {
@@ -27,11 +29,25 @@ function requireEmail(value: string, label: string) {
   return email;
 }
 
+async function sendNotification(
+  supabase: ReturnType<typeof getSupabase>,
+  functionName: string,
+  body: Record<string, unknown>,
+): Promise<SubmissionResult> {
+  if (!supabaseSendEmail()) return { notification: "skipped" };
+  try {
+    const { error } = await supabase.functions.invoke(functionName, { body });
+    return { notification: error ? "failed" : "sent" };
+  } catch {
+    return { notification: "failed" };
+  }
+}
+
 export async function submitContactMessage(input: {
   name: string;
   email: string;
   message: string;
-}) {
+}): Promise<SubmissionResult> {
   const name = input.name.trim();
   if (!name) {
     throw new SupabaseSubmitError("Name is required.");
@@ -44,21 +60,14 @@ export async function submitContactMessage(input: {
   };
 
   const supabase = client();
-  const { error: dbError } = await supabase.from("contact_submissions").insert([payload]);
+  const { error: dbError } = await supabase
+    .from("contact_submissions")
+    .insert([payload]);
   if (dbError) {
     throw new SupabaseSubmitError(dbError.message);
   }
 
-  if (!supabaseSendEmail()) {
-    return;
-  }
-
-  const { error: emailError } = await supabase.functions.invoke("send-contact-email", {
-    body: payload,
-  });
-  if (emailError) {
-    throw new SupabaseSubmitError("Failed to send email notification");
-  }
+  return sendNotification(supabase, "send-contact-email", payload);
 }
 
 /** Default when Apply is not tied to a listed role (open application CTAs). */
@@ -72,9 +81,11 @@ export async function submitJobApplication(input: {
   email: string;
   linkedinUrl: string;
   githubUrl: string;
+  coolProject?: string;
+  motivation?: string;
   jobId?: string;
   jobTitle?: string;
-}) {
+}): Promise<SubmissionResult> {
   const fullName = input.fullName.trim();
   if (!fullName) {
     throw new SupabaseSubmitError("Full name is required.");
@@ -83,92 +94,65 @@ export async function submitJobApplication(input: {
   const email = requireEmail(input.email, "Email");
   const linkedinUrl = input.linkedinUrl.trim() || null;
   const githubUrl = input.githubUrl.trim() || null;
+  const coolProject = input.coolProject?.trim() || null;
+  const motivation = input.motivation?.trim() || null;
   const jobId = input.jobId?.trim() || OPEN_APPLICATION_JOB.jobId;
   const jobTitle = input.jobTitle?.trim() || OPEN_APPLICATION_JOB.jobTitle;
 
   const supabase = client();
-  const { error: insertError } = await supabase.from("job_applications").insert({
-    job_id: jobId,
-    job_title: jobTitle,
-    full_name: fullName,
-    email,
-    linkedin_url: linkedinUrl,
-    github_url: githubUrl,
-  });
+  const { error: insertError } = await supabase
+    .from("job_applications")
+    .insert({
+      job_id: jobId,
+      job_title: jobTitle,
+      full_name: fullName,
+      email,
+      linkedin_url: linkedinUrl,
+      github_url: githubUrl,
+      cool_project: coolProject,
+      motivation,
+    });
   if (insertError) {
-    throw new SupabaseSubmitError(`Error saving application: ${insertError.message}`);
+    throw new SupabaseSubmitError(
+      `Error saving application: ${insertError.message}`,
+    );
   }
 
-  if (!supabaseSendEmail()) {
-    return;
-  }
-
-  const { error } = await supabase.functions.invoke("send-application-email", {
-    body: {
-      jobId,
-      jobTitle,
-      applicant: {
-        fullName,
-        email,
-        linkedinUrl,
-        githubUrl,
-      },
+  return sendNotification(supabase, "send-application-email", {
+    jobId,
+    jobTitle,
+    applicant: {
+      fullName,
+      email,
+      linkedinUrl,
+      githubUrl,
+      coolProject,
+      motivation,
     },
   });
-  if (error) {
-    throw new SupabaseSubmitError(`Error sending email: ${error.message}`);
-  }
 }
 
-const TULIP_TIERS = new Set(["standard", "enterprise"]);
-
-export async function submitTulipLead(input: {
+export async function submitRoseOpenSourceApplication(input: {
   name: string;
   email: string;
-  company: string;
-  message: string;
-  supportTier: string;
-}) {
+  githubUrl: string;
+}): Promise<SubmissionResult> {
   const name = input.name.trim();
-  if (!name) {
-    throw new SupabaseSubmitError("Name is required.");
-  }
-
+  if (!name) throw new SupabaseSubmitError("Name is required.");
   const email = requireEmail(input.email, "Email");
-  const supportTier = input.supportTier.trim();
-  if (!TULIP_TIERS.has(supportTier)) {
-    throw new SupabaseSubmitError("Support tier is required.");
+  const githubUrl = normalizeGitHubRepositoryUrl(input.githubUrl);
+  if (!githubUrl) {
+    throw new SupabaseSubmitError("A valid GitHub URL is required.");
   }
 
-  const company = input.company.trim() || undefined;
-  const message = input.message.trim() || undefined;
-
-  const supabase = client();
-  const { error: dbError } = await supabase.from("tulip_leads").insert({
-    name,
-    email,
-    company: company ?? null,
-    notes: message ?? null,
-    support_tier: supportTier,
-  });
-  if (dbError) {
-    throw new SupabaseSubmitError(dbError.message);
-  }
-
-  if (!supabaseSendEmail()) {
-    return;
-  }
-
-  const { error: emailError } = await supabase.functions.invoke("send-tulip-lead-email", {
-    body: {
+  const { error } = await client()
+    .from("rose_leads")
+    .insert({
       name,
       email,
-      company,
-      message,
-      supportTier,
-    },
-  });
-  if (emailError) {
-    throw new SupabaseSubmitError("Failed to send email notification");
-  }
+      notes: `GitHub repository: ${githubUrl}`,
+      kind: "open_source",
+    });
+  if (error) throw new SupabaseSubmitError(error.message);
+  return { notification: "skipped" };
 }

@@ -7,6 +7,8 @@ export const solutionsHero = {
 
 export const solutionsMeta = {
   title: "OllyGarden Solutions — Clean telemetry for your industry",
+  description:
+    "How OllyGarden improves telemetry quality for financial services, retail and e-commerce, and enterprise software, from PII in traces to huge Collector fleets.",
   path: "/solutions/overview",
 } as const;
 
@@ -39,7 +41,7 @@ export const solutionIndustries = [
     imageWidth: 1240,
     imageHeight: 654,
     flip: false,
-    body: "Enterprise software companies instrument thousands of services across multi-tenant platforms. OllyGarden helps you improve instrumentation quality at scale, run a supported Collector, and give every developer the guidance they need to ship clean telemetry.",
+    body: "Enterprise software companies instrument thousands of services across multi-tenant platforms. OllyGarden helps you improve instrumentation quality at scale and give every developer the guidance they need to ship clean telemetry.",
   },
 ] as const;
 

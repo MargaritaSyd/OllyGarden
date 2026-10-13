@@ -17,6 +17,15 @@
 
   --color-background: var(--color-forest);
   --color-foreground: var(--color-mist);
+  --color-card: #082312;
+  --color-border: color-mix(in srgb, var(--color-mist) 12%, transparent);
+  --color-muted: #19321e;
+  --color-muted-foreground: color-mix(
+    in srgb,
+    var(--color-mist) 72%,
+    transparent
+  );
+  --color-olly-green: var(--color-sunflower);
 }
 
 @theme inline {
@@ -52,24 +61,22 @@ body {
   z-index: 1;
 }
 
-.surface-grain > .plan-pixels {
-  position: absolute;
-}
-
+/* Rose "The problem" cards: rotations and corner positions from Figma 2371:31421–31430
+   (1440×728 frame; percentages are the unrotated card box, bounding boxes removed). */
 .m-a {
-  --rot: -6deg;
+  --rot: -5deg;
 }
 
 .m-b {
-  --rot: -4deg;
+  --rot: 8.1deg;
 }
 
 .m-c {
-  --rot: 4deg;
+  --rot: 7.24deg;
 }
 
 .m-d {
-  --rot: 7deg;
+  --rot: -15deg;
 }
 
 .rose-card-float {
@@ -78,23 +85,23 @@ body {
 
 @media (min-width: 1140px) {
   .m-a {
-    top: 15%;
-    left: 5%;
+    top: 21.2%;
+    left: 7.4%;
   }
 
   .m-b {
-    bottom: 17%;
-    left: 4%;
+    bottom: 28.2%;
+    left: 4.9%;
   }
 
   .m-c {
-    top: 15%;
-    right: 5%;
+    top: 21.4%;
+    right: 4.5%;
   }
 
   .m-d {
-    bottom: 15%;
-    right: 4%;
+    bottom: 20%;
+    right: 7.1%;
   }
 
   .m-a .rose-card-float {
@@ -166,42 +173,13 @@ body {
   }
 }
 
-.rose-context-line {
-  animation: rose-dash-flow 1.6s linear infinite;
-}
-
-.rose-context-pulse {
-  animation: rose-context-pulse 3.4s ease-in-out infinite;
-}
-
-@keyframes rose-dash-flow {
-  to {
-    stroke-dashoffset: -12;
-  }
-}
-
-@keyframes rose-context-pulse {
-  0%,
-  100% {
-    opacity: 0.55;
-    transform: scale(0.92);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.08);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .rose-card-float,
-  .rose-context-line,
-  .rose-context-pulse,
-  .js-anim.rv-in .dash-shield {
+  .rose-card-float {
     animation: none;
   }
 }
 
-/* Tulip page: dashed layout grid after the hero motif (matches reference). */
+/* Dashed layout grid behind dark sections (matches reference). */
 .tulip-grid {
   pointer-events: none;
   position: absolute;
@@ -224,337 +202,9 @@ body {
   }
 }
 
-/* Tulip drop-in: typewriter + tip float (matches reference). */
-.dropin.js-anim :is(.di-mark, .di-label, .dropin h2, .di-body, .di-code, .di-tip) {
-  opacity: 0;
-  transform: translateY(8px);
-  transition:
-    opacity 0.35s ease-out,
-    transform 0.35s ease-out;
-}
-
-.dropin.js-anim .di-code {
-  transition-duration: 0.28s;
-  transform: scale(0.98);
-}
-
-.dropin.js-anim.in-view :is(.di-mark, .di-label, .dropin h2, .di-body, .di-tip) {
-  opacity: 1;
-  transform: none;
-}
-
-.dropin.js-anim.in-view .di-label {
-  transition-delay: 80ms;
-}
-
-.dropin.js-anim.in-view h2 {
-  transition-delay: 0.16s;
-}
-
-.dropin.js-anim.in-view .di-body {
-  transition-delay: 0.24s;
-}
-
-.dropin.js-anim.in-view .di-code {
-  opacity: 1;
-  transform: scale(1);
-  transition-delay: 0.1s;
-}
-
-.dropin.js-anim.in-view .di-tip {
-  transition-delay: 0.3s;
-  animation: di-bob 7s ease-in-out 1.4s infinite alternate;
-}
-
-.di-pre {
-  min-height: 392px;
-}
-
-.di-pre .cl {
-  display: flex;
-  min-height: 1.5em;
-}
-
-.di-pre .cl .gut {
-  flex: 0 0 2ch;
-  text-align: center;
-  user-select: none;
-}
-
-.di-pre .cl .txt {
-  white-space: pre;
-}
-
-.di-pre .cl.rm {
-  background: rgb(90 29 29 / 0.55);
-  color: #f2b8b8;
-}
-
-.di-pre .cl.add {
-  background: rgb(29 74 40 / 0.7);
-  color: #b7e3b4;
-}
-
-.di-code.typing .cl.rm,
-.di-code.typing .cl.add {
-  background: transparent;
-  color: inherit;
-}
-
-.di-code.typing .cl .gut {
-  opacity: 0;
-}
-
-.di-cursor {
-  display: inline-block;
-  width: 8px;
-  height: 1em;
-  margin-left: 1px;
-  vertical-align: text-bottom;
-  background: rgb(202 213 226 / 0.4);
-  animation: di-blink 0.7s step-end infinite;
-}
-
-@keyframes di-blink {
-  50% {
-    opacity: 0;
-  }
-}
-
-@keyframes di-band-in {
-  0% {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  70% {
-    opacity: 1;
-    filter: brightness(1.35);
-    transform: translateX(0);
-  }
-  100% {
-    opacity: 1;
-    filter: none;
-    transform: translateX(0);
-  }
-}
-
-.di-pre .cl.flash {
-  animation: di-band-in 0.32s ease-out both;
-}
-
-@keyframes di-bob {
-  0% {
-    transform: translateY(-3px) rotate(-0.3deg);
-  }
-  100% {
-    transform: translateY(3px) rotate(0.3deg);
-  }
-}
-
-@media (width <= 1199px) {
-  .di-pre {
-    min-height: 360px;
-  }
-
-  .dropin .di-tip {
-    position: static;
-    width: 100%;
-    margin-top: 24px;
-  }
-}
-
-@media (width <= 767px) {
-  .di-pre {
-    min-height: 300px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .dropin.js-anim :is(.di-mark, .di-label, .dropin h2, .di-body, .di-code, .di-tip) {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
-    animation: none !important;
-  }
-
-  .dropin.js-anim.in-view .di-tip,
-  .di-pre .cl.flash,
-  .di-cursor {
-    animation: none !important;
-  }
-}
-
-/* Tulip hero entrance (matches reference th-* animations). */
-@keyframes th-up {
-  from {
-    opacity: 0;
-    transform: translateY(22px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes th-icon-in {
-  from {
-    opacity: 0;
-    transform: translateY(16px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes th-ctas-in {
-  from {
-    opacity: 0;
-    transform: translateY(22px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes th-note-in {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.th-icon {
-  animation: th-icon-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.th-badge {
-  animation: th-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
-}
-
-.tulip-hero h1 {
-  animation: th-up 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both;
-}
-
-.th-lede {
-  animation: th-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
-}
-
-.th-ctas {
-  animation: th-ctas-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.54s both;
-}
-
-.th-note {
-  animation: th-note-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.7s both;
-}
-
-/* Tulip in Action cards. */
-.js-anim .ta-card,
-.js-anim .ta-arrow {
-  opacity: 0;
-}
-
-.js-anim .ta-card {
-  transform: translateY(16px);
-  transition:
-    opacity 0.4s ease-out,
-    transform 0.4s ease-out,
-    border-color 0.25s ease-out,
-    background-color 0.25s ease-out,
-    box-shadow 0.25s ease-out;
-}
-
-.js-anim .ta-arrow {
-  transform: scale(0.96);
-  transition:
-    opacity 0.4s ease-out,
-    transform 0.4s ease-out,
-    box-shadow 0.2s;
-}
-
-.js-anim.in-view .ta-card,
-.js-anim.in-view .ta-arrow {
-  opacity: 1;
-  transform: none;
-}
-
-.js-anim.in-view .ta-card:nth-child(1) {
-  transition-delay: 50ms;
-}
-
-.js-anim.in-view .ta-card:nth-child(2) {
-  transition-delay: 0.17s;
-}
-
-.js-anim.in-view .ta-card:nth-child(3) {
-  transition-delay: 0.29s;
-}
-
-.js-anim.in-view .ta-arrow-1 {
-  transition-delay: 0.24s;
-}
-
-.js-anim.in-view .ta-arrow-2 {
-  transition-delay: 0.34s;
-}
-
-.js-anim.in-view .ta-card:hover,
-.ta-card:hover {
-  border-color: rgba(227, 226, 112, 0.7);
-  background-color: rgba(0, 48, 18, 0.66);
-  transition-delay: 0s;
-  transform: translateY(-6px);
-  box-shadow:
-    0 24px 50px rgba(0, 0, 0, 0.4),
-    0 0 30px rgba(217, 229, 51, 0.12);
-}
-
-/* Tulip Support Plans. */
-.tp-plans.js-anim .tp-head,
-.tp-plans.js-anim .tp-card {
-  opacity: 0;
-  transform: translateY(10px);
-  transition:
-    opacity 0.28s ease-out,
-    transform 0.28s ease-out,
-    border-color 0.2s,
-    box-shadow 0.2s;
-}
-
-.tp-plans.js-anim.in-view .tp-head,
-.tp-plans.js-anim.in-view .tp-card {
-  opacity: 1;
-  transform: none;
-}
-
-.tp-plans.js-anim.in-view .tp-card:nth-child(1) {
-  transition-delay: 80ms;
-}
-
-.tp-plans.js-anim.in-view .tp-card:nth-child(2) {
-  transition-delay: 0.16s;
-}
-
-.tp-plans .tp-card:hover {
-  border-color: #9ca703;
-  transform: scale(1.01);
-  box-shadow:
-    inset 0 0 44px rgba(156, 167, 3, 0.18),
-    0 14px 34px rgba(0, 0, 0, 0.3);
-}
-
-.tp-plans .tp-card:hover .tp-check {
-  transform: scale(1.1);
-}
-
-/* Tulip FAQ. */
-.tulip-faq.js-anim .fq-head,
-.tulip-faq.js-anim .fq-item {
+/* FAQ accordion. */
+.faq-accordion.js-anim .fq-head,
+.faq-accordion.js-anim .fq-item {
   opacity: 0;
   transform: translateY(10px);
   transition:
@@ -562,95 +212,22 @@ body {
     transform 0.28s ease-out;
 }
 
-.tulip-faq.js-anim.in-view .fq-head,
-.tulip-faq.js-anim.in-view .fq-item {
+.faq-accordion.js-anim.in-view .fq-head,
+.faq-accordion.js-anim.in-view .fq-item {
   opacity: 1;
   transform: none;
 }
 
-.tulip-faq.js-anim.in-view .fq-item:nth-child(1) {
-  transition-delay: 60ms;
-}
-
-.tulip-faq.js-anim.in-view .fq-item:nth-child(2) {
-  transition-delay: 0.12s;
-}
-
-.tulip-faq.js-anim.in-view .fq-item:nth-child(3) {
-  transition-delay: 0.18s;
-}
-
-.tulip-faq.js-anim.in-view .fq-item:nth-child(4) {
-  transition-delay: 0.24s;
-}
-
-.tulip-faq.js-anim.in-view .fq-item:nth-child(5) {
-  transition-delay: 0.3s;
-}
-
-.tulip-faq.js-anim.in-view .fq-item:nth-child(6) {
-  transition-delay: 0.36s;
-}
-
-.tulip-faq.js-anim.in-view .fq-item:nth-child(7) {
-  transition-delay: 0.42s;
-}
-
-/* Tulip lead form. */
-.tulip-lead.js-anim .lf-copy > *,
-.tulip-lead.js-anim .lf-card {
-  opacity: 0;
-  transform: translateY(14px);
-  transition:
-    opacity 0.3s ease-out,
-    transform 0.3s ease-out;
-}
-
-.tulip-lead.js-anim.in-view .lf-copy > *,
-.tulip-lead.js-anim.in-view .lf-card {
-  opacity: 1;
-  transform: none;
-}
-
-.tulip-lead.js-anim.in-view .lf-copy > :nth-child(2) {
-  transition-delay: 80ms;
-}
-
-.tulip-lead.js-anim.in-view .lf-copy > :nth-child(3) {
-  transition-delay: 0.16s;
-}
-
-.tulip-lead.js-anim.in-view .lf-card {
-  transition-delay: 0.12s;
+.faq-accordion.js-anim.in-view .fq-item {
+  transition-delay: min(calc(60ms * (var(--i) + 1)), 0.42s);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .th-icon,
-  .th-badge,
-  .tulip-hero h1,
-  .th-lede,
-  .th-ctas,
-  .th-note {
-    animation: none;
-  }
-
-  .js-anim .ta-card,
-  .js-anim .ta-arrow,
-  .tp-plans.js-anim .tp-head,
-  .tp-plans.js-anim .tp-card,
-  .tulip-faq.js-anim .fq-head,
-  .tulip-faq.js-anim .fq-item,
-  .tulip-lead.js-anim .lf-copy > *,
-  .tulip-lead.js-anim .lf-card {
+  .faq-accordion.js-anim .fq-head,
+  .faq-accordion.js-anim .fq-item {
     opacity: 1;
     transform: none;
     transition: none;
-  }
-
-  .js-anim.in-view .ta-card:hover,
-  .tp-plans .tp-card:hover,
-  .tp-plans .tp-card:hover .tp-check {
-    transform: none;
   }
 }
 
@@ -670,18 +247,26 @@ body {
   background-color: #19321e;
 }
 
-.tulip-faq-item[open] svg {
+.faq-accordion-item[open] svg {
   transform: rotate(180deg);
 }
 
 .fs-pr-card {
   background-color: #19321e;
   background-image:
-    radial-gradient(125% 80% at 50% -10%, rgba(156, 167, 3, 0.14), transparent 60%),
+    radial-gradient(
+      125% 80% at 50% -10%,
+      rgba(156, 167, 3, 0.14),
+      transparent 60%
+    ),
     url("/images/texture-grain.png");
-  background-position: center top, 0 0;
+  background-position:
+    center top,
+    0 0;
   background-repeat: no-repeat, repeat;
-  background-size: 100% 100%, 328px 140px;
+  background-size:
+    100% 100%,
+    328px 140px;
 }
 
 .fs-pr-card::before {
@@ -1057,7 +642,8 @@ body {
 }
 
 .hiw.is-playing .hiw-pk--out {
-  animation: hiwPkAcross 0.7s cubic-bezier(0.45, 0, 0.55, 1) both var(--pk-d, 4.95s);
+  animation: hiwPkAcross 0.7s cubic-bezier(0.45, 0, 0.55, 1) both
+    var(--pk-d, 4.95s);
 }
 
 .hiw.is-playing [data-hiw="insights"] {
@@ -1277,89 +863,136 @@ body {
   }
 }
 
+/* Home "The New Reality": four cards, then three audit figures. */
+.home-reality {
+  isolation: isolate;
+}
+
+.home-reality-card {
+  background-color: #011a09;
+  background-image: linear-gradient(181.5deg, #427e2733 0%, #427e2700 68%);
+  transition:
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.5s;
+}
+
+.home-reality-card:hover {
+  border-color: #e3e270b3;
+  transform: translateY(-6px);
+  box-shadow:
+    0 24px 50px #0006,
+    0 0 30px #d9e5331f,
+    inset 0 1px #ffffff14;
+}
+
+.js-anim .home-reality-head > * {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.js-anim .home-reality-head > :nth-child(2) {
+  transition-delay: 80ms;
+}
+
+.js-anim .home-reality-head > :nth-child(3) {
+  transition-delay: 0.16s;
+}
+
+.js-anim.in-view .home-reality-head > * {
+  opacity: 1;
+  transform: none;
+}
+
+.js-anim .home-reality-card {
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.5s;
+  transition-delay: calc(var(--i, 0) * 90ms);
+}
+
+.js-anim.rv-in .home-reality-card {
+  opacity: 1;
+  transform: none;
+}
+
+.js-anim.rv-in .home-reality-card:hover {
+  transform: translateY(-6px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-reality-card,
+  .home-reality-card:hover,
+  .js-anim .home-reality-card,
+  .js-anim.rv-in .home-reality-card,
+  .js-anim.rv-in .home-reality-card:hover {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Home Security, Figma variant 4 (node 2371:29228): full-bleed gradient panel,
+   copy on the left, 6 x 6 pixel cluster with the SOC badge hugging the right. */
+/* Home security panel — Figma 2371:27005. Flat #011e0c behind the shared
+   .tulip-grid overlay (same grid as the blog section). */
 .ogsec {
-  --sec-bg: #011e0c;
-  --sec-card: #011a09;
-  --sec-border: #d1d10052;
-  --sec-border-hover: #d1d10085;
   --sec-eyebrow: #9ca703;
   --sec-paper: #faf9f0;
   --sec-ease: cubic-bezier(0.16, 1, 0.3, 1);
-  --sec-radius: 24px;
   isolation: isolate;
   position: relative;
+  display: grid;
   overflow: hidden;
-  background: var(--sec-bg);
-  padding: 96px 104px;
-}
-
-.ogsec .tulip-grid {
-  z-index: 0;
-  animation: none;
+  min-height: 404px;
+  padding: 0;
+  background: #011e0c;
 }
 
 .ogsec-inner {
-  position: relative;
-  z-index: 1;
-  max-width: 1232px;
-  margin-inline: auto;
-}
-
-.ogsec-card {
   box-sizing: border-box;
   position: relative;
-  display: flex;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   gap: 48px;
-  min-height: 235px;
-  padding: 32px 56px;
-  border: 1px solid var(--sec-border);
-  border-radius: var(--sec-radius);
-  background-color: var(--sec-card);
-  background-image:
-    linear-gradient(182deg, rgba(120, 126, 39, 0.086) 0%, rgba(120, 126, 39, 0) 45%),
-    linear-gradient(rgba(1, 26, 9, 0.5), rgba(1, 26, 9, 0.5)),
-    url("/images/texture-grain.png");
-  background-repeat: no-repeat, no-repeat, repeat;
-  background-size: 100% 100%, 100% 100%, 328px 140px;
-  transition:
-    border-color 0.45s var(--sec-ease),
-    box-shadow 0.45s var(--sec-ease);
-}
-
-.ogsec-card:hover,
-.ogsec-card:focus-within {
-  border-color: var(--sec-border-hover);
-  box-shadow:
-    0 18px 44px rgba(0, 0, 0, 0.34),
-    0 0 0 1px rgba(209, 209, 0, 0.08),
-    0 0 46px -12px rgba(120, 126, 39, 0.34);
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding: 96px 104px;
 }
 
 .ogsec-copy {
   display: flex;
   min-width: 0;
   flex-direction: column;
+  align-items: flex-start;
   gap: 16px;
-  margin-bottom: 6px;
 }
 
 .ogsec-eyebrow {
   margin: 0;
   font-size: 16px;
   font-weight: 700;
-  line-height: 20px;
+  line-height: normal;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--sec-eyebrow);
 }
 
 .ogsec-title {
-  margin: -6px 0 0;
+  margin: 0;
   font-size: 48px;
   font-weight: 700;
-  line-height: 61px;
+  line-height: normal;
   letter-spacing: -0.02em;
   color: var(--sec-paper);
 }
@@ -1368,17 +1001,18 @@ body {
   margin: 0;
   font-size: 16px;
   font-weight: 400;
-  line-height: 22px;
+  line-height: 1.4;
   letter-spacing: 0.02em;
   color: var(--sec-paper);
-  opacity: 0.92;
 }
 
 .ogsec-badge {
+  --seal: 180px;
   position: relative;
-  flex: 0 0 auto;
-  width: 171px;
-  height: 171px;
+  justify-self: end;
+  width: var(--seal);
+  height: var(--seal);
+  margin-right: 21px;
   transition: transform 0.45s var(--sec-ease);
 }
 
@@ -1386,52 +1020,21 @@ body {
   display: block;
   width: 100%;
   height: 100%;
+  object-fit: cover;
   border-radius: 50%;
-}
-
-.ogsec-card:hover .ogsec-badge {
-  transform: translateY(-4px) rotate(1.5deg);
 }
 
 .ogsec-tm {
   position: absolute;
   top: 89%;
-  left: 91%;
-  font-size: 8px;
+  left: 100%;
+  margin-left: 4px;
+  font-size: 5px;
   font-weight: 700;
   line-height: 1;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   color: #fff;
-}
-
-.ogsec-card:focus-visible,
-.ogsec-badge:focus-visible {
-  outline: 2px solid #e3e270;
-  outline-offset: 4px;
-}
-
-.js-anim.ogsec .tulip-grid {
-  opacity: 0;
-}
-
-.js-anim.ogsec.in-view .tulip-grid {
-  opacity: 1;
-  transition: opacity 0.5s 0.25s;
-}
-
-.js-anim.ogsec .ogsec-card {
-  opacity: 0;
-  transform: translateY(24px) scale(0.98);
-}
-
-.js-anim.ogsec.in-view .ogsec-card {
-  opacity: 1;
-  transform: none;
-  transition:
-    opacity 0.55s var(--sec-ease),
-    transform 0.55s var(--sec-ease),
-    border-color 0.45s var(--sec-ease),
-    box-shadow 0.45s var(--sec-ease);
 }
 
 .js-anim.ogsec .ogsec-copy > * {
@@ -1468,114 +1071,86 @@ body {
     transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.24s;
 }
 
-.js-anim.ogsec.in-view .ogsec-card:hover .ogsec-badge {
-  transform: translateY(-4px) rotate(1.5deg);
-}
-
 @media (width <= 1279px) {
-  .ogsec {
-    padding: 88px clamp(40px, 6vw, 80px);
+  .ogsec-inner {
+    padding-inline: clamp(40px, 7.2vw, 104px);
   }
 
   .ogsec-title {
     font-size: 42px;
-    line-height: 54px;
-  }
-
-  .ogsec-badge {
-    width: 150px;
-    height: 150px;
   }
 }
 
 @media (width <= 1023px) {
   .ogsec {
-    padding: 72px clamp(24px, 5vw, 48px);
-  }
-
-  .ogsec-card {
     min-height: 0;
-    flex-direction: column;
-    align-items: center;
-    gap: 32px;
-    padding: 40px;
-    text-align: center;
   }
 
-  .ogsec-copy {
-    align-items: center;
+  .ogsec-inner {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 32px;
+    padding: 64px clamp(24px, 5vw, 48px);
   }
 
   .ogsec-badge {
-    width: 128px;
-    height: 128px;
+    justify-self: start;
   }
 }
 
 @media (width <= 767px) {
-  .ogsec {
-    padding: 56px 22px;
-  }
-
-  .ogsec-card {
-    gap: 28px;
-    padding: 32px 24px;
-  }
-
   .ogsec-eyebrow {
     font-size: 14px;
-    line-height: 18px;
   }
 
   .ogsec-title {
     font-size: 32px;
-    line-height: 40px;
   }
 
   .ogsec-body {
     font-size: 14px;
-    line-height: 20px;
   }
 
   .ogsec-badge {
-    width: 104px;
-    height: 104px;
-  }
-
-  .ogsec-tm {
-    font-size: 7px;
-  }
-
-  .ogsec-card:hover {
-    border-color: var(--sec-border);
-    box-shadow: none;
-  }
-
-  .ogsec-card:hover .ogsec-badge,
-  .js-anim.ogsec.in-view .ogsec-card:hover .ogsec-badge {
-    transform: none;
+    --seal: 140px;
   }
 }
 
 @media (width <= 479px) {
   .ogsec-title {
     font-size: 28px;
-    line-height: 34px;
-  }
-
-  .ogsec-badge {
-    width: 96px;
-    height: 96px;
   }
 }
 
+/* Figma 1:245: 480px cards tilt ±5° and zig-zag about 26px either side of the
+   column centre. The shift lives on the wrapper so the card's own tilt, entrance
+   and hover transforms stay untouched. */
 .why-card-wrap {
   --tilt: 5deg;
+  --shift: 0px;
   position: relative;
+  display: flex;
+  justify-content: center;
+  transform: translateX(var(--shift));
 }
 
 .why-card-wrap:nth-child(even) {
   --tilt: -5deg;
+}
+
+/* The wrapper transform makes each card its own stacking context, so the
+   hover lift has to happen here to clear the neighbouring cards' corners. */
+.why-card-wrap:hover {
+  z-index: 1;
+}
+
+@media (width >= 64rem) {
+  .why-card-wrap {
+    --shift: -27px;
+  }
+
+  .why-card-wrap:nth-child(even) {
+    --shift: 26px;
+  }
 }
 
 .why-card {
@@ -1587,6 +1162,13 @@ body {
     transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
     background 0.35s,
     box-shadow 0.45s;
+}
+
+/* `.surface-grain > *` above forces direct children to position: relative and
+   is unlayered, so it beats the Tailwind utility. The motif has to stay pinned
+   to the card edge (Figma 1:253) and must not add height. */
+.why-card > .card-motif {
+  position: absolute;
 }
 
 .card-motif {
@@ -1874,18 +1456,12 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ogsec-card,
   .ogsec-badge,
-  .ogsec .tulip-grid,
   .ogsec-copy > * {
     opacity: 1;
     transform: none;
     animation: none;
     transition: none;
-  }
-
-  .ogsec-card:hover .ogsec-badge {
-    transform: none;
   }
 
   .why-card,
@@ -1921,7 +1497,6 @@ body {
 
   .js-anim.ogsec .ogsec-copy > *,
   .js-anim.ogsec .ogsec-badge,
-  .js-anim.ogsec .ogsec-card,
   .js-anim .why-copy > *,
   .js-anim .voices-head > *,
   .js-anim .voice-card,
@@ -1958,17 +1533,10 @@ body {
   .js-anim.fi-rv,
   .js-anim.pr-rv,
   .js-anim .action-video,
-  .js-anim .rose-step .rs-el,
-  .js-anim .rose-step .rose-step-visual,
-  .js-anim .rose-step .d-el,
   .js-anim .m-card,
   .js-anim .client-photo,
   .js-anim .client-quote,
   .js-anim .client-quote .qmark,
-  .js-anim .graph-panel,
-  .js-anim .g-node,
-  .js-anim .g-center,
-  .js-anim .graph-curves,
   .js-anim .plan-card,
   .js-anim .plan-os {
     opacity: 1;
@@ -1978,11 +1546,6 @@ body {
     transition: none;
   }
 
-  .js-anim .g-center {
-    transform: translate(-50%, -50%);
-  }
-
-  .rose-step:hover,
   .plan-card:hover,
   .plan-os:hover,
   .js-anim.fp-rv.rv-in:hover,
@@ -2134,78 +1697,6 @@ body {
 
 .fp-sq {
   transition: opacity 0.25s ease-out;
-}
-
-.rose-step {
-  transition:
-    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.5s;
-}
-
-.rose-step:hover,
-.js-anim.rv-in.rose-step:hover {
-  border-color: rgba(211, 222, 60, 0.35);
-  transform: translateY(-6px);
-  box-shadow:
-    0 24px 50px rgba(0, 0, 0, 0.4),
-    0 0 30px rgba(217, 229, 51, 0.12),
-    inset 0 1px rgba(255, 255, 255, 0.08);
-}
-
-.js-anim .rose-step .rs-el {
-  opacity: 0;
-  transform: translateY(22px);
-  transition:
-    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.js-anim .rose-step .rose-step-num {
-  transform: scale(0.7);
-}
-
-.js-anim .rose-step .rose-step-visual {
-  opacity: 0;
-  filter: blur(12px);
-  transform: translateY(14px);
-  transition:
-    opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.3s,
-    transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.3s,
-    filter 0.85s 0.3s;
-}
-
-.js-anim .rose-step .d-el {
-  opacity: 0;
-  transform: translateY(14px);
-  transition:
-    opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.js-anim.rv-in .rs-el,
-.js-anim.rv-in .rose-step-visual,
-.js-anim.rv-in .d-el {
-  opacity: 1;
-  filter: none;
-  transform: none;
-}
-
-.js-anim.rv-in .dash-shield {
-  animation: rose-shield-float 4.5s ease-in-out infinite alternate;
-}
-
-.js-anim.rv-in .dash-shield-b {
-  animation-delay: 1.4s;
-}
-
-@keyframes rose-shield-float {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(-8px);
-  }
 }
 
 .js-anim .action-video {
@@ -2361,74 +1852,6 @@ body {
   }
 }
 
-.g-center {
-  transform: translate(-50%, -50%);
-}
-
-.js-anim .graph-panel {
-  opacity: 0;
-  transform: scale(0.95);
-  transition:
-    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.1s,
-    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
-}
-
-.js-anim .g-node {
-  opacity: 0;
-  transform: scale(0.82);
-  transition:
-    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.js-anim .g-center {
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0.8);
-  transition:
-    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.25s,
-    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.25s;
-}
-
-.js-anim .graph-curves {
-  opacity: 0;
-  transition: opacity 1s 0.45s;
-}
-
-.js-anim .gn-tl {
-  transition-delay: 0.5s;
-}
-
-.js-anim .gn-tr {
-  transition-delay: 0.65s;
-}
-
-.js-anim .gn-bl {
-  transition-delay: 0.8s;
-}
-
-.js-anim .gn-br {
-  transition-delay: 0.95s;
-}
-
-.js-anim.in-view .graph-panel {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.js-anim.in-view .graph-curves {
-  opacity: 1;
-}
-
-.js-anim.in-view .g-node {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.js-anim.in-view .g-center {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
-}
-
 .plan-card,
 .plan-os {
   background-color: #19321e;
@@ -2443,36 +1866,59 @@ body {
     background 0.35s;
 }
 
+/* Rose plan surfaces (Figma 2371:31924): the olive glow sits on the card's own fill. */
 .plan-free {
+  background-color: #002810;
   background-image:
     linear-gradient(
       165deg,
-      rgba(217, 229, 51, 0.09),
+      rgba(120, 126, 39, 0.14),
       rgba(255, 255, 255, 0.02) 50%,
       rgba(0, 0, 0, 0.12)
     ),
     url("/images/texture-grain.png");
   background-repeat: no-repeat, repeat;
-  background-size: 100% 100%, 328px 140px;
+  background-size:
+    100% 100%,
+    328px 140px;
 }
 
 .plan-ent {
+  background-color: #011608;
   background-image:
-    linear-gradient(165deg, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.34)),
+    linear-gradient(
+      165deg,
+      rgba(120, 126, 39, 0.14),
+      rgba(255, 255, 255, 0.02) 50%,
+      rgba(0, 0, 0, 0.12)
+    ),
     url("/images/texture-grain.png");
   background-repeat: no-repeat, repeat;
-  background-size: 100% 100%, 328px 140px;
+  background-size:
+    100% 100%,
+    328px 140px;
 }
 
 .plan-os {
+  background-color: #002810;
   background-image:
-    linear-gradient(rgba(217, 229, 51, 0.05), rgba(217, 229, 51, 0.05)),
+    linear-gradient(
+      165deg,
+      rgba(120, 126, 39, 0.14),
+      rgba(255, 255, 255, 0.02) 50%,
+      rgba(0, 0, 0, 0.12)
+    ),
     url("/images/texture-grain.png");
   background-repeat: no-repeat, repeat;
-  background-size: 100% 100%, 328px 140px;
+  background-size:
+    100% 100%,
+    328px 140px;
 }
 
-.plan-card > :not(.plan-pixels) {
+/* Excludes dialog: this rule is unlayered, so it beats Tailwind's utilities and
+   would override position:fixed on a modal rendered inside a card, laying it out
+   in the card's flow while it still paints in the top layer. */
+.plan-card > :not(dialog) {
   position: relative;
   z-index: 1;
 }
@@ -2517,6 +1963,70 @@ body {
   box-shadow:
     inset 0 0 44px rgba(156, 167, 3, 0.18),
     0 14px 34px rgba(0, 0, 0, 0.3);
+}
+
+.ig-plan-card.is-recommended,
+.ig-plan-card.is-recommended:hover {
+  border-color: var(--color-sunflower);
+}
+
+.plan-card > .ig-plan-badge {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  right: 1.5rem;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: var(--color-sunflower);
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 15px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  text-transform: uppercase;
+  color: #011e0c;
+}
+
+.ig-pr-sq {
+  opacity: 1;
+}
+
+.ig-pr-sq rect {
+  opacity: 0.3;
+}
+
+.ig-pr-sq--r {
+  top: 1px;
+  right: -8px;
+  width: 136px;
+  height: 342px;
+}
+
+.ig-pr-sq--l {
+  bottom: 7px;
+  left: -12px;
+  width: 119px;
+  height: 295px;
+}
+
+.js-anim .ig-pr-sq rect {
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.js-anim.in-view .ig-pr-sq rect {
+  opacity: 0.3;
+  transform: none;
+}
+
+@media (max-width: 880px) {
+  .ig-pr-sq {
+    display: none;
+  }
 }
 
 .post-richtext {
@@ -2614,7 +2124,8 @@ body {
   font-style: italic;
 }
 
-.post-richtext :not(pre) > code {
+.post-richtext :not(pre) > code,
+.inline-code {
   border: 1px solid rgb(227 226 112 / 0.18);
   border-radius: 6px;
   background: rgb(0 40 14 / 0.6);
@@ -2633,7 +2144,9 @@ body {
   background:
     linear-gradient(rgb(0 20 8 / 0.82), rgb(0 20 8 / 0.82)),
     var(--color-forest) url("/images/texture-grain.png") repeat;
-  background-size: auto, 328px 140px;
+  background-size:
+    auto,
+    328px 140px;
   padding: 1.25rem;
   font-family: ui-monospace, "Cascadia Code", "Segoe UI Mono", monospace;
   font-size: 0.875rem;
@@ -2681,7 +2194,9 @@ body {
   background:
     linear-gradient(rgb(0 40 14 / 0.6), rgb(0 40 14 / 0.6)),
     #00280e url("/images/texture-grain.png") repeat;
-  background-size: auto, 328px 140px;
+  background-size:
+    auto,
+    328px 140px;
   padding: clamp(1rem, 2vw, 1.5rem);
   font-size: clamp(1.0625rem, 1.5vw, 1.1875rem);
   line-height: 1.45;
@@ -2716,7 +2231,9 @@ body {
   background:
     linear-gradient(rgb(0 40 14 / 0.6), rgb(0 40 14 / 0.6)),
     #00280e url("/images/texture-grain.png") repeat;
-  background-size: auto, 328px 140px;
+  background-size:
+    auto,
+    328px 140px;
   font-size: 0.875rem;
   text-align: left;
 }
@@ -2846,7 +2363,9 @@ body {
     linear-gradient(rgb(1 30 12 / 0.55), rgb(1 30 12 / 0.55)),
     url("/images/texture-grain.png");
   background-repeat: no-repeat, repeat;
-  background-size: auto, 328px 140px;
+  background-size:
+    auto,
+    328px 140px;
 }
 
 .js-anim .mv-card {
@@ -2910,11 +2429,18 @@ body {
 .p-card-body {
   background-color: #143d20;
   background-image:
-    radial-gradient(140% 130% at 16% -8%, rgb(156 184 62 / 0.34), rgb(20 61 32 / 0) 54%),
+    radial-gradient(
+      140% 130% at 16% -8%,
+      rgb(156 184 62 / 0.34),
+      rgb(20 61 32 / 0) 54%
+    ),
     linear-gradient(rgb(10 38 19 / 0.72), rgb(10 38 19 / 0.72)),
     url("/images/texture-grain.png");
   background-repeat: no-repeat, no-repeat, repeat;
-  background-size: auto, auto, 328px 140px;
+  background-size:
+    auto,
+    auto,
+    328px 140px;
 }
 
 @keyframes p-float-a {
@@ -3163,11 +2689,19 @@ body {
 .ct-info-card,
 .ct-form-card {
   background-image:
-    radial-gradient(125% 80% at 50% -10%, rgba(156, 167, 3, 0.14), transparent 60%),
+    radial-gradient(
+      125% 80% at 50% -10%,
+      rgba(156, 167, 3, 0.14),
+      transparent 60%
+    ),
     url("/images/texture-grain.png");
-  background-position: center top, 0 0;
+  background-position:
+    center top,
+    0 0;
   background-repeat: no-repeat, repeat;
-  background-size: 100% 100%, 328px 140px;
+  background-size:
+    100% 100%,
+    328px 140px;
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.05);
 }
 
@@ -3377,7 +2911,9 @@ body {
   background:
     linear-gradient(rgb(0 40 14 / 0.6), rgb(0 40 14 / 0.6)),
     #00280e url("/images/texture-grain.png") repeat;
-  background-size: auto, 328px 140px;
+  background-size:
+    auto,
+    328px 140px;
   border-left: 8px solid var(--color-sunflower);
   border-radius: 0 24px 24px 0;
   display: flex;
@@ -3532,5 +3068,480 @@ body {
 
   .pr-back:hover .pr-back-arrow {
     transform: none;
+  }
+}
+
+@keyframes og-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes og-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.og-dialog[open] {
+  position: fixed;
+  inset: 0;
+  animation: og-dialog-in 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.og-dialog[open]::backdrop {
+  animation: og-backdrop-in 0.24s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .og-dialog[open],
+  .og-dialog[open]::backdrop {
+    animation: none;
+  }
+}
+
+/* Section headings double as in-page anchor targets. Without this a hash link
+   lands them flush against the viewport top, clipped and cramped. */
+h2[id],
+h3[id],
+section[id] {
+  scroll-margin-top: 5rem;
+}
+/* Insights levels — bento section (reference: gsec bento) */
+.insights-levels {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 64px;
+  min-height: 0;
+  padding: 96px 104px;
+}
+
+.insights-levels .il-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 64px;
+  width: 100%;
+  max-width: 1232px;
+}
+
+.insights-levels .il-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1232px;
+}
+
+.insights-levels .il-mark {
+  margin-bottom: 16px;
+  color: var(--color-bitmap-mid);
+}
+
+.insights-levels .il-eyebrow {
+  margin-bottom: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 20px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-bitmap-mid);
+}
+
+.insights-levels .il-title {
+  margin-bottom: 20px;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 61px;
+  letter-spacing: -0.02em;
+  color: var(--color-mist);
+}
+
+.insights-levels .il-sub {
+  max-width: 500px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: 0.02em;
+  color: var(--color-mist);
+}
+
+.insights-levels .il-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  width: 100%;
+  max-width: 1232px;
+}
+
+.insights-levels .il-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.insights-levels .il-cell--wide {
+  grid-column: 1 / -1;
+}
+
+.insights-levels .il-cell > .il-card {
+  flex: auto;
+}
+
+.insights-levels .il-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 480px;
+  overflow: hidden;
+  border: 1px solid rgba(227, 226, 112, 0.4);
+  border-radius: 24px;
+  background: #19321e url("/images/texture-grain.png") 0 0 / 328px 140px;
+  padding: 32px;
+  transition:
+    transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.28s ease,
+    box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.insights-levels .il-card:hover,
+.insights-levels .il-card:focus-visible {
+  border-color: rgba(227, 226, 112, 0.62);
+  transform: scale(1.01);
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.35),
+    0 0 34px rgba(209, 209, 0, 0.1);
+}
+
+.insights-levels .il-card:focus-visible {
+  outline: 2px solid var(--color-sunflower);
+  outline-offset: 2px;
+}
+
+.insights-levels .il-card-title {
+  margin-bottom: 8px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 26px;
+  letter-spacing: -0.01em;
+  color: var(--color-mist);
+}
+
+.insights-levels .il-card-body {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%;
+  color: rgba(250, 249, 240, 0.75);
+}
+
+.insights-levels .il-media {
+  position: relative;
+}
+
+.insights-levels .il-media img {
+  display: block;
+  transition:
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.3s ease;
+}
+
+.insights-levels .il-card:hover .il-media img {
+  transform: perspective(900px) rotateX(1.2deg) scale(1.015);
+}
+
+.insights-levels .il-media--fill {
+  flex: 1;
+  margin: 16px -32px -32px 0;
+  overflow: hidden;
+  border-radius: 8px 0 0;
+}
+
+.insights-levels .il-media--fill img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left top;
+  border-radius: 8px 0 0;
+}
+
+.insights-levels .il-card--wide {
+  justify-content: center;
+  height: auto;
+  min-height: 258px;
+}
+
+.insights-levels .il-card--wide .il-copy {
+  max-width: min(548px, 46%);
+}
+
+.insights-levels .il-media--side {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: min(604px, 50%);
+  height: 106%;
+  overflow: hidden;
+  border-radius: 8px 0 0 8px;
+  transform: translateY(-50%);
+}
+
+.insights-levels .il-media--side img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left center;
+}
+
+.insights-levels .il-sq {
+  position: absolute;
+}
+
+.insights-levels .il-sq rect {
+  opacity: 0.3;
+}
+
+.insights-levels .il-sq--r {
+  top: 5px;
+  right: -12px;
+  width: 204px;
+  height: 546px;
+}
+
+.insights-levels .il-sq--l {
+  bottom: 43px;
+  left: -12px;
+  width: 136px;
+  height: 545px;
+}
+
+.js-anim.insights-levels .il-sq rect {
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.js-anim.insights-levels.in-view .il-sq rect {
+  opacity: 0.3;
+  transform: none;
+}
+
+.js-anim.insights-levels .il-cell {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.js-anim.insights-levels.in-view .il-cell {
+  opacity: 1;
+  transform: none;
+}
+
+.js-anim.insights-levels.in-view .il-cell:nth-child(1) {
+  transition-delay: 0.1s;
+}
+
+.js-anim.insights-levels.in-view .il-cell:nth-child(2) {
+  transition-delay: 0.22s;
+}
+
+.js-anim.insights-levels.in-view .il-cell:nth-child(3) {
+  transition-delay: 0.34s;
+}
+
+.js-anim.insights-levels .il-media {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.js-anim.insights-levels.in-view .il-cell:nth-child(1) .il-media {
+  opacity: 1;
+  transition-delay: 0.22s;
+}
+
+.js-anim.insights-levels.in-view .il-cell:nth-child(2) .il-media {
+  opacity: 1;
+  transition-delay: 0.34s;
+}
+
+.js-anim.insights-levels.in-view .il-cell:nth-child(3) .il-media {
+  opacity: 1;
+  transition-delay: 0.46s;
+}
+
+@media (width <= 1279px) {
+  .insights-levels {
+    padding: 72px 64px;
+  }
+
+  .insights-levels .il-inner,
+  .insights-levels {
+    gap: 48px;
+  }
+
+  .insights-levels .il-grid {
+    gap: 32px;
+  }
+
+  .insights-levels .il-title {
+    font-size: 40px;
+    line-height: 52px;
+  }
+}
+
+@media (width <= 1023px) {
+  .insights-levels .il-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .insights-levels .il-card {
+    height: 420px;
+  }
+
+  .insights-levels .il-card--wide {
+    justify-content: flex-start;
+    height: auto;
+    min-height: 0;
+  }
+
+  .insights-levels .il-card--wide .il-copy {
+    max-width: 640px;
+  }
+
+  .insights-levels .il-media--side {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: auto;
+    height: 240px;
+    margin: 16px -32px -32px 0;
+    border-radius: 8px 0 0;
+    transform: none;
+  }
+
+  .insights-levels .il-media--side img {
+    object-position: left top;
+  }
+}
+
+@media (width <= 767px) {
+  .insights-levels {
+    gap: 32px;
+    padding: 64px 24px;
+  }
+
+  .insights-levels .il-inner {
+    gap: 32px;
+  }
+
+  .insights-levels .il-title {
+    font-size: 36px;
+    line-height: 46px;
+  }
+
+  .insights-levels .il-eyebrow {
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  .insights-levels .il-grid {
+    gap: 24px;
+  }
+
+  .insights-levels .il-card,
+  .insights-levels .il-card--wide {
+    height: 380px;
+    padding: 24px;
+  }
+
+  .insights-levels .il-media--fill {
+    margin: 16px -24px -24px 0;
+  }
+
+  .insights-levels .il-media--side {
+    flex: 1;
+    width: auto;
+    height: auto;
+    margin: 16px -24px -24px 0;
+  }
+
+  .insights-levels .il-media--side img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: left top;
+    border-radius: 8px 0 0;
+  }
+
+  .insights-levels .il-sq--l {
+    display: none;
+  }
+
+  .insights-levels .il-sq--r rect {
+    opacity: 0.15;
+  }
+
+  .js-anim.insights-levels.in-view .il-sq--r rect {
+    opacity: 0.15;
+  }
+}
+
+@media (width <= 479px) {
+  .insights-levels {
+    padding: 48px 16px;
+  }
+
+  .insights-levels .il-title {
+    font-size: 28px;
+    line-height: 36px;
+  }
+
+  .insights-levels .il-sub {
+    font-size: 14px;
+  }
+
+  .insights-levels .il-card,
+  .insights-levels .il-card--wide {
+    height: 340px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .insights-levels .il-card,
+  .insights-levels .il-media img {
+    transition: none;
+  }
+
+  .insights-levels .il-card:hover,
+  .insights-levels .il-card:focus-visible,
+  .insights-levels .il-card:hover .il-media img {
+    transform: none;
+  }
+
+  .js-anim.insights-levels .il-sq rect,
+  .js-anim.insights-levels .il-cell,
+  .js-anim.insights-levels .il-media {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }

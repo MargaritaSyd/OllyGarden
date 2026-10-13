@@ -1,0 +1,23 @@
+[build]
+  command = "bun run build"
+
+[build.environment]
+  BUN_VERSION = "1.4.2"
+  # These values are intentionally public: NEXT_PUBLIC_* is inlined into the client
+  # bundle, SUPABASE_PUBLISHABLE_KEY is the anon/publishable key, and
+  # SUPABASE_SEND_EMAIL is a true/false flag. Netlify's secrets scanner would
+  # otherwise fail the build when it finds them in the output.
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SITE_URL,NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN,NEXT_PUBLIC_APOLLO_APP_ID,VITE_POSTHOG_API_KEY,SUPABASE_PUBLISHABLE_KEY,SUPABASE_SEND_EMAIL"
+
+[[edge_functions]]
+  function = "markdown-negotiation"
+  path = "/*"
+  excludedPath = "/agent-content/*"
+
+# Netlify upgrades http://www to https://www before its www-to-apex redirect,
+# which costs crawlers an extra hop. Send it straight to the canonical origin.
+[[redirects]]
+  from = "http://www.ollygarden.com/*"
+  to = "https://ollygarden.com/:splat"
+  status = 301
+  force = true

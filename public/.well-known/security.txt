@@ -1,0 +1,5 @@
+Contact: mailto:security@ollygarden.com
+Expires: 2027-09-25T00:00:00.000Z
+Preferred-Languages: en, de
+Canonical: https://ollygarden.com/.well-known/security.txt
+Policy: https://ollygarden.com/security#vulnerability-disclosure

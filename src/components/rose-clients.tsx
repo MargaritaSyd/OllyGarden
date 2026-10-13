@@ -12,6 +12,9 @@ import { roseClients } from "@/lib/rose";
 
 const CAROUSEL_INTERVAL_MS = 6000;
 
+const pagerButtonClass =
+  "grid size-12 shrink-0 place-items-center rounded-full bg-olive text-mist transition-[background,transform] duration-150 hover:scale-[1.02] hover:bg-[#7f9410] active:scale-[0.98] active:bg-[#5e7006]";
+
 export function RoseClients() {
   const quotes = roseClients.quotes;
   const count = quotes.length;
@@ -119,12 +122,12 @@ export function RoseClients() {
 
   return (
     <InView as="section" aria-labelledby="client-title">
-      <div className="mx-auto w-full max-w-[1328px] px-5 py-[clamp(4.75rem,8vw,7.25rem)] sm:px-12">
+      <div className="mx-auto w-full max-w-[1328px] px-5 py-[clamp(4.75rem,8vw,6rem)] sm:px-12">
         <div className="client-head ov-stagger mb-[clamp(2.5rem,5vw,4rem)]">
           <TulipMark />
           <h2
             id="client-title"
-            className="mt-4 text-[clamp(1.875rem,3.3vw,2.875rem)] leading-[1.15] font-semibold tracking-[-0.02em] text-mist"
+            className="mt-4 text-[clamp(2rem,3.4vw,3rem)] leading-[normal] font-bold tracking-[-0.02em] text-mist"
           >
             {roseClients.title}
           </h2>
@@ -148,31 +151,31 @@ export function RoseClients() {
                 return (
                   <figure
                     key={`${quote.name}-${slideIndex}`}
-                    className="client-slide grid w-full bg-[#011407] md:grid-cols-[minmax(15rem,24.875rem)_minmax(0,1fr)]"
+                    className="client-slide flex w-full flex-col bg-[#011307] md:flex-row md:items-center md:gap-2"
                     aria-hidden={!active}
                     {...(!active ? { inert: true } : {})}
                   >
-                    <div className="client-photo relative z-10 flex h-fit max-w-[400px] flex-col self-start overflow-visible md:max-w-none">
+                    <div className="client-photo relative z-10 flex w-full shrink-0 flex-col justify-end md:w-[397px] md:self-stretch">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={quote.image}
                         alt={quote.imageAlt}
-                        width={398}
-                        height={352}
+                        width={199}
+                        height={177}
                         loading={slideIndex <= 1 ? "eager" : "lazy"}
                         decoding="async"
-                        className="aspect-[199/176] h-auto w-full shrink-0 object-cover"
+                        className="h-[177px] w-[199px] shrink-0 object-cover"
                       />
-                      <p className="w-[66%] min-w-[12.5rem] bg-olive px-[22px] py-3.5 text-[15px] font-semibold whitespace-nowrap text-white">
+                      <p className="w-[262px] max-w-full bg-olive px-3 py-4 text-base font-bold whitespace-nowrap text-white">
                         {quote.name}
                       </p>
-                      <p className="w-full bg-sunflower px-[22px] py-3.5 text-[14.5px] font-semibold text-[#394813] max-md:whitespace-normal md:w-[calc(100%+6.25rem)] md:whitespace-nowrap">
+                      <p className="w-full bg-[#d6d620] px-3 py-4 text-base font-bold text-[#394813] md:whitespace-nowrap">
                         {quote.role}
                       </p>
                     </div>
-                    <blockquote className="client-quote px-[clamp(1.75rem,4.5vw,4rem)] py-[clamp(1.75rem,3.4vw,2.875rem)]">
+                    <blockquote className="client-quote flex min-w-0 flex-1 flex-col gap-3 px-5 py-5 md:px-10 md:py-6">
                       <QuoteMark />
-                      <div className="mt-5 max-w-[62ch] space-y-4 text-[clamp(1rem,1.35vw,1.156rem)] leading-[1.5] text-mist">
+                      <div className="space-y-2 text-xl leading-[1.3] text-mist">
                         {quote.paragraphs.map((paragraph) => (
                           <p key={paragraph}>{paragraph}</p>
                         ))}
@@ -187,10 +190,10 @@ export function RoseClients() {
             </div>
           </div>
 
-          <div className="mt-[clamp(1.75rem,3vw,2.5rem)] flex items-center justify-between">
+          <div className="mt-[clamp(2.5rem,5vw,4rem)] flex items-center justify-between gap-4">
             <button
               type="button"
-              className="grid size-12 place-items-center rounded-full bg-olive text-mist transition-[background,transform] duration-150 hover:scale-[1.02] hover:bg-[#7f9410] active:scale-[0.98] active:bg-[#5e7006]"
+              className={pagerButtonClass}
               aria-label="Previous testimonial"
               onClick={goPrev}
             >
@@ -203,7 +206,7 @@ export function RoseClients() {
                   type="button"
                   aria-label={`Show testimonial ${quoteIndex + 1} of ${quotes.length}: ${quote.name}`}
                   aria-current={quoteIndex === realIndex ? "true" : undefined}
-                  className={`h-2 rounded-full bg-sunflower transition-[width,opacity,transform] duration-300 ${
+                  className={`h-2 rounded-full bg-[#d6d620] transition-[width,opacity,transform] duration-300 ${
                     quoteIndex === realIndex
                       ? "w-12 opacity-100"
                       : "w-2 opacity-60 hover:scale-110 hover:opacity-100"
@@ -214,7 +217,7 @@ export function RoseClients() {
             </div>
             <button
               type="button"
-              className="grid size-12 place-items-center rounded-full bg-olive text-mist transition-[background,transform] duration-150 hover:scale-[1.02] hover:bg-[#7f9410] active:scale-[0.98] active:bg-[#5e7006]"
+              className={pagerButtonClass}
               aria-label="Next testimonial"
               onClick={goNext}
             >
@@ -230,6 +233,7 @@ export function RoseClients() {
   );
 }
 
+/* Figma 2371:31799 "flower - testimonials": same paths as the exported SVG. */
 function TulipMark() {
   return (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
@@ -264,13 +268,19 @@ function QuoteMark() {
   );
 }
 
-function ArrowIcon({ className }: { className?: string }) {
+/* Arrow path from the Figma lucide/arrow-left export (2371:31818); the button draws the circle. */
+function ArrowIcon({ className = "" }: { className?: string }) {
   return (
-    <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg
+      className={`size-full ${className}`}
+      viewBox="0 0 48 48"
+      fill="none"
+      aria-hidden="true"
+    >
       <path
-        d="M14 6 8 12l6 6"
+        d="M24 12.3333L12.3333 24L24 35.6667M12.3333 24H35.6667"
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="3.33333"
         strokeLinecap="round"
         strokeLinejoin="round"
       />

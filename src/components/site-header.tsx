@@ -7,7 +7,9 @@ import { BrandLogo } from "@/components/brand-logo";
 import { MegaMenu } from "@/components/mega-menu";
 import { MobileNav } from "@/components/mobile-nav";
 import { ResourcesMegaMenu } from "@/components/resources-mega-menu";
-import { headerMenus, type NavGroup } from "@/lib/nav";
+import { headerMenus, pricingLink, type NavGroup } from "@/lib/nav";
+import { captureCtaClick } from "@/lib/posthog";
+import { siteConfig } from "@/lib/site";
 
 export function SiteHeader() {
   const pathname = usePathname();
@@ -79,7 +81,7 @@ function SiteHeaderBar() {
         ref={panelRef}
         className={`nav-grain texture-grain relative mx-auto max-w-7xl rounded-2xl border border-mist/20 shadow-[0_8px_40px_rgba(1,30,12,0.45)] ${
           mobileOpen
-            ? "flex h-auto max-h-[calc(100dvh-1.5rem)] flex-col overflow-x-hidden overflow-y-clip"
+            ? "flex h-auto max-h-[calc(100dvh-1.5rem-var(--announcement-height,0px))] flex-col overflow-x-hidden overflow-y-clip"
             : "overflow-hidden"
         }`}
         onMouseEnter={cancelClose}
@@ -109,15 +111,30 @@ function SiteHeaderBar() {
                     />
                   </li>
                 ))}
+                <li>
+                  <Link
+                    href={pricingLink.href}
+                    className={navItemClass(pathname === pricingLink.href)}
+                  >
+                    {pricingLink.label}
+                  </Link>
+                </li>
               </ul>
             </nav>
 
-            <Link
-              href="/get-started"
+            <a
+              href={siteConfig.appUrl}
               className="ml-auto inline-flex h-9 shrink-0 items-center whitespace-nowrap rounded-full bg-mist px-3.5 text-sm font-medium text-forest transition-colors hover:bg-sunflower sm:h-10 sm:px-4"
+              onClick={() =>
+                captureCtaClick({
+                  buttonId: "header_sign_in",
+                  buttonText: "Sign In",
+                  section: "header",
+                })
+              }
             >
-              Get Started
-            </Link>
+              Sign In
+            </a>
 
             <button
               type="button"

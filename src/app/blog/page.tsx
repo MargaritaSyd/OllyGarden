@@ -9,6 +9,7 @@ export const metadata = createPageMetadata({
   title: "Blog",
   description: `Articles on technical SEO, metadata, and structured data from ${siteConfig.name}.`,
   path: "/blog",
+  noIndex: true,
 });
 
 export default function BlogPage() {

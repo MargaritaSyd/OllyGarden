@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import { useIsClient, usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
 type FinancialStatProps = {
   end: number;
@@ -21,6 +21,7 @@ export function FinancialStat({ end, suffix, sep, prefix = "" }: FinancialStatPr
   const prefersReducedMotion = usePrefersReducedMotion();
   const [value, setValue] = useState(0);
   const [started, setStarted] = useState(false);
+  const hydrated = useIsClient();
 
   useEffect(() => {
     if (prefersReducedMotion) {
@@ -68,7 +69,9 @@ export function FinancialStat({ end, suffix, sep, prefix = "" }: FinancialStatPr
     return () => window.cancelAnimationFrame(frame);
   }, [end, prefersReducedMotion, started]);
 
-  const shown = prefersReducedMotion ? end : started ? value : 0;
+  // Server HTML carries the final value so crawlers read the real number;
+  // the browser resets it to zero until the count-up starts.
+  const shown = prefersReducedMotion || !hydrated ? end : started ? value : 0;
 
   return (
     <div

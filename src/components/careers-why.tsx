@@ -11,11 +11,11 @@ const delay = (i: number) => ({ "--i": i }) as CSSProperties;
 
 const whyIcons = {
   remote: careersIcons.remote,
-  tech: careersIcons.tech,
+  timeOff: careersIcons.balance,
   comp: careersIcons.comp,
-  collab: careersIcons.collab,
-  balance: careersIcons.balance,
-  growth: careersIcons.proGrowth,
+  learning: careersIcons.proGrowth,
+  speaking: careersIcons.achievements,
+  setup: careersIcons.tech,
 } as const;
 
 export function CareersWhy() {

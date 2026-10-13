@@ -11,7 +11,9 @@ export const financialHero = {
 } as const;
 
 export const financialMeta = {
-  title: "Financial Services — OllyGarden Solutions",
+  title: "Telemetry Quality for Financial Services — OllyGarden",
+  description:
+    "Clean, compliant OpenTelemetry data for financial services: catch PII in telemetry, cut noise and cost, and take control of your pipeline.",
   path: "/solutions/financial-services",
 } as const;
 
@@ -78,7 +80,7 @@ export const financialStats = {
 export const financialProducts = {
   eyebrow: "Products & Services",
   title: "How OllyGarden helps",
-  sub: "Purpose-built tools to improve telemetry quality, manage your pipeline, and support your collectors.",
+  sub: "Purpose-built tools to measure telemetry quality and fix instrumentation at the source.",
   cards: [
     {
       href: "/products/insights",
@@ -86,13 +88,6 @@ export const financialProducts = {
       family: "OllyGarden Insights",
       title: "Insights",
       body: "Score and audit instrumentation quality across your entire fleet. Identify PII leaks, missing attributes, and compliance gaps before they become incidents.",
-    },
-    {
-      href: "/products/tulip",
-      icon: "/images/solutions/financial/tulip.svg",
-      family: "OllyGarden Tulip",
-      title: "Tulip",
-      body: "Run a commercially supported OpenTelemetry Collector with predictable releases, CVE backports, and patch guarantees — no vendor lock-in.",
     },
     {
       href: "/products/rose",

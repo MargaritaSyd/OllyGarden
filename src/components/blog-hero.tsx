@@ -1,5 +1,6 @@
 import { HeroBlob } from "@/components/hero-blob";
 import { blogHero } from "@/lib/blog";
+import { registerOpenTelemetry } from "@/lib/trademarks";
 
 export function BlogHero() {
   return (
@@ -17,7 +18,7 @@ export function BlogHero() {
           id="blog-title"
           className="ov-blur-rise mt-6 max-w-[704px] text-[clamp(2.5rem,4.45vw,4rem)] leading-[1.06] font-bold tracking-[-0.02em] text-mist max-[880px]:text-[clamp(2.25rem,9.5vw,2.75rem)] [animation-delay:0.25s]"
         >
-          {blogHero.title}
+          {registerOpenTelemetry(blogHero.title)}
         </h1>
       </div>
     </section>

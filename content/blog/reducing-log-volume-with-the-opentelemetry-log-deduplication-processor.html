@@ -7,6 +7,7 @@
 <p>The core concept is straightforward. Logs are considered identical when they share the same resource attributes, scope, body, attributes, and severity. The processor computes a hash of these fields and tracks occurrences within a configurable interval.</p>
 <p>When the interval expires, the processor emits a single log entry with three additional attributes: <code>log_count</code> (the number of duplicates), <code>first_observed_timestamp</code>, and <code>last_observed_timestamp</code>. You keep full visibility into frequency patterns without storing every identical entry.</p>
 <p>This approach differs from sampling in an important way. Sampling discards data permanently. Deduplication preserves the information that matters (what happened, how often, and when) while eliminating redundant storage.</p>
+<!-- cta -->
 <h2>Practical configuration</h2>
 <p>Here is a configuration that deduplicates connection errors while preserving audit logs:</p>
 <pre><code class="hljs language-yaml"><span class="hljs-attr">processors:</span>

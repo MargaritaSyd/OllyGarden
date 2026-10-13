@@ -1,6 +1,6 @@
 # Wicket
 
-OllyGarden marketing site rebuilt in Next.js, with server-rendered SEO. Visual source of truth is the [Awesomic JULY 2026 Figma](https://www.figma.com/design/2Q2qXohp53pJbg6jb2NXHz/Ollygarden---Awesomic--JULY--2026-?node-id=2-14). The [Pages preview](https://ollygarden-website.pages.dev/) is the inventory of routes and copy.
+OllyGarden marketing site in Next.js, with server-rendered SEO. Visual source of truth is the [Awesomic JULY 2026 Figma](https://www.figma.com/design/2Q2qXohp53pJbg6jb2NXHz/Ollygarden---Awesomic--JULY--2026-?node-id=2-14). The [Pages preview](https://ollygarden-website.pages.dev/) is the inventory of routes and copy.
 
 The three-stage plan lives in [`doc/roadmap.md`](doc/roadmap.md).
 
@@ -17,8 +17,8 @@ The three-stage plan lives in [`doc/roadmap.md`](doc/roadmap.md).
 
 ```bash
 cp .env.example .env.local
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
@@ -27,14 +27,24 @@ Set `NEXT_PUBLIC_SITE_URL` to the production origin in every deployed environmen
 
 Form submits need `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` (server-only). Leave `SUPABASE_SEND_EMAIL` as `false` until you want Edge Function emails. Details: [`doc/supabase.md`](doc/supabase.md).
 
+Website analytics use PostHog when `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` is set at build time. See
+[`operations.md`](operations.md) for the event inventory, consent behavior, and production checks.
+
 ## Scripts
 
 ```bash
-npm run dev      # development server
-npm run build    # production build
-npm run start    # serve the production build
-npm run lint     # ESLint
+bun run dev        # development server
+bun run build      # production build
+bun run start      # serve the production build
+bun run typecheck  # next typegen + tsc --noEmit
+bun run lint       # ESLint
+bun run test:unit  # test/*.test.mjs with a coverage report (no threshold)
+bun run test:rss   # production build, then test/build/rss.test.mjs against it
+bun run test       # test:unit + test:rss
 ```
+
+GitHub Actions runs typecheck, lint, test:unit, and test:rss on every pull request and push to
+`main` (`.github/workflows/ci.yml`). Netlify only runs the build.
 
 ## SEO
 
@@ -46,8 +56,8 @@ npm run lint     # ESLint
 | `robots.txt` | `src/app/robots.ts` |
 | `sitemap.xml` | `src/app/sitemap.ts` |
 | Web app manifest | `src/app/manifest.ts` |
-| Default Open Graph image | `src/app/opengraph-image.tsx` |
-| RSS feed | `src/app/feed.xml/route.ts` |
+| Open Graph cards | `src/lib/og-cards.ts`, rendered to `public/og/` by `scripts/render-og-images.mjs` |
+| RSS feed | `src/app/blog/rss.xml/route.ts` |
 
 Every public page should export a unique `title` and `description`, set a canonical path, render visible English copy in the HTML (prefer Server Components), and add JSON-LD when the page maps to a schema.org type.
 
@@ -56,3 +66,4 @@ Every public page should export a unique `title` and `description`, set a canoni
 - [`doc/roadmap.md`](doc/roadmap.md) — stages, routes, tokens, and open questions
 - [`doc/layout.md`](doc/layout.md) — breakpoints, header chrome, grain
 - [`doc/supabase.md`](doc/supabase.md) — contact and careers → Supabase
+- [`operations.md`](operations.md) — runtime, analytics, failure scenarios, and production checks

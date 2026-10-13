@@ -1,8 +1,9 @@
+import { siteConfig } from "@/lib/site";
+
 export type MenuIconName =
   | "insights"
   | "rose"
-  | "tulip"
-  | "polder"
+  // | "polder"
   | "overview"
   | "financial"
   | "retail"
@@ -41,28 +42,25 @@ export const productLinks: NavLink[] = [
     icon: "rose",
   },
   {
-    href: "/products/tulip",
-    label: "Tulip",
-    heading: "OllyGarden Tulip",
-    description: "Run OpenTelemetry Collector with confidence.",
-    icon: "tulip",
-  },
-  {
     href: "/products/insights",
     label: "Insights",
     heading: "OllyGarden Insights",
     description: "Analyze and score telemetry quality.",
     icon: "insights",
   },
-  {
-    href: "/products/polder",
-    label: "Polder",
-    heading: "OllyGarden Polder",
-    description: "Coming soon!",
-    icon: "polder",
-    soon: true,
-  },
+  // Polder is not announced yet. Re-enable when it launches.
+  // {
+  //   href: "/products/polder",
+  //   label: "Polder",
+  //   heading: "OllyGarden Polder",
+  //   description: "Coming soon!",
+  //   icon: "polder",
+  //   soon: true,
+  // },
 ];
+
+/** Top-level header link, shown after the menus. */
+export const pricingLink: NavLink = { href: "/pricing", label: "Pricing" };
 
 export const solutionLinks: NavLink[] = [
   {
@@ -92,10 +90,25 @@ export const solutionLinks: NavLink[] = [
 ];
 
 export const resourceLinks: NavLink[] = [
-  { href: "/resources/faq", label: "Docs" },
+  { href: "/resources", label: "All Resources" },
+  { href: siteConfig.docsUrl, label: "Docs" },
   { href: "/resources/blog", label: "Blog" },
+  { href: "/resources/webinars-conferences", label: "Webinars" },
+  { href: "/resources/events", label: "Events" },
+  { href: "/resources/case-studies", label: "Case Studies" },
+  { href: "/resources/telemetry-quality", label: "Telemetry Quality" },
+  { href: "/resources/instrumentation-score", label: "Instrumentation Score" },
+  { href: "/resources/agent-skills", label: "Agent Skills" },
+  { href: "/resources/faq", label: "FAQ" },
+  { href: "/otel-quiz", label: "OTel Quiz" },
   { href: "/contact", label: "Contact" },
 ];
+
+const headerResourceDocs: NavLink = {
+  href: siteConfig.docsUrl,
+  label: "Docs",
+  description: "Product guides and the API reference.",
+};
 
 const headerResourceBlog: NavLink = {
   href: "/resources/blog",
@@ -121,18 +134,54 @@ const headerResourcePress: NavLink = {
   description: "Announcements and news from OllyGarden.",
 };
 
+const headerResourceCaseStudies: NavLink = {
+  href: "/resources/case-studies",
+  label: "Case Studies",
+  description: "Anonymized, real stories with the numbers that moved.",
+};
+
+const headerResourceQuality: NavLink = {
+  href: "/resources/telemetry-quality",
+  label: "Telemetry Quality",
+  description: "What good telemetry is, and the signs it is not.",
+};
+
+const headerResourceScore: NavLink = {
+  href: "/resources/instrumentation-score",
+  label: "Instrumentation Score",
+  description: "The open 0–100 score for instrumentation quality.",
+};
+
+const headerResourceSkills: NavLink = {
+  href: "/resources/agent-skills",
+  label: "Agent Skills",
+  description: "Open source OpenTelemetry skills for coding agents.",
+};
+
 const headerResourceFaq: NavLink = {
   href: "/resources/faq",
   label: "FAQ",
   description: "Answers to the questions we hear most.",
 };
 
+const headerResourceQuiz: NavLink = {
+  href: "/otel-quiz",
+  label: "OTel Quiz",
+  description: "Ten questions that challenge even OpenTelemetry maintainers.",
+};
+
 export const headerResourceLinks: NavLink[] = [
+  headerResourceDocs,
   headerResourceBlog,
+  headerResourceCaseStudies,
   headerResourceWebinars,
   headerResourceEvents,
   headerResourcePress,
+  headerResourceQuality,
+  headerResourceScore,
+  headerResourceSkills,
   headerResourceFaq,
+  headerResourceQuiz,
 ];
 
 export type FeaturedResource = {
@@ -163,7 +212,8 @@ export const featuredResources: FeaturedResource[] = [
     date: "July 30, 2026",
     source: "YouTube",
     sourceIcon: "youtube",
-    title: "‘I Know OTel’ — Giving Expert-Level OTel Knowledge to Your AI Agents",
+    title:
+      "‘I Know OTel’ — Giving Expert-Level OTel Knowledge to Your AI Agents",
     image: "/images/blog/teach-your-coding-agent-opentelemetry.png",
     imageAlt: "‘I Know OTel’ video thumbnail",
   },
@@ -181,7 +231,7 @@ export const featuredResources: FeaturedResource[] = [
 export const companyLinks: NavLink[] = [
   { href: "/company", label: "About Us" },
   { href: "/careers", label: "Careers" },
-  { href: "/company", label: "Press" },
+  { href: "/resources/press-releases", label: "Press" },
 ];
 
 export const headerCompanyLinks: NavLink[] = [
@@ -206,9 +256,13 @@ export const headerCompanyLinks: NavLink[] = [
 ];
 
 export const legalLinks: NavLink[] = [
-  { href: "#", label: "Terms & Conditions", hash: true },
-  { href: "#", label: "Rose Terms of Service", hash: true },
-  { href: "#", label: "Privacy Policy", hash: true },
+  { href: "/terms-of-use", label: "Terms & Conditions" },
+  { href: "/rose-terms-of-service", label: "Rose Terms of Service" },
+  { href: "/privacy-policy", label: "Privacy Policy" },
+  { href: "/data-protection-policy", label: "Data Protection Policy" },
+  { href: "/subprocessors", label: "Subprocessors" },
+  { href: "/security", label: "Security" },
+  { href: "/imprint", label: "Imprint" },
 ];
 
 export const headerMenus: NavGroup[] = [
@@ -218,24 +272,37 @@ export const headerMenus: NavGroup[] = [
   { id: "company", label: "Company", items: headerCompanyLinks },
 ];
 
-const footerProductHrefs = [
+export const productHrefs = [
   "/products/rose",
-  "/products/tulip",
   "/products/insights",
 ] as const;
+
+export type ProductHref = (typeof productHrefs)[number];
+
+/** The product's menu entry, which every product mention reuses for its name and pitch. */
+export function getProductLink(href: ProductHref) {
+  const link = productLinks.find((item) => item.href === href);
+  if (!link?.icon || !link.heading || !link.description) {
+    throw new Error(`No product link for ${href}`);
+  }
+  return { ...link, icon: link.icon, heading: link.heading, description: link.description };
+}
 
 export const footerColumns: NavGroup[] = [
   {
     id: "products",
     label: "Products",
-    items: footerProductHrefs.flatMap((href) =>
-      productLinks.filter((link) => link.href === href && !link.soon),
-    ),
+    items: [
+      ...productHrefs.flatMap((href) =>
+        productLinks.filter((link) => link.href === href && !link.soon),
+      ),
+      pricingLink,
+    ],
   },
   {
     id: "solutions",
     label: "Solutions",
-    items: solutionLinks.filter((link) => link.href !== "/solutions/overview"),
+    items: solutionLinks,
   },
   { id: "resources", label: "Resources", items: resourceLinks },
   { id: "company", label: "Company", items: companyLinks },

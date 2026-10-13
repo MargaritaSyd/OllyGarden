@@ -2,6 +2,8 @@ import { blogVideos } from "@/lib/blog";
 
 export const webinarsMeta = {
   title: "Webinars & Conferences — OllyGarden",
+  description:
+    "Webinars, demos, and conference talks on OpenTelemetry, telemetry quality, and instrumentation from the OllyGarden team.",
   path: "/resources/webinars-conferences",
 } as const;
 
@@ -19,6 +21,7 @@ export const webinarsSessions = {
   sub: "Our live sessions, streamed and archived on our YouTube channel.",
   cta: "Check our YouTube",
   youtubeHref: webinarsYoutubeHref,
+  pageSize: 3,
   videos: blogVideos,
 } as const;
 
@@ -34,7 +37,7 @@ export type StageTalk = {
 export const webinarsStage = {
   eyebrow: "Conferences",
   title: "OllyGarden on Stage",
-  sub: "Our talks from KubeCon and other community events.",
+  sub: "Our talks from KubeCon® + CloudNativeCon® and other community events.",
   pageSize: 3,
 } as const;
 
@@ -53,8 +56,8 @@ export const stageTalks: readonly StageTalk[] = [
       "Let Me Be Your OpenTelemetry Champ — Pavol Loffay, Red Hat & Nicolas Wörner, OllyGarden",
     href: "https://www.youtube.com/watch?v=pdKemf65KGc",
     image: "/images/youtube/pdKemf65KGc.jpg",
-    alt: "KubeCon Amsterdam talk: Let Me Be Your OpenTelemetry Champ",
-    venue: "KubeCon Amsterdam",
+    alt: "KubeCon + CloudNativeCon Europe 2026 talk: Let Me Be Your OpenTelemetry Champ",
+    venue: "KubeCon + CloudNativeCon Europe 2026",
   },
   {
     date: "2026-04-13",
@@ -62,8 +65,8 @@ export const stageTalks: readonly StageTalk[] = [
       "OpenTelemetry Gateways: Enforce, Transform, Route — Juraci Paixão Kröhling & Natalie Ujuk",
     href: "https://www.youtube.com/watch?v=S6z2gd666qg",
     image: "/images/youtube/S6z2gd666qg.jpg",
-    alt: "KubeCon Amsterdam talk: OpenTelemetry Gateways — Enforce, Transform, Route",
-    venue: "KubeCon Amsterdam",
+    alt: "KubeCon + CloudNativeCon Europe 2026 talk: OpenTelemetry Gateways — Enforce, Transform, Route",
+    venue: "KubeCon + CloudNativeCon Europe 2026",
   },
   {
     date: "2026-04-08",
@@ -71,8 +74,8 @@ export const stageTalks: readonly StageTalk[] = [
       "Day-2 Reality Check: Taming Wasteful Telemetry — Juraci Paixão Kröhling & Elena Kovalenko",
     href: "https://www.youtube.com/watch?v=cpB5NTtUdwQ",
     image: "/images/youtube/cpB5NTtUdwQ.jpg",
-    alt: "KubeCon Amsterdam talk: Day-2 Reality Check — Taming Wasteful Telemetry",
-    venue: "KubeCon Amsterdam",
+    alt: "KubeCon + CloudNativeCon Europe 2026 talk: Day-2 Reality Check — Taming Wasteful Telemetry",
+    venue: "KubeCon + CloudNativeCon Europe 2026",
   },
   {
     date: "2025-11-24",
@@ -80,8 +83,8 @@ export const stageTalks: readonly StageTalk[] = [
       "There's a Lot of Bad Telemetry Out There — Dan Gomez Blanco, New Relic & Juraci Paixão Kröhling",
     href: "https://www.youtube.com/watch?v=06U2_PIZ0S4",
     image: "/images/youtube/06U2_PIZ0S4.jpg",
-    alt: "KubeCon Salt Lake City talk: There's a Lot of Bad Telemetry Out There",
-    venue: "KubeCon Salt Lake City",
+    alt: "KubeCon + CloudNativeCon North America 2025 talk: There's a Lot of Bad Telemetry Out There",
+    venue: "KubeCon + CloudNativeCon North America 2025",
   },
   {
     date: "2025-11-24",
@@ -89,7 +92,7 @@ export const stageTalks: readonly StageTalk[] = [
       "Instrumentation Score: The Difference Between Telemetry and Good Telemetry — Juraci Paixão Kröhling & Michele Mancioppi",
     href: "https://www.youtube.com/watch?v=kdzeUiMI_t4",
     image: "/images/youtube/kdzeUiMI_t4.jpg",
-    alt: "KubeCon Salt Lake City talk: Instrumentation Score — The Difference Between Telemetry and Good Telemetry",
-    venue: "KubeCon Salt Lake City",
+    alt: "KubeCon + CloudNativeCon North America 2025 talk: Instrumentation Score — The Difference Between Telemetry and Good Telemetry",
+    venue: "KubeCon + CloudNativeCon North America 2025",
   },
 ];

@@ -2,18 +2,65 @@ import { ContentCard } from "@/components/content-card";
 import { InView } from "@/components/in-view";
 import { homeWhy, type WhyMotif } from "@/lib/home";
 
+// Figma 1:215: two soft lime glows and six scattered pixel squares sit behind
+// the copy and the card column. Offsets are measured from the centred 1328px
+// container (the frame's 56px side margins removed) so they track the content
+// instead of the viewport, and the layer only renders from xl up, where the
+// gutters are wide enough that nothing lands on the copy.
+const GLOWS = [
+  { size: 560, blur: 109, style: { top: 20, right: 4 } },
+  { size: 460, blur: 169, style: { bottom: -120, right: 424 } },
+] as const;
+
+const SQUARES = [
+  { size: 48, color: "#d9e533", opacity: 0.5, style: { top: 120, left: 584 } },
+  { size: 48, color: "#6a7a2a", opacity: 0.3, style: { top: 250, right: 34 } },
+  { size: 48, color: "#e3e270", opacity: 0.6, style: { top: 520, right: 504 } },
+  { size: 48, color: "#cddc29", opacity: 0.4, style: { bottom: 150, right: 94 } },
+  { size: 32, color: "#d9e533", opacity: 0.35, style: { bottom: 90, left: 374 } },
+  { size: 32, color: "#a7b93b", opacity: 0.3, style: { top: 340, left: 4 } },
+] as const;
+
 export function HomeWhy() {
   return (
-    <InView as="section" aria-labelledby="why-title" className="relative">
-      <div className="mx-auto grid w-full max-w-[1328px] items-center gap-12 px-6 py-24 sm:px-12 lg:grid-cols-[minmax(0,560px)_minmax(0,576px)] lg:gap-24 lg:py-[140px]">
-        <div className="why-copy">
+    <InView as="section" aria-labelledby="why-title" className="relative lg:overflow-hidden">
+      <div className="relative mx-auto grid w-full max-w-[1328px] items-center gap-12 px-6 py-24 sm:px-12 lg:grid-cols-[minmax(0,560px)_minmax(0,576px)] lg:gap-[86px] lg:py-[130px]">
+        <div className="pointer-events-none absolute inset-0 hidden xl:block" aria-hidden="true">
+          {GLOWS.map((glow, index) => (
+            <span
+              key={index}
+              className="absolute rounded-full bg-[#d9e533] opacity-[0.07]"
+              style={{
+                width: glow.size,
+                height: glow.size,
+                filter: `blur(${glow.blur}px)`,
+                ...glow.style,
+              }}
+            />
+          ))}
+          {SQUARES.map((square, index) => (
+            <span
+              key={index}
+              className="absolute"
+              style={{
+                width: square.size,
+                height: square.size,
+                backgroundColor: square.color,
+                opacity: square.opacity,
+                ...square.style,
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="why-copy relative">
           <SunMark />
           <p className="mt-7 text-sm font-bold tracking-[0.14em] text-bitmap-mid uppercase">
             {homeWhy.eyebrow}
           </p>
           <h2
             id="why-title"
-            className="mt-5 text-[clamp(2rem,4vw,3.375rem)] leading-[1.16] font-semibold tracking-[-0.02em] text-mist"
+            className="mt-5 text-[clamp(2rem,4vw,3.375rem)] leading-[1.16] font-bold tracking-[-0.02em] text-mist"
           >
             {homeWhy.title}
           </h2>
@@ -29,7 +76,8 @@ export function HomeWhy() {
           ))}
         </div>
 
-        <ul className="flex flex-col gap-4">
+        {/* 52px plus the 132px card gives the Figma 185px pitch. */}
+        <ul className="relative flex flex-col gap-8 lg:gap-[52px]">
           {homeWhy.cards.map((card) => (
             <InView as="li" mark="rv-in" key={card.title} className="why-card-wrap">
               <ContentCard
@@ -62,7 +110,8 @@ function SunMark() {
 }
 
 function CardMotif({ motif }: { motif: WhyMotif }) {
-  const className = "h-[140px] w-24";
+  // Fills the card height; the shapes past x=96 bleed off the card edge as in Figma.
+  const className = "h-full w-auto";
 
   switch (motif) {
     case "chevrons":

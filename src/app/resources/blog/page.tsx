@@ -4,13 +4,13 @@ import { BlogPosts } from "@/components/blog-posts";
 import { BlogTrending } from "@/components/blog-trending";
 import { JsonLd } from "@/components/json-ld";
 import { SiteCta } from "@/components/site-cta";
-import { blogHero, blogMeta } from "@/lib/blog";
+import { blogMeta } from "@/lib/blog";
 import { createPageMetadata } from "@/lib/metadata";
 import { resourcesBlogGraph } from "@/lib/structured-data";
 
 export const metadata = createPageMetadata({
   title: blogMeta.title,
-  description: blogHero.title,
+  description: blogMeta.description,
   path: blogMeta.path,
   absoluteTitle: true,
 });

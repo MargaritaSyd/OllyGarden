@@ -1,13 +1,25 @@
+// Imported by next.config.ts, which loads outside the tsconfig path aliases.
+// Keep this file free of imports and "@/" aliases or next dev/build will fail.
 export const siteConfig = {
   name: "OllyGarden",
+  legalName: "OllyGarden, Inc.",
   shortName: "OllyGarden",
   description:
-    "Observability starts with good telemetry. Identify bad telemetry with Insights, fix quality issues at the source with Rose, and transmit data confidently using Tulip.",
+    "Observability starts with good telemetry. Identify bad telemetry with Insights and fix it at the source with Rose.",
   tagline:
     "Transforming bad telemetry into actionable insights. Built by OpenTelemetry experts for the observability community.",
+  appUrl: "https://ollygarden.app",
+  docsUrl: "https://docs.ollygarden.com",
+  logoPath: "/brand/logo.svg",
+  contactEmail: "contact@olly.garden",
+  address: {
+    locality: "Berlin",
+    country: "DE",
+  },
   locale: "en_US",
   language: "en",
   author: "OllyGarden",
+  blogFeedPath: "/blog/rss.xml",
   keywords: [
     "OllyGarden",
     "OpenTelemetry",
@@ -15,7 +27,6 @@ export const siteConfig = {
     "telemetry",
     "Insights",
     "Rose",
-    "Tulip",
     "instrumentation",
   ],
   social: {

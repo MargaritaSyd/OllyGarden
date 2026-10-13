@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
-import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import { useIsClient, usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { insightsScore } from "@/lib/insights";
 
 const SCORE_END = Number(insightsScore.value);
@@ -14,7 +14,11 @@ export function InsightsScore() {
   const label = open ? insightsScore.hide : insightsScore.show;
   const prefersReducedMotion = usePrefersReducedMotion();
   const [score, setScore] = useState(0);
-  const displayScore = prefersReducedMotion ? SCORE_END : score;
+  const hydrated = useIsClient();
+  // Server HTML carries the real score for crawlers; motion-allowing visitors see it only once the
+  // count-up takes over, so it never flashes the final value before counting from zero.
+  const displayScore = prefersReducedMotion || !hydrated ? SCORE_END : score;
+  const hideUntilHydrated = hydrated ? "" : "motion-safe:invisible";
 
   useEffect(() => {
     if (prefersReducedMotion) {
@@ -64,7 +68,7 @@ export function InsightsScore() {
             />
           </div>
           <div className="flex flex-1 flex-col items-center justify-center pb-6">
-            <p className="text-[clamp(4.5rem,10vw,6.5rem)] leading-none font-bold tracking-[-0.04em] text-bitmap-highlight tabular-nums">
+            <p className={`text-[clamp(4.5rem,10vw,6.5rem)] leading-none font-bold tracking-[-0.04em] text-bitmap-highlight tabular-nums ${hideUntilHydrated}`}>
               {displayScore}
             </p>
             <p className="mt-2 text-xl font-semibold text-bitmap-highlight">
@@ -84,7 +88,7 @@ export function InsightsScore() {
             <div className="flex items-center justify-between gap-4 px-6 pt-6">
               <h2 className="flex items-baseline gap-2.5 text-base font-bold tracking-[0.01em] text-mist">
                 {insightsScore.title}
-                <span className="text-lg font-bold text-bitmap-highlight tabular-nums">
+                <span className={`text-lg font-bold text-bitmap-highlight tabular-nums ${hideUntilHydrated}`}>
                   {displayScore}
                 </span>
               </h2>

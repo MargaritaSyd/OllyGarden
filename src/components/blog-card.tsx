@@ -1,6 +1,6 @@
 import { BlogMeta, BlogReadLink, BlogTags } from "@/components/blog-ui";
 import {
-  blogAuthor,
+  blogAuthorLabel,
   blogCardTags,
   blogCoverAlt,
   blogPostHref,
@@ -25,7 +25,7 @@ export function BlogCard({ post }: { post: BlogPost }) {
       <div className="flex flex-1 flex-col gap-5 p-6">
         <BlogMeta
           date={formatBlogDate(post.date, "short")}
-          suffix={`Author: ${blogAuthor}`}
+          suffix={blogAuthorLabel(post)}
         />
         <h3 className="text-2xl leading-[1.29] font-bold tracking-[-0.02em] text-mist">
           {post.title}

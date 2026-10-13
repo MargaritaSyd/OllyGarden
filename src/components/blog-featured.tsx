@@ -3,7 +3,7 @@
 import { useState, type KeyboardEvent } from "react";
 import { BlogMeta, BlogReadLink, BlogTags, PetalMark } from "@/components/blog-ui";
 import {
-  blogAuthor,
+  blogAuthorLabel,
   blogCoverAlt,
   blogPostHref,
   featuredBlogPosts,
@@ -68,7 +68,7 @@ export function BlogFeatured() {
                     <p className="text-base leading-[1.4] text-mist/85">{post.excerpt}</p>
                     <BlogMeta
                       date={formatBlogDate(post.date, "long")}
-                      suffix={`Author: ${blogAuthor}`}
+                      suffix={blogAuthorLabel(post)}
                     />
                     <BlogTags tags={post.tags} />
                     <BlogReadLink href={blogPostHref(post.slug)}>Read Article</BlogReadLink>

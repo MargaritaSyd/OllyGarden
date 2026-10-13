@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_root"
+
+echo "Checking Node.js toolchain..."
+node -e '
+  const [major, minor] = process.versions.node.split(".").map(Number);
+  if (major < 22 || (major === 22 && minor < 18)) {
+    console.error(`Node.js >=22.18.0 is required; found ${process.version}.`);
+    process.exit(1);
+  }
+'
+bun --version
+
+echo "Installing dependencies from bun.lock..."
+time bun install --frozen-lockfile
+
+if [[ ! -f .env.local ]]; then
+  echo "Creating .env.local from .env.example..."
+  cp -- .env.example .env.local
+fi
+
+echo "Orb setup complete."

@@ -15,7 +15,7 @@ export function HomeHow() {
           </p>
           <h2
             id="how-title"
-            className="mt-[18px] flex flex-wrap items-center justify-center gap-x-1 text-[clamp(2rem,4vw,3.375rem)] leading-[1.16] font-semibold tracking-[-0.02em] text-mist"
+            className="mt-[18px] flex flex-wrap items-center justify-center gap-x-1 text-[clamp(2rem,4vw,3.375rem)] leading-[1.16] font-bold tracking-[-0.02em] text-mist"
           >
             {homeHow.title.map((word, index) => (
               <span key={word} className="inline-flex items-center">
