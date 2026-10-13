@@ -14,7 +14,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "bun run test:unit && bun run test:rss",
     "test:unit": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test --experimental-test-coverage --test-coverage-include='src/**' --test-coverage-include='scripts/**' 'test/*.test.mjs'",
-    "test:rss": "NEXT_PUBLIC_SITE_URL=https://ollygarden.com next build && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test test/build/rss.test.mjs"
+    "test:rss": "NEXT_PUBLIC_SITE_URL=https://ollygarden.com next build && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test test/build/rss.test.mjs",
+    "supabase": "bunx supabase@2.120.0"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.114.0",

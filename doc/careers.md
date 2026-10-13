@@ -85,8 +85,9 @@ Edge Function body when `SUPABASE_SEND_EMAIL=true`:
 
 The two optional textareas ask “Tell us something cool you built:” and “Why do you want to
 become an OllyGardener?”. Answers are trimmed, preserve internal line breaks, and become `null`
-when blank. Both listed-role and open applications use these fields. The required Supabase
-schema change and external email-template prerequisite are documented in [`supabase.md`](supabase.md).
+when blank. Both listed-role and open applications use these fields. Their columns come from a
+migration in `supabase/migrations/`, and the hiring notification email shows them, escaped. See
+[`supabase.md`](supabase.md).
 
 ## Role pages
 

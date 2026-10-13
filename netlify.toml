@@ -2,7 +2,7 @@
   command = "bun run build"
 
 [build.environment]
-  BUN_VERSION = "1.4.2"
+  BUN_VERSION = "1.4.3"
   # These values are intentionally public: NEXT_PUBLIC_* is inlined into the client
   # bundle, SUPABASE_PUBLISHABLE_KEY is the anon/publishable key, and
   # SUPABASE_SEND_EMAIL is a true/false flag. Netlify's secrets scanner would

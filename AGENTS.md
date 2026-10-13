@@ -117,8 +117,11 @@ the visual language. For historical URL migrations only, compare the sitemap in 
   `src/lib/supabase/submissions.ts`. Keep Supabase URL and publishable key server-only; never add a
   `NEXT_PUBLIC_` prefix or use a `service_role` key.
 - `SUPABASE_SEND_EMAIL` gates the optional Edge Function invocation after a successful insert.
-  Database policies and Edge Functions live outside this repository. See `doc/supabase.md` before
-  changing form payloads or tables.
+- `supabase/` defines the existing Website project (`sspupghymzfikfemusdc`): migrations, Edge
+  Functions, and each function's `verify_jwt` in `config.toml`. A payload change that needs a new
+  or changed column ships its migration in the same PR. Nothing in this repository applies
+  migrations yet; apply them by hand before the dependent code deploys. See `doc/supabase.md`
+  before changing form payloads, tables, policies, or functions.
 
 ## Analytics and Netlify
 

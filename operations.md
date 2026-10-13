@@ -84,15 +84,15 @@ monitoring.
   persistence only with an explicitly authorized controlled write, then locate the database record
   before interpreting notification events. Never submit real applicant or customer details as test
   data.
-- **Careers optional answers:** Deploy the optional project and motivation fields only after
-  `public.job_applications` has nullable text columns `cool_project` and `motivation`; the SQL is
-  in [doc/supabase.md](doc/supabase.md). The insert includes both columns even for blank answers.
-  Local Server Action tests proved trimming, blank-to-null normalization, preserved internal line
-  breaks, and forwarding to the notification payload against an in-process Supabase stand-in.
-  Desktop and narrow Chromium checks proved visible optional textareas and a reachable submit
-  button. These checks do not establish production schema compatibility or email delivery.
-  Update the external email template to display escaped answers, then verify preview persistence
-  and notification contents before release. Production schema and email checks remain pending.
+- **Careers optional answers:** The form shipped before its columns existed, so every application
+  insert failed until `cool_project` and `motivation` were added by hand on 2026-10-13. They are now
+  recorded in `supabase/migrations/`, and `db diff --linked` reports no drift between the
+  migrations and production. The insert includes both columns even for blank answers.
+  After deploying `send-application-email`, verify that one application notification shows both
+  answers.
+- **Supabase changes:** Before merging code that needs a schema change, run `db push --dry-run`
+  and `db push` from [doc/supabase.md](doc/supabase.md#schema-and-edge-functions), then confirm
+  `db diff --linked --schema public` reports no changes.
 - **Security headers:** Probe a representative HTML page, Markdown representation, static discovery
   document, and `/openapi.json` for the CSP, HSTS, referrer policy, `nosniff`, and clickjacking
   protection. Browser-check PostHog and Supabase connections after any CSP change.

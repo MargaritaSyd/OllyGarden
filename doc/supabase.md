@@ -14,7 +14,7 @@ Copy [`.env.example`](../.env.example) and set:
 | `SUPABASE_PUBLISHABLE_KEY` | Publishable / anon key — stays on the server |
 | `SUPABASE_SEND_EMAIL` | `true` to invoke Edge Functions after insert. Anything else (`false`, unset) **inserts only** — no mail |
 
-On Vercel, add these as regular (or Sensitive) env vars. Do not use the `NEXT_PUBLIC_` prefix.
+On Netlify, add these as regular (or secret) env vars. Do not use the `NEXT_PUBLIC_` prefix.
 
 Restart `next dev` after changing these.
 
@@ -52,18 +52,56 @@ and “Why do you want to become an OllyGardener?”. They are stored as nullabl
 `cool_project` and `motivation`; blank or omitted answers become `null`. Notifications receive
 them as `applicant.coolProject` and `applicant.motivation`.
 
-Before deploying this form change, an authorized Supabase operator must add the columns:
+The columns come from
+[`20261013120000_job_applications_answers.sql`](../supabase/migrations/20261013120000_job_applications_answers.sql).
+Production received them by hand on 2026-10-13, after PR #98 had shipped the form without them;
+every application insert failed until then. The insert always sends both keys, so the columns must
+exist before the form code deploys.
 
-```sql
-alter table public.job_applications
-  add column cool_project text,
-  add column motivation text;
+[`send-application-email`](../supabase/functions/send-application-email/index.ts) shows both
+answers, when present, in the hiring email. `send-contact-email` accepts a blank message, matching
+the optional `/contact` field. Both build their HTML in
+[`_shared/email.ts`](../supabase/functions/_shared/email.ts), which escapes every form value and
+links only http(s) URLs; `test/email-templates.test.mjs` covers it. Both return a non-2xx status
+when Resend rejects the team notification, so the Server Action reports
+`notification: "failed"`. A rejected applicant confirmation is only logged.
+
+The quiz, Rose, Tulip, and waitlist functions are deployed but not called by this site. They still
+interpolate input unescaped.
+
+## Schema and Edge Functions
+
+[`supabase/`](../supabase) is the source of truth for the existing **Website** Supabase project
+(ref `sspupghymzfikfemusdc`). Do not create a new project; `project_id` in `config.toml` is only a
+local Docker label.
+
+| Path | What |
+| --- | --- |
+| `supabase/migrations/` | Every schema, grant, and RLS change, in order. The first eight files are copied unchanged from `ollygarden/ollygarden-com`, which owned the project before Wicket, so their versions match the remote history |
+| `supabase/functions/` | The six deployed Edge Functions, downloaded from production on 2026-10-13 |
+| `supabase/config.toml` | Local stack settings, Postgres major version 15 to match production, and each function's `verify_jwt` (`join-waitlist` is `false`) |
+
+The CLI version is pinned in `package.json`; run it as `bun run supabase …`. A personal login
+(`bun run supabase login`) is enough: without a database password the CLI creates a temporary
+login role. `db diff` also needs Docker.
+
+```bash
+bun run supabase link --project-ref sspupghymzfikfemusdc
+bun run supabase migration new <change>        # write the SQL; prefer additive changes
+bun run supabase migration list --linked       # local and remote versions must line up
+bun run supabase db diff --linked --schema public  # "No schema changes found" = repo matches prod
+bun run supabase db push --dry-run --linked    # shows exactly what would be applied
 ```
 
-This SQL has not been applied by Wicket. Without the columns, application inserts will fail,
-including applications with blank answers. Update the external `send-application-email` function
-to include the answers in notification emails and escape them as untrusted text if rendering HTML.
-Passing the answers to the function does not guarantee its existing email template displays them.
+Apply a migration with `bun run supabase db push --linked` **before** the code that depends on it
+deploys; Netlify deploys on merge and nothing in this repository applies migrations yet. Keep
+migrations backward compatible (new nullable columns, new tables) so the deployed code works on
+both sides of the change. Deploy a function with
+`bun run supabase functions deploy <name> --project-ref sspupghymzfikfemusdc`.
+
+This repository is the only source of the project's migrations and functions.
+`ollygarden/ollygarden-com` deployed them from its `main` until 2026-10-13, when its PR #314
+removed that workflow and its `supabase/` folder. Do not make database or function changes there.
 
 
 ## Client
@@ -78,6 +116,9 @@ Package: `@supabase/supabase-js` only. No `@supabase/ssr` (no sessions).
 
 ## Local test without mail
 
+There is only one Website project, so these steps write real rows to production. Agree the test
+entry with the team first, use obviously fake details, and never use a real person's data.
+
 1. Set URL + publishable key.
 2. Leave `SUPABASE_SEND_EMAIL` as `false`.
 3. Submit `/contact` and the careers modal.
@@ -87,4 +128,4 @@ When you want the first real notification, set `SUPABASE_SEND_EMAIL=true` and re
 
 ## RLS
 
-Inserts still use the publishable key (`anon`) on the server. Keep RLS tight: `anon` may insert, and must not `SELECT` other people’s rows. Policy changes live in the Supabase project, not in this repo.
+Inserts still use the publishable key (`anon`) on the server. Keep RLS tight: `anon` may insert, and must not `SELECT` other people’s rows. Policy changes are migrations in `supabase/migrations/`, not dashboard edits.

@@ -47,49 +47,6 @@ export const homeWhy = {
 
 export type WhyMotif = (typeof homeWhy.cards)[number]["motif"];
 
-export const homeReality = {
-  eyebrow: "The New Reality",
-  title: "Humans wrote code",
-  titleAccent: "Now agents do too",
-  cards: [
-    {
-      title: "More code, same context",
-      body: "Coding agents now write much of the new code. They instrument it with the context they have, which rarely includes your conventions or what your team needs to see during an incident.",
-      icon: "/images/home/nr-blend.svg",
-    },
-    {
-      title: "Review can’t keep up",
-      body: "Your observability engineers know what good instrumentation looks like. They can’t read every pull request in every repository.",
-      icon: "/images/home/nr-square-stack.svg",
-    },
-    {
-      title: "The gap grows with every merge",
-      body: "A pattern that slips through gets copied into the next service. By the time it shows up on a bill or in an incident, it is in every repository.",
-      icon: "/images/home/nr-gap-horizontal.svg",
-    },
-    {
-      title: "More code, more telemetry",
-      body: "More services, more signals, more to run. Your Collectors carry it and your backend stores it, whether or not the data is worth keeping.",
-      icon: "/images/home/nr-layers-arrow-down.svg",
-    },
-  ],
-  stats: [
-    {
-      value: "82%",
-      body: "Of logs were duplicates at a fintech we audited.",
-    },
-    {
-      value: "63%",
-      body: "Of trace data was waste at another company.",
-    },
-    {
-      value: "5 of 6",
-      body: "Audits surfaced leaked credentials or personal data.",
-    },
-  ],
-  note: "From OllyGarden telemetry audits.",
-} as const;
-
 export const homeVoices = {
   title: "What people are saying",
   sub: "Voices from engineers and observability leaders working with OpenTelemetry®, telemetry quality, and production systems.",

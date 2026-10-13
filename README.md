@@ -11,7 +11,7 @@ The three-stage plan lives in [`doc/roadmap.md`](doc/roadmap.md).
 - TypeScript
 - Tailwind CSS 4
 - ESLint with Core Web Vitals rules
-- Supabase (`@supabase/supabase-js`) for `/contact` and `/careers` form submits
+- Supabase (`@supabase/supabase-js`) for the contact, careers, and Rose open-source form submits
 
 ## Getting started
 
@@ -65,5 +65,10 @@ Every public page should export a unique `title` and `description`, set a canoni
 
 - [`doc/roadmap.md`](doc/roadmap.md) — stages, routes, tokens, and open questions
 - [`doc/layout.md`](doc/layout.md) — breakpoints, header chrome, grain
-- [`doc/supabase.md`](doc/supabase.md) — contact and careers → Supabase
+- [`doc/supabase.md`](doc/supabase.md) — form submissions, migrations, and Edge Functions for the Website Supabase project
+- [`doc/careers.md`](doc/careers.md) — open positions, role pages, and application payloads
+- [`doc/case-studies.md`](doc/case-studies.md) — anonymized customer stories, linking, and audio
+- [`doc/seo.md`](doc/seo.md) — search and answer-engine conventions
+- [`doc/analytics.md`](doc/analytics.md) — PostHog event contract, consent, and Apollo
 - [`operations.md`](operations.md) — runtime, analytics, failure scenarios, and production checks
+- [Website Runbook](https://github.com/ollygarden/codex/blob/main/operations/website-runbook.md) in the codex handbook — accounts, access, shipping, troubleshooting, and known gaps for the team
