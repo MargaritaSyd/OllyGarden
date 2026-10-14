@@ -9,14 +9,15 @@ export function HomeSecurity() {
     <InView as="section" aria-labelledby="ogsec-title" className="ogsec">
       <div className="tulip-grid" aria-hidden="true" />
       <div className="ogsec-inner">
-        <div className="ogsec-copy">
-          <p className="ogsec-eyebrow">{homeSecurity.eyebrow}</p>
-          <h2 id="ogsec-title" className="ogsec-title">
-            {homeSecurity.title}
-          </h2>
-          <p className="ogsec-body">{homeSecurity.body}</p>
-        </div>
-        <div className="ogsec-badge">
+        <div className="ogsec-card surface-grain">
+          <div className="ogsec-copy">
+            <p className="ogsec-eyebrow">{homeSecurity.eyebrow}</p>
+            <h2 id="ogsec-title" className="ogsec-title">
+              {homeSecurity.title}
+            </h2>
+            <p className="ogsec-body">{homeSecurity.body}</p>
+          </div>
+          <div className="ogsec-badge">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={homeSecurity.badgeSrc}
@@ -26,9 +27,10 @@ export function HomeSecurity() {
             loading="lazy"
             decoding="async"
           />
-          <span className="ogsec-tm" aria-hidden="true">
-            TM
-          </span>
+            <span className="ogsec-tm" aria-hidden="true">
+              TM
+            </span>
+          </div>
         </div>
       </div>
     </InView>

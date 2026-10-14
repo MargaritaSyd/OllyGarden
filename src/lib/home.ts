@@ -76,15 +76,18 @@ export const homeReality = {
   ],
   stats: [
     {
-      value: "82%",
+      end: 82,
+      suffix: "%",
       body: "Of logs were duplicates at a fintech we audited.",
     },
     {
-      value: "63%",
+      end: 63,
+      suffix: "%",
       body: "Of trace data was waste at another company.",
     },
     {
-      value: "5 of 6",
+      end: 5,
+      suffix: " of 6",
       body: "Audits surfaced leaked credentials or personal data.",
     },
   ],

@@ -1,59 +1,62 @@
 import { ContentCard } from "@/components/content-card";
+import { HomeWhyFx } from "@/components/home-why-fx";
 import { InView } from "@/components/in-view";
 import { homeWhy, type WhyMotif } from "@/lib/home";
 
-// Figma 1:215: two soft lime glows and six scattered pixel squares sit behind
-// the copy and the card column. Offsets are measured from the centred 1328px
-// container (the frame's 56px side margins removed) so they track the content
-// instead of the viewport, and the layer only renders from xl up, where the
-// gutters are wide enough that nothing lands on the copy.
-const GLOWS = [
-  { size: 560, blur: 109, style: { top: 20, right: 4 } },
-  { size: 460, blur: 169, style: { bottom: -120, right: 424 } },
+// Positions and drift match the reference `.why-bg`: two lime glows and six
+// squares, measured from the section, not the centred column.
+const SQUARES = [
+  { parallax: "0.18", color: "#D9E533", opacity: 0.5, style: { top: 120, left: 640 } },
+  { parallax: "-0.14", color: "#6A7A2A", opacity: 0.3, style: { top: 250, right: 90 } },
+  { parallax: "0.1", color: "#E3E270", opacity: 0.6, style: { top: 520, right: 560 } },
+  { parallax: "-0.2", color: "#CDDC29", opacity: 0.4, style: { bottom: 150, right: 150 } },
+  {
+    parallax: "0.15",
+    color: "#D9E533",
+    opacity: 0.35,
+    size: 32,
+    style: { bottom: 90, left: 430 },
+  },
+  {
+    parallax: "-0.09",
+    color: "#A7B93B",
+    opacity: 0.3,
+    size: 32,
+    style: { top: 340, left: 60 },
+  },
 ] as const;
 
-const SQUARES = [
-  { size: 48, color: "#d9e533", opacity: 0.5, style: { top: 120, left: 584 } },
-  { size: 48, color: "#6a7a2a", opacity: 0.3, style: { top: 250, right: 34 } },
-  { size: 48, color: "#e3e270", opacity: 0.6, style: { top: 520, right: 504 } },
-  { size: 48, color: "#cddc29", opacity: 0.4, style: { bottom: 150, right: 94 } },
-  { size: 32, color: "#d9e533", opacity: 0.35, style: { bottom: 90, left: 374 } },
-  { size: 32, color: "#a7b93b", opacity: 0.3, style: { top: 340, left: 4 } },
-] as const;
+const CARD_PARALLAX = ["-0.08", "0.12", "-0.1", "0.07"] as const;
 
 export function HomeWhy() {
   return (
-    <InView as="section" aria-labelledby="why-title" className="relative lg:overflow-hidden">
-      <div className="relative mx-auto grid w-full max-w-[1328px] items-center gap-12 px-6 py-24 sm:px-12 lg:grid-cols-[minmax(0,560px)_minmax(0,576px)] lg:gap-[86px] lg:py-[130px]">
-        <div className="pointer-events-none absolute inset-0 hidden xl:block" aria-hidden="true">
-          {GLOWS.map((glow, index) => (
-            <span
-              key={index}
-              className="absolute rounded-full bg-[#d9e533] opacity-[0.07]"
-              style={{
-                width: glow.size,
-                height: glow.size,
-                filter: `blur(${glow.blur}px)`,
-                ...glow.style,
-              }}
-            />
-          ))}
-          {SQUARES.map((square, index) => (
-            <span
-              key={index}
-              className="absolute"
-              style={{
-                width: square.size,
-                height: square.size,
-                backgroundColor: square.color,
-                opacity: square.opacity,
-                ...square.style,
-              }}
-            />
-          ))}
-        </div>
-
-        <div className="why-copy relative">
+    <InView
+      as="section"
+      data-why=""
+      aria-labelledby="why-title"
+      className="relative overflow-hidden"
+    >
+      <HomeWhyFx />
+      <div className="why-bg pointer-events-none absolute inset-0" aria-hidden="true">
+        <div className="why-blob why-blob-a" data-parallax="-0.12" />
+        <div className="why-blob why-blob-b" data-parallax="0.09" />
+        {SQUARES.map((square) => (
+          <div
+            key={square.parallax}
+            className="why-px"
+            data-parallax={square.parallax}
+            style={{
+              backgroundColor: square.color,
+              opacity: square.opacity,
+              width: "size" in square ? square.size : undefined,
+              height: "size" in square ? square.size : undefined,
+              ...square.style,
+            }}
+          />
+        ))}
+      </div>
+      <div className="relative z-[1] mx-auto grid w-full max-w-[1328px] items-center gap-12 px-6 py-24 sm:px-12 lg:grid-cols-[minmax(0,560px)_minmax(0,576px)] lg:gap-[86px] lg:py-[130px]">
+        <div className="why-copy relative" data-parallax="0.05">
           <SunMark />
           <p className="mt-7 text-sm font-bold tracking-[0.14em] text-bitmap-mid uppercase">
             {homeWhy.eyebrow}
@@ -78,8 +81,14 @@ export function HomeWhy() {
 
         {/* 52px plus the 132px card gives the Figma 185px pitch. */}
         <ul className="relative flex flex-col gap-8 lg:gap-[52px]">
-          {homeWhy.cards.map((card) => (
-            <InView as="li" mark="rv-in" key={card.title} className="why-card-wrap">
+          {homeWhy.cards.map((card, index) => (
+            <InView
+              as="li"
+              mark="rv-in"
+              key={card.title}
+              className="why-card-wrap"
+              data-parallax={CARD_PARALLAX[index]}
+            >
               <ContentCard
                 title={card.title}
                 subtitle={card.body}

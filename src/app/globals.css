@@ -960,14 +960,36 @@ body {
   box-sizing: border-box;
   position: relative;
   z-index: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 48px;
   width: 100%;
   max-width: 1440px;
   margin-inline: auto;
   padding: 96px 104px;
+}
+
+.ogsec-card {
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: space-between;
+  gap: 48px;
+  min-height: 235px;
+  padding: 32px 56px;
+  border: 1px solid #d1d10052;
+  border-radius: 24px;
+  background-color: #011a09;
+  background-image: linear-gradient(182deg, #787e2716 0%, #787e2700 45%);
+  transition:
+    border-color 0.45s var(--sec-ease),
+    box-shadow 0.45s var(--sec-ease);
+}
+
+.ogsec-card:hover,
+.ogsec-card:focus-within {
+  border-color: #d1d10085;
+  box-shadow:
+    0 18px 44px #00000057,
+    0 0 0 1px #d1d10014,
+    0 0 46px -12px #787e2757;
 }
 
 .ogsec-copy {
@@ -1071,6 +1093,12 @@ body {
     transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.24s;
 }
 
+.ogsec-card:hover .ogsec-badge,
+.js-anim.ogsec.in-view .ogsec-card:hover .ogsec-badge {
+  transform: translateY(-4px) rotate(1.5deg);
+  transition: transform 0.45s var(--sec-ease);
+}
+
 @media (width <= 1279px) {
   .ogsec-inner {
     padding-inline: clamp(40px, 7.2vw, 104px);
@@ -1087,13 +1115,15 @@ body {
   }
 
   .ogsec-inner {
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 32px;
     padding: 64px clamp(24px, 5vw, 48px);
   }
 
-  .ogsec-badge {
-    justify-self: start;
+  .ogsec-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 32px;
+    min-height: 0;
+    padding: 40px;
   }
 }
 
@@ -1113,6 +1143,22 @@ body {
   .ogsec-badge {
     --seal: 140px;
   }
+
+  .ogsec-card {
+    gap: 28px;
+    padding: 32px 24px;
+  }
+
+  .ogsec-card:hover,
+  .ogsec-card:focus-within {
+    border-color: #d1d10052;
+    box-shadow: none;
+  }
+
+  .ogsec-card:hover .ogsec-badge,
+  .js-anim.ogsec.in-view .ogsec-card:hover .ogsec-badge {
+    transform: none;
+  }
 }
 
 @media (width <= 479px) {
@@ -1121,31 +1167,86 @@ body {
   }
 }
 
+/* Two soft lime glows and the pixel squares behind Why. Blur and size follow
+   the reference, including the smaller mobile field. */
+.why-blob {
+  position: absolute;
+  border-radius: 9999px;
+  background: #d9e533;
+  opacity: 0.07;
+  filter: blur(90px);
+  will-change: transform;
+}
+
+.why-blob-a {
+  top: 20px;
+  right: 60px;
+  width: 560px;
+  height: 560px;
+}
+
+.why-blob-b {
+  right: 480px;
+  bottom: -120px;
+  width: 460px;
+  height: 460px;
+}
+
+.why-px {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  will-change: transform;
+}
+
+@media (width <= 767px) {
+  .why-blob {
+    filter: blur(70px);
+  }
+
+  .why-blob-a {
+    right: -80px;
+    width: 340px;
+    height: 340px;
+  }
+
+  .why-blob-b {
+    right: 40px;
+    width: 300px;
+    height: 300px;
+  }
+
+  .why-px {
+    width: 28px;
+    height: 28px;
+  }
+}
+
 /* Figma 1:245: 480px cards tilt ±5° and zig-zag about 26px either side of the
-   column centre. The shift lives on the wrapper so the card's own tilt, entrance
-   and hover transforms stay untouched. */
+   column centre. The shift is `left`, not a transform, so scroll drift can own
+   the wrapper's transform without undoing the zig-zag. */
 .why-card-wrap {
   --tilt: 5deg;
   --shift: 0px;
   position: relative;
   display: flex;
   justify-content: center;
-  transform: translateX(var(--shift));
+  left: var(--shift);
 }
 
 .why-card-wrap:nth-child(even) {
   --tilt: -5deg;
 }
 
-/* The wrapper transform makes each card its own stacking context, so the
-   hover lift has to happen here to clear the neighbouring cards' corners. */
+/* The wrapper is positioned, so the hover lift can clear the neighbouring
+   cards' corners. */
 .why-card-wrap:hover {
   z-index: 1;
 }
 
 @media (width >= 64rem) {
   .why-card-wrap {
-    --shift: -27px;
+    --shift: -26px;
   }
 
   .why-card-wrap:nth-child(even) {
@@ -2185,11 +2286,17 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .ogsec-badge,
-  .ogsec-copy > * {
+  .ogsec-copy > *,
+  .ogsec-card {
     opacity: 1;
     transform: none;
     animation: none;
     transition: none;
+  }
+
+  .ogsec-card:hover .ogsec-badge,
+  .js-anim.ogsec.in-view .ogsec-card:hover .ogsec-badge {
+    transform: none;
   }
 
   .why-card,

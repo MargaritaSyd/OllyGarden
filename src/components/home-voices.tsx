@@ -22,14 +22,14 @@ export function HomeVoices() {
           </p>
         </div>
 
-        <div className="grid gap-9 md:grid-cols-3 md:gap-x-[39px] md:gap-y-9">
+        <div className="mx-auto grid max-w-[620px] gap-7 lg:max-w-none lg:grid-cols-3 lg:gap-x-[39px] lg:gap-y-9">
           {lead.map((quote) => (
             <InView key={quote.name} mark="rv-in">
               <VoiceCard quote={quote} />
             </InView>
           ))}
           {wide.map((quote) => (
-            <InView key={quote.name} mark="rv-in" className="md:col-span-3">
+            <InView key={quote.name} mark="rv-in" className="lg:col-span-3">
               <VoiceCard quote={quote} wide />
             </InView>
           ))}
@@ -50,7 +50,7 @@ function VoiceCard({
     <article
       className={
         wide
-          ? "voice-card voice-wide overflow-hidden bg-[#011407] md:grid md:grid-cols-[auto_minmax(0,1fr)] md:items-center"
+          ? "voice-card voice-wide overflow-hidden bg-[#011407] lg:grid lg:grid-cols-[auto_minmax(0,1fr)] lg:items-center"
           : "voice-card flex flex-col overflow-hidden bg-[#011407]"
       }
     >
@@ -76,8 +76,8 @@ function VoiceCard({
         <span
           className={
             wide
-              ? "vc-name flex min-w-[260px] items-center justify-self-start bg-olive px-[26px] text-[15px] font-semibold tracking-[0.01em] whitespace-nowrap text-mist max-md:min-w-0 max-md:whitespace-normal max-sm:px-3.5 max-sm:text-[13.5px]"
-              : "vc-name flex min-w-[77%] items-center justify-self-start bg-olive px-5 text-[15px] font-semibold tracking-[0.01em] whitespace-nowrap text-mist max-md:whitespace-normal max-sm:px-3.5 max-sm:text-[13.5px]"
+              ? "vc-name flex min-w-[260px] items-center justify-self-start bg-olive px-[26px] text-[15px] font-semibold tracking-[0.01em] whitespace-nowrap text-mist max-lg:min-w-0 max-lg:whitespace-normal max-sm:px-3.5 max-sm:text-[13.5px]"
+              : "vc-name flex min-w-[77%] items-center justify-self-start bg-olive px-5 text-[15px] font-semibold tracking-[0.01em] whitespace-nowrap text-mist max-lg:whitespace-normal max-sm:px-3.5 max-sm:text-[13.5px]"
           }
         >
           {quote.name}
@@ -85,8 +85,8 @@ function VoiceCard({
         <span
           className={
             wide
-              ? "vc-role flex min-w-[396px] items-center justify-self-start bg-[#d9e533] px-[26px] text-[14.5px] leading-snug font-semibold tracking-[0.01em] whitespace-nowrap text-[#0b2410] max-md:min-w-0 max-md:whitespace-normal max-sm:px-3.5 max-sm:text-[13.5px]"
-              : "vc-role flex items-center bg-[#d9e533] px-5 text-[14.5px] leading-snug font-semibold tracking-[0.01em] whitespace-nowrap text-[#0b2410] max-md:whitespace-normal max-sm:px-3.5 max-sm:text-[13.5px]"
+              ? "vc-role flex min-w-[396px] items-center justify-self-start bg-[#d9e533] px-[26px] text-[14.5px] leading-snug font-semibold tracking-[0.01em] whitespace-nowrap text-[#0b2410] max-lg:min-w-0 max-lg:whitespace-normal max-sm:px-3.5 max-sm:text-[13.5px]"
+              : "vc-role flex items-center bg-[#d9e533] px-5 text-[14.5px] leading-snug font-semibold tracking-[0.01em] whitespace-nowrap text-[#0b2410] max-lg:whitespace-normal max-sm:px-3.5 max-sm:text-[13.5px]"
           }
         >
           {quote.role}
@@ -95,7 +95,7 @@ function VoiceCard({
       <blockquote
         className={
           wide
-            ? "vc-quote px-7 pt-4 pb-[46px] md:px-16 md:pt-[34px] md:pb-[38px]"
+            ? "vc-quote px-7 pt-3.5 pb-[46px] lg:px-16 lg:pt-[34px] lg:pb-[38px]"
             : "vc-quote px-7 pt-16 pb-[60px]"
         }
       >

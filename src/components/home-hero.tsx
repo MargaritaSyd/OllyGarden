@@ -1,4 +1,4 @@
-import { GetStartedLink } from "@/components/get-started-link";
+import { HomeHeroCta } from "@/components/home-hero-cta";
 import { homeHero } from "@/lib/home";
 
 export function HomeHero() {
@@ -33,14 +33,7 @@ export function HomeHero() {
         <p className="ov-fade-up-slow max-w-[780px] text-[17px] leading-[1.65] text-mist/80 [animation-delay:1.1s]">
           {homeHero.lede}
         </p>
-        <div className="ov-fade-up-slow [animation-delay:1.35s]">
-          <GetStartedLink
-            href={homeHero.ctaHref}
-            analytics={{ id: "home_hero_primary", section: "hero" }}
-          >
-            {homeHero.cta}
-          </GetStartedLink>
-        </div>
+        <HomeHeroCta />
       </div>
     </section>
   );

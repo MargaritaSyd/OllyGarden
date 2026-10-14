@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { HomeRealityStats } from "@/components/home-reality-stats";
 import { InView } from "@/components/in-view";
 import { homeReality } from "@/lib/home";
 
@@ -54,23 +55,7 @@ export function HomeReality() {
           ))}
         </ul>
 
-        <ul className="mt-8 grid grid-cols-1 gap-5 min-[901px]:mt-12 min-[901px]:grid-cols-3 sm:gap-8">
-          {homeReality.stats.map((stat, index) => (
-            <InView as="li" mark="rv-in" key={stat.value}>
-              <article
-                className="home-reality-card surface-grain h-full rounded-3xl border border-bitmap-highlight/40 p-6 sm:p-8"
-                style={{ "--i": index } as CSSProperties}
-              >
-                <p className="mb-3 text-[clamp(3rem,4.72vw,4.25rem)] leading-[1.28] font-bold tracking-[-0.01em] text-sunflower tabular-nums">
-                  {stat.value}
-                </p>
-                <p className="text-base leading-normal text-mist/75 min-[901px]:max-w-[316px]">
-                  {stat.body}
-                </p>
-              </article>
-            </InView>
-          ))}
-        </ul>
+        <HomeRealityStats />
 
         <p className="mt-6 text-[15.5px] leading-[1.62] text-[#e2e5c0]/75 italic">
           {homeReality.note}
