@@ -134,36 +134,57 @@ export const homeVoices = {
 
 export const homeHow = {
   eyebrow: "How OllyGarden Works",
-  title: ["Ingest", "Analyze", "Score", "Fix"] as const,
-  sub: "OllyGarden continuously evaluates telemetry quality, scores issues by impact, and turns findings into source-level fixes or pipeline improvements.",
-  video: {
-    src: "/videos/how-ollygarden-works.webm",
-    label: "How OllyGarden works — product walkthrough video",
-  },
+  title: "From pull request",
+  titleAccent: "to production",
+  sub: "We don’t replace your observability backend. We make whatever you run send cleaner, cheaper, more trustworthy data.",
+  diagramLabel:
+    "How OllyGarden works: your service sends telemetry through the OpenTelemetry Collector to your observability backend and to OllyGarden Insights. Insights analyzes the telemetry and sends findings to OllyGarden Rose. Rose, using your org context and skills, opens a pull request into your service. New telemetry is sent and the loop starts over.",
   steps: [
     {
       n: "1",
+      parts: [
+        { text: "Insights analyzes your telemetry", strong: true },
+        { text: " and finds what’s missing or wrong in your instrumentation.", strong: false },
+      ],
+    },
+    {
+      n: "2",
+      parts: [
+        { text: "Rose opens a pull request", strong: true },
+        { text: " to fix it at the source, guided by your org context and skills.", strong: false },
+      ],
+    },
+    {
+      n: "3",
+      parts: [
+        { text: "Your team ", strong: false },
+        { text: "reviews and merges", strong: true },
+        { text: " it, ", strong: false },
+        { text: "new telemetry is sent", strong: true },
+        { text: ", and the loop starts over.", strong: false },
+      ],
+    },
+  ],
+  noteLead: "Use one or both.",
+  note: " Rose and Insights each work independently, so you can choose the product that fits your needs.",
+  productsCta: "Explore the Products",
+  contactCta: "Talk to Us",
+  products: [
+    {
       icon: "rose" as const,
       label: "OllyGarden Rose",
       title: "Fix instrumentation at the source",
       body: "Rose reviews your code and helps improve OpenTelemetry instrumentation before bad patterns spread across repositories.",
-      flip: false,
-      video: {
-        src: "/videos/meet-rose.mp4",
-        label: "Meet OllyGarden Rose — product demo video",
-      },
+      href: "/products/rose",
+      cta: "Learn More",
     },
     {
-      n: "2",
       icon: "insights" as const,
       label: "OllyGarden Insights",
       title: "Analyze and score telemetry quality",
       body: "Insights detects quality issues across your services and helps teams understand where telemetry is breaking down.",
-      flip: true,
-      video: {
-        src: "/videos/insights-demo.mp4",
-        label: "OllyGarden Insights — product demo video",
-      },
+      href: "/products/insights",
+      cta: "Learn More",
     },
   ],
 } as const;
