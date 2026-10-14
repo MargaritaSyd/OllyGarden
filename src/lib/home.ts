@@ -3,7 +3,8 @@ export const homeHero = {
   titleLead: "Observability starts",
   titleAccent: "good telemetry",
   lede: "OllyGarden helps teams find and fix bad telemetry before it reaches any observability backend, giving engineers and AI agents data they can rely on — from pull request to production.",
-  cta: "Get Started",
+  cta: "See How It Works",
+  ctaHref: "#how",
 } as const;
 
 export const homeSecurity = {

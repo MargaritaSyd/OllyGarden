@@ -34,7 +34,10 @@ export function HomeHero() {
           {homeHero.lede}
         </p>
         <div className="ov-fade-up-slow [animation-delay:1.35s]">
-          <GetStartedLink analytics={{ id: "home_hero_primary", section: "hero" }}>
+          <GetStartedLink
+            href={homeHero.ctaHref}
+            analytics={{ id: "home_hero_primary", section: "hero" }}
+          >
             {homeHero.cta}
           </GetStartedLink>
         </div>
