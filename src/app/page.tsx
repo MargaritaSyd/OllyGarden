@@ -29,8 +29,14 @@ export default function Home() {
       <HomeSecurity />
       <HomeHow />
       <HomeBlog />
-      {/* Figma 1:599: the closing panel sits flush under the blog section on home only. */}
-      <SiteCta content={{ ...homeCta, flush: true }} />
+      {/* Preview closing CTA is Get Started only. The quiz stays on homeCta for every other page. */}
+      <SiteCta
+        content={{
+          title: homeCta.title,
+          buttonSize: homeCta.buttonSize,
+          flush: true,
+        }}
+      />
     </>
   );
 }

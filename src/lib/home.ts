@@ -190,9 +190,8 @@ export const homeHow = {
   ],
 } as const;
 
-// Figma 1:599: single-color title, 57px buttons, quiz as the secondary action.
-// This is also the default SiteCta content on other pages, so the home-only
-// flush spacing is set at the call site in src/app/page.tsx.
+// Default SiteCta on other pages: single-color title, 57px buttons, quiz as the
+// secondary action. The homepage omits that button; see src/app/page.tsx.
 export const homeCta = {
   title: ["Keep your observability backend", "Send it better telemetry"],
   secondary: { label: "Test Your OTel Knowledge", href: "/otel-quiz" },
