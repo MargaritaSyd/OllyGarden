@@ -49,16 +49,18 @@ export function RoseHero() {
               {roseHero.badge}
             </p>
 
-            {/* Figma: 52px / 72px / -1.04px (-0.02em), centered. */}
+            {/* Reference: 52px at 1440px, shrinking with the viewport to 30px. */}
             <h1
               id="rose-hero-title"
-              className="text-[clamp(2.125rem,4.6vw,3.25rem)] leading-[1.385] font-bold tracking-[-0.02em] text-mist"
+              className="text-[clamp(30px,3.61vw,52px)] leading-[1.385] font-bold tracking-[-0.02em] text-mist max-[767px]:leading-[1.25]"
             >
               <span className="ov-blur-rise-slow block [animation-delay:0.48s]">
                 {roseHero.titleLead}
               </span>
               <span className="ov-blur-rise-slow block [animation-delay:0.72s]">
-                {roseHero.titleRest}
+                <span className="bg-[linear-gradient(90deg,#d9e533_0%,#c4d336_55%,#7e9230_100%)] bg-clip-text text-transparent">
+                  {roseHero.titleRest}
+                </span>
               </span>
             </h1>
 

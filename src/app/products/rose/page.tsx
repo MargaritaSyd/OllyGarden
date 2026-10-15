@@ -1,6 +1,5 @@
 import { JsonLd } from "@/components/json-ld";
 import { RelatedReading } from "@/components/related-reading";
-import { RoseAction } from "@/components/rose-action";
 import { RoseClients } from "@/components/rose-clients";
 import { RoseDoes } from "@/components/rose-does";
 import { RoseFaq } from "@/components/rose-faq";
@@ -33,7 +32,6 @@ export default function RosePage() {
       <RoseDoes />
       <RoseHow />
       <RoseMvi />
-      <RoseAction />
       <RoseTeams />
       <RoseClients />
       <RoseSecurity />

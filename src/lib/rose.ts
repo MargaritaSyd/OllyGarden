@@ -178,17 +178,6 @@ export const roseMvi = {
   },
 } as const;
 
-export const roseAction = {
-  eyebrow: "Rose in Action",
-  title: "See what Rose finds in your instrumentation",
-  sub: "Watch OllyGarden Rose in action and see how it turns service analysis into practical OpenTelemetry recommendations your team can use.",
-  video: {
-    src: "/videos/meet-rose.mp4",
-    label:
-      "Demo video: Rose analyzing a repository and producing OpenTelemetry recommendations",
-  },
-} as const;
-
 export const roseTeams = {
   eyebrow: "Improve your team",
   title: "What changes for your teams",
