@@ -6,8 +6,9 @@ production behavior.
 ## Runtime shape
 
 - **Business role:** Public marketing, product, company, and resource website.
-- **Deployment:** Next.js 16 application configured for Netlify. `NEXT_PUBLIC_SITE_URL` defines the
-  canonical production origin at build time.
+- **Deployment:** Next.js 16 application configured for Netlify. Production builds start only from
+  the **Deploy production** GitHub Actions workflow, after Supabase migrations and Edge Functions.
+  `NEXT_PUBLIC_SITE_URL` defines the canonical production origin at build time.
 - **Hot path:** Server-rendered and statically generated pages, with client-side navigation after
   hydration.
 - **State:** Page content is built into the deployment. Visitor analytics consent is stored for one
@@ -90,9 +91,19 @@ monitoring.
   migrations and production. The insert includes both columns even for blank answers.
   After deploying `send-application-email`, verify that one application notification shows both
   answers.
-- **Supabase changes:** Before merging code that needs a schema change, run `db push --dry-run`
-  and `db push` from [doc/supabase.md](doc/supabase.md#schema-and-edge-functions), then confirm
-  `db diff --linked --schema public` reports no changes.
+- **Supabase changes:** Ship the migration in the same pull request as the code. The
+  **Supabase check** run on the pull request shows what will apply; on merge, **Deploy production**
+  applies it before Netlify builds. Afterwards, `db diff --linked --schema public` should report no
+  changes. See [doc/supabase.md](doc/supabase.md#automatic-deploys).
+- **A merge did not reach production:** Open the **Deploy production** run for the commit. A
+  failed migration, function deploy, or build-hook call stops the deploy and leaves the previous
+  one live; fix the cause and re-run it (applied migrations are skipped). A cancelled run was
+  superseded by a newer commit. A Netlify production deploy that fails in `prebuild` either was not
+  started by the workflow (no hook body: run the workflow instead) or built a newer commit than the
+  workflow migrated (the log names both commits: the newer commit's run publishes it). A commit
+  with `[skip ci]` in its message starts no run at all; run the workflow by hand to publish it. If Supabase itself is down, the workflow's
+  **skip_supabase** option publishes code that needs neither a pending migration nor an Edge
+  Function update.
 - **Security headers:** Probe a representative HTML page, Markdown representation, static discovery
   document, and `/openapi.json` for the CSP, HSTS, referrer policy, `nosniff`, and clickjacking
   protection. Browser-check PostHog and Supabase connections after any CSP change.

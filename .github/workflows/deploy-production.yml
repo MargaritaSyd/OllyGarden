@@ -1,0 +1,160 @@
+name: Deploy production
+run-name: ${{ inputs.skip_supabase && 'Deploy production (publish only, Supabase skipped)' || github.event.head_commit.message || 'Deploy production' }}
+
+# Production deploys run here, in order: Supabase migrations, then Edge Functions, then the
+# Netlify build. Netlify skips the production builds a merge would start (`ignore` in
+# netlify.toml) and builds only from the build hook this workflow calls, so new code never goes
+# live before the schema it needs. The hook body is the commit this run migrated for; the
+# production prebuild refuses to build any other commit.
+
+on:
+  push:
+    branches: [main]
+  # Redeploy without a merge, for example after changing a Netlify environment variable.
+  workflow_dispatch:
+    inputs:
+      skip_supabase:
+        description: "Emergency only: publish main without touching Supabase (no migrations or functions)"
+        type: boolean
+        default: false
+
+# One deploy at a time, never cancelled midway: a cancelled `db push` can leave a migration
+# half-recorded. GitHub keeps only the newest queued run; that is safe because each run applies
+# every pending migration and diffs functions against the last successful Supabase deploy.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  # write only to cancel this run when a newer commit supersedes it.
+  actions: write
+
+env:
+  SUPABASE_PROJECT_REF: sspupghymzfikfemusdc
+
+jobs:
+  deploy:
+    name: Migrate, deploy functions, publish
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      # Optional. The CLI reads it from the environment and, when it is empty, connects through a
+      # temporary login role. Never pass it as --password: CLI 2.120 rejects an empty value.
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      NETLIFY_BUILD_HOOK_URL: ${{ secrets.NETLIFY_BUILD_HOOK_URL }}
+      SKIP_SUPABASE: ${{ inputs.skip_supabase && 'true' || 'false' }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      # A run for an older commit (queued behind a newer merge, or re-run later) must not touch
+      # production: it could deploy older functions over newer ones. Cancelled rather than
+      # successful, so the function diff below never treats it as deployed.
+      - name: Stop if a newer commit is on main
+        run: |
+          head=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)
+          if [ "$head" != "$GITHUB_SHA" ]; then
+            echo "main is at $head; the run for that commit deploys it."
+            gh run cancel "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY"
+            sleep 60
+            exit 1
+          fi
+
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+
+      - name: Check deploy secrets
+        run: |
+          missing=""
+          [ -n "$NETLIFY_BUILD_HOOK_URL" ] || missing="$missing NETLIFY_BUILD_HOOK_URL"
+          if [ "$SKIP_SUPABASE" != "true" ] && [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
+            missing="$missing SUPABASE_ACCESS_TOKEN"
+          fi
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secrets:$missing. Nothing was deployed."
+            exit 1
+          fi
+
+      - name: Link Supabase
+        if: env.SKIP_SUPABASE != 'true'
+        # Read-only, so safe to retry on network faults.
+        run: |
+          for attempt in 1 2 3; do
+            if bun run supabase link --project-ref "$SUPABASE_PROJECT_REF"; then
+              exit 0
+            fi
+            [ "$attempt" -lt 3 ] && sleep $((attempt * 10))
+          done
+          echo "::error::supabase link failed after 3 attempts"
+          exit 1
+
+      - name: Show migration state
+        if: env.SKIP_SUPABASE != 'true'
+        run: bun run supabase migration list --linked
+
+      - name: Apply migrations
+        if: env.SKIP_SUPABASE != 'true'
+        # Not retried: a blind re-run after a partial failure can re-issue DDL. If this fails, read
+        # the log and the live schema; when the change is present but unrecorded, use
+        # `supabase migration repair <version> --status applied` instead of re-running the SQL.
+        run: bun run supabase db push --linked --yes
+
+      - name: Find changed Edge Functions
+        if: env.SKIP_SUPABASE != 'true'
+        id: functions
+        run: |
+          # The last run that deployed Supabase. Publish-only runs are named for it and skipped.
+          last=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-production.yml/runs?branch=main&status=success&per_page=50" \
+            --jq '[.workflow_runs[] | select(.display_title | contains("publish only") | not)][0].head_sha // empty')
+          if [ -z "$last" ]; then
+            # No run has deployed Supabase yet (or every one failed), so nothing proves the live
+            # functions match the repository: deploy them all.
+            changed="(no earlier successful Supabase deploy)"
+          else
+            # The compare API needs no history in this checkout. It lists at most 300 files;
+            # anything that large deploys every function.
+            files=$(gh api "repos/$GITHUB_REPOSITORY/compare/$last...$GITHUB_SHA" --jq '.files[].filename')
+            if [ "$(printf '%s\n' "$files" | grep -c .)" -ge 300 ]; then
+              changed="(300 or more files changed since $last)"
+            else
+              changed=$(printf '%s\n' "$files" | grep -E '^supabase/(functions/|config\.toml$)' || true)
+            fi
+          fi
+          if [ -z "$changed" ]; then
+            echo "No function changes since ${last:-the parent commit}."
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+          else
+            printf '%s\n' "$changed"
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy Edge Functions
+        if: env.SKIP_SUPABASE != 'true' && steps.functions.outputs.deploy == 'true'
+        # Any change deploys every function in supabase/functions, each with its verify_jwt from
+        # config.toml. --use-api bundles server-side instead of pulling the edge-runtime image.
+        run: |
+          for attempt in 1 2 3; do
+            if bun run supabase functions deploy --use-api --project-ref "$SUPABASE_PROJECT_REF"; then
+              exit 0
+            fi
+            [ "$attempt" -lt 3 ] && sleep $((attempt * 10))
+          done
+          echo "::error::supabase functions deploy failed after 3 attempts"
+          exit 1
+
+      - name: Publish on Netlify
+        run: |
+          head=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)
+          if [ "$head" != "$GITHUB_SHA" ]; then
+            echo "main moved to $head while this run deployed Supabase; the run for that commit publishes it."
+            exit 0
+          fi
+          curl --fail --silent --show-error --retry 3 --retry-all-errors -X POST \
+            -H "Content-Type: text/plain" --data "$GITHUB_SHA" "$NETLIFY_BUILD_HOOK_URL"
+          echo "Netlify production build requested for $GITHUB_SHA."

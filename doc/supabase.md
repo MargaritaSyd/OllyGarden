@@ -93,10 +93,52 @@ bun run supabase db diff --linked --schema public  # "No schema changes found" =
 bun run supabase db push --dry-run --linked    # shows exactly what would be applied
 ```
 
-Apply a migration with `bun run supabase db push --linked` **before** the code that depends on it
-deploys; Netlify deploys on merge and nothing in this repository applies migrations yet. Keep
-migrations backward compatible (new nullable columns, new tables) so the deployed code works on
-both sides of the change. Deploy a function with
+### Automatic deploys
+
+Merging to `main` runs [`deploy-production.yml`](../.github/workflows/deploy-production.yml), one
+run at a time:
+
+1. `db push` applies every pending migration in `supabase/migrations/`.
+2. If anything under `supabase/functions/` or `config.toml` changed since the last run that
+   deployed Supabase, every function is redeployed with its `verify_jwt`. Until one run has
+   succeeded, every run deploys all functions.
+3. A Netlify build hook starts the production build, with the commit as the hook body.
+
+Netlify skips the production build a merge would start (`ignore` in `netlify.toml`), and the
+production `prebuild` refuses to build without that hook body or for a different commit
+(`validateProductionDeploy` in `scripts/validate-netlify-env.mjs`). So a failed migration leaves
+the previous deploy live instead of publishing code against the old schema. Deploy previews still
+build on every pull request. To redeploy without a merge, for example after changing a Netlify
+variable, run **Deploy production** from the Actions tab; Netlify's own **Trigger deploy** is
+skipped or fails in `prebuild` by design. A run for a commit that is no longer `main` HEAD cancels
+itself before touching Supabase, so re-running an old run never deploys old functions. Re-running a
+failed run is otherwise safe: applied migrations are skipped. A commit message with `[skip ci]`
+skips the deploy too; run the workflow by hand afterwards.
+
+If Supabase is unavailable or a migration is stuck and a code fix must ship, run **Deploy
+production** with **skip_supabase** checked. It publishes `main` without migrations or functions,
+so only use it when the code needs neither a pending migration nor an Edge Function update.
+
+Pull requests that touch `supabase/` also run
+[`supabase-check.yml`](../.github/workflows/supabase-check.yml): `migration list` and
+`db push --dry-run` against the project, which show what the merge will apply and fail when the
+project has migrations this branch does not.
+
+Keep migrations backward compatible (new nullable columns, new tables): they apply while the
+previous code is still live. Migration file names are timestamps, and `db push` refuses one older
+than the newest applied migration. If another migration merged first, rename yours with a newer
+timestamp (`bun run supabase migration new` makes one) before merging; **Supabase check** shows the
+order, so re-run it after other migrations land. A failed `db push` is not retried; read the run log and the live
+schema, and when the change is present but unrecorded, run
+`bun run supabase migration repair <version> --status applied` instead of re-running the SQL.
+
+The workflows need repository secrets `SUPABASE_ACCESS_TOKEN` (a Supabase access token whose owner
+can change the Website project) and `NETLIFY_BUILD_HOOK_URL` (a build hook on `main` for
+`ollygarden-wicket`). `SUPABASE_DB_PASSWORD` is optional; without it the CLI uses a temporary
+login role. Values live in GitHub and the services, never in this repository.
+
+The manual commands above still work for local checks and emergencies. A hand-applied migration
+is recorded in the remote history, so the next deploy skips it. Deploy one function by hand with
 `bun run supabase functions deploy <name> --project-ref sspupghymzfikfemusdc`.
 
 This repository is the only source of the project's migrations and functions.

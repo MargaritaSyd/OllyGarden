@@ -119,9 +119,13 @@ the visual language. For historical URL migrations only, compare the sitemap in 
 - `SUPABASE_SEND_EMAIL` gates the optional Edge Function invocation after a successful insert.
 - `supabase/` defines the existing Website project (`sspupghymzfikfemusdc`): migrations, Edge
   Functions, and each function's `verify_jwt` in `config.toml`. A payload change that needs a new
-  or changed column ships its migration in the same PR. Nothing in this repository applies
-  migrations yet; apply them by hand before the dependent code deploys. See `doc/supabase.md`
-  before changing form payloads, tables, policies, or functions.
+  or changed column ships its migration in the same PR, and the migration must be additive so the
+  live code keeps working once it applies. On every merge to `main`,
+  `.github/workflows/deploy-production.yml` applies pending migrations, redeploys the Edge
+  Functions when any changed, and only then starts the Netlify production build through a build hook; production
+  never builds from a plain push. A `[skip ci]` commit skips that workflow, so it is not deployed
+  until the workflow runs by hand or the next merge. See `doc/supabase.md` before changing form payloads, tables,
+  policies, or functions.
 
 ## Analytics and Netlify
 

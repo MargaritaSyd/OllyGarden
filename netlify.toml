@@ -1,5 +1,10 @@
 [build]
   command = "bun run build"
+  # Production builds start only from the Deploy production workflow's build hook, after it has
+  # applied Supabase migrations (Netlify never cancels a build-hook build). Exit 0 skips the build
+  # a merge to main would start; exit 1 builds deploy previews and branch deploys as usual. The
+  # BRANCH check covers an ignore environment without CONTEXT; the prebuild guard backs up both.
+  ignore = 'if [ "$CONTEXT" = "production" ] || { [ "$BRANCH" = "main" ] && [ "$PULL_REQUEST" != "true" ]; }; then echo "Production builds start from the Deploy production workflow."; exit 0; fi; exit 1'
 
 [build.environment]
   BUN_VERSION = "1.4.3"

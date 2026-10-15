@@ -1,0 +1,47 @@
+name: Supabase check
+
+# Shows what the Deploy production workflow would apply to the Website project when this pull
+# request merges. It changes nothing: `db push --dry-run` only reads, and it fails when the remote
+# history has migrations this branch does not, which means the project drifted from the repository.
+
+on:
+  pull_request:
+    paths:
+      - "supabase/**"
+
+permissions:
+  contents: read
+
+jobs:
+  dry-run:
+    name: Migration dry run
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SUPABASE_PROJECT_REF: sspupghymzfikfemusdc
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+
+      - name: Check secret
+        run: |
+          if [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
+            echo "::error::SUPABASE_ACCESS_TOKEN is not available to this workflow."
+            exit 1
+          fi
+
+      - name: Link Supabase
+        run: bun run supabase link --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Migration state
+        run: bun run supabase migration list --linked
+
+      - name: Dry run
+        run: bun run supabase db push --dry-run --linked

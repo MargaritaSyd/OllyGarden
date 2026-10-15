@@ -44,7 +44,9 @@ bun run test       # test:unit + test:rss
 ```
 
 GitHub Actions runs typecheck, lint, test:unit, and test:rss on every pull request and push to
-`main` (`.github/workflows/ci.yml`). Netlify only runs the build.
+`main` (`.github/workflows/ci.yml`). Netlify only runs the build. Production deploys go through
+`.github/workflows/deploy-production.yml`: Supabase migrations and Edge Functions first, then the
+Netlify production build. Details: [`doc/supabase.md`](doc/supabase.md#schema-and-edge-functions).
 
 ## SEO
 
