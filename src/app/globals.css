@@ -4595,6 +4595,12 @@ section[id] {
   padding: 0 24px;
 }
 
+.rz-mvx-attrs.rz-term-note {
+  margin: 0 24px 20px;
+  margin-top: auto;
+  padding: 16px;
+}
+
 .rz-mvx-attrs-ctx {
   margin-bottom: 12px;
   border-bottom: 1px solid #e3e27038;
@@ -4940,6 +4946,12 @@ section[id] {
 
   .rz-mvx-attrs {
     padding: 0 16px;
+  }
+
+  .rz-mvx-attrs.rz-term-note {
+    margin: 0 16px 20px;
+    margin-top: auto;
+    padding: 16px;
   }
 
   .rz-mvx-attrs-names {

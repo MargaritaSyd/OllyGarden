@@ -72,7 +72,7 @@ export function RoseMvi() {
             rows={roseMvi.after.rows}
             caption={roseMvi.after.caption}
           >
-            <div className="rz-mvx-attrs">
+            <div className="rz-term-note rz-mvx-attrs">
               <p className="rz-mvx-attrs-ctx">{roseMvi.after.context}</p>
               <p className="rz-mvx-attrs-head">{roseMvi.after.attributesHead}</p>
               <p className="rz-mvx-attrs-names">
