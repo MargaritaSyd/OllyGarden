@@ -4422,3 +4422,292 @@ section[id] {
     transition: none;
   }
 }
+
+/* Rose MVI waterfall. The child arrow is an SVG because U+21B3 is outside JetBrains Mono. */
+.rz-term {
+  display: flex;
+  min-width: 0;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #212c2599;
+  border-radius: 16px;
+  background: #092611;
+  box-shadow:
+    0 10px 15px -3px #0000001a,
+    0 4px 6px -4px #0000001a;
+}
+
+.rz-term-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid #1d3d1d;
+  background: #04160a;
+  padding: 12px 16px 13px;
+}
+
+.rz-term-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.rz-term-dots i {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.rz-term-dots i:first-child {
+  background: #fb2c36cc;
+}
+
+.rz-term-dots i:nth-child(2) {
+  background: #f0b100cc;
+}
+
+.rz-term-dots i:nth-child(3) {
+  background: #00c950cc;
+}
+
+.rz-term-label,
+.rz-mvx-cols,
+.rz-mvx-row,
+.rz-mvx-more,
+.rz-mvx-attrs-head {
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+.rz-term-label {
+  color: #90a1b9;
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.rz-term-label.is-accent {
+  color: #9ca703;
+}
+
+.rz-term-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  background: #092611;
+  padding: 20px 0;
+}
+
+.rz-mvx-cols,
+.rz-mvx-row {
+  display: grid;
+  grid-template-columns: minmax(170px, 54%) minmax(0, 1fr);
+  align-items: center;
+  padding: 0 24px;
+}
+
+.rz-mvx-cols {
+  padding-bottom: 10px;
+  color: #90a1b9;
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rz-mvx-rows {
+  list-style: none;
+}
+
+.rz-mvx-row {
+  min-height: 28px;
+  color: #cad5e2;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.rz-mvx-row.is-noise {
+  min-height: 22px;
+  background: #faf9f00b;
+  color: #cad5e28c;
+  font-size: 12px;
+}
+
+.rz-mvx-row.is-key {
+  background: #e3e2704d;
+  color: #faf9f0;
+}
+
+.rz-mvx-row.is-root {
+  color: #faf9f0;
+}
+
+.rz-mvx-op {
+  overflow: hidden;
+  padding-left: calc(var(--depth, 0) * 16px);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rz-mvx-track {
+  position: relative;
+  height: 10px;
+}
+
+.rz-mvx-track i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 2px;
+  background: #9ca703;
+}
+
+.rz-mvx-row.is-root .rz-mvx-track i {
+  background: #faf9f0;
+}
+
+.rz-mvx-row.is-noise .rz-mvx-track i {
+  background: #cad5e266;
+}
+
+.rz-mvx-row.is-key .rz-mvx-track i {
+  top: -1px;
+  bottom: -1px;
+  border: 1.5px solid #faf9f0;
+  background: #d1d100;
+}
+
+.rz-mvx-more {
+  margin: 10px 0 24px;
+  padding: 0 24px 0 48px;
+  color: #90a1b9;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.rz-mvx-rows:has(+ .rz-mvx-attrs) {
+  margin-bottom: 24px;
+}
+
+.rz-mvx-attrs {
+  margin-top: auto;
+  margin-bottom: 20px;
+  padding: 0 24px;
+}
+
+.rz-mvx-attrs-ctx {
+  margin-bottom: 12px;
+  border-bottom: 1px solid #e3e27038;
+  padding-bottom: 12px;
+  color: #faf9f0bf;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.rz-mvx-attrs-head {
+  color: #9ca703;
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rz-mvx-attrs-names {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  color: #faf9f0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.28;
+  letter-spacing: -0.01em;
+}
+
+.rz-mvx-attrs-names span + span::before {
+  content: "·";
+  margin: 0 0.55em;
+}
+
+.rz-term-note {
+  margin: 24px 24px 0;
+  margin-top: auto;
+  border: 1px solid #e3e27066;
+  border-radius: 16px;
+  background-color: #19321e;
+  background-image:
+    linear-gradient(#011e0c6b 0%, #011e0cc7 100%),
+    url("/images/texture-grain.png");
+  background-repeat: no-repeat, repeat;
+  background-size: 100% 100%, 328px 140px;
+  padding: 16px;
+  color: #faf9f0;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.rz-banner {
+  border: 1px solid #d1d10052;
+  border-radius: 24px;
+  background-color: #19321e;
+  background-image:
+    linear-gradient(#002810a8, #002810a8),
+    url("/images/texture-grain.png");
+  background-repeat: no-repeat, repeat;
+  background-size: 100% 100%, 328px 140px;
+}
+
+.rz-banner .rz-banner-cta:hover {
+  background-color: var(--color-mist);
+  color: var(--color-forest);
+}
+
+.rz-mvx-attrs + .rz-term-note {
+  margin-top: 0;
+}
+
+@media (width <= 767px) {
+  .rz-mvx-cols,
+  .rz-mvx-row {
+    grid-template-columns: minmax(0, 68%) minmax(0, 1fr);
+    padding: 0 16px;
+  }
+
+  .rz-mvx-cols {
+    padding-bottom: 8px;
+  }
+
+  .rz-mvx-row {
+    font-size: 12px;
+  }
+
+  .rz-mvx-row.is-noise {
+    font-size: 11px;
+  }
+
+  .rz-mvx-op {
+    padding-left: calc(var(--depth, 0) * 10px);
+  }
+
+  .rz-mvx-more {
+    padding-left: 28px;
+  }
+
+  .rz-mvx-attrs {
+    padding: 0 16px;
+  }
+
+  .rz-mvx-attrs-names {
+    flex-direction: column;
+    gap: 4px;
+    font-size: 17px;
+  }
+
+  .rz-mvx-attrs-names span + span::before {
+    content: none;
+  }
+
+  .rz-term-note {
+    margin: 20px 16px 0;
+    margin-top: auto;
+  }
+}
