@@ -74,33 +74,11 @@ export const roseDoes = {
 export type RoseDoesIcon = (typeof roseDoes.cards)[number]["icon"];
 
 export const roseHow = {
-  eyebrow: "How Rose works",
+  eyebrow: "How Rose Works",
   title: "Instrumentation that improves with your code",
   sub: "Rooted in OpenTelemetry. Curated by OllyGarden. Rose connects patterns across your services with OpenTelemetry standards, OllyGarden’s instrumentation expertise, and your organization’s context and skills.",
-  skillsLink: "Explore the open source skills behind Rose",
-  skillsHref: "/resources/agent-skills",
-  diagram: {
-    label: "How Rose fits your delivery loop",
-    nodes: {
-      rose: { title: "OllyGarden Rose", sub: "AI instrumentation agent" },
-      context: { title: "Org context & skills" },
-      service: { title: "Your service" },
-      collector: { title: "Collector", sub: "OpenTelemetry Collector" },
-      backend: { title: "Your observability backend" },
-      insights: { title: "OllyGarden Insights", tag: "Optional" },
-    },
-    edges: [
-      { n: "1", from: "context", to: "rose" },
-      { n: "2", from: "rose", to: "service", label: "open pull request" },
-      { n: "3", from: "service", to: "collector", label: "telemetry" },
-      { from: "collector", to: "backend", label: "telemetry" },
-      { from: "collector", to: "insights", label: "telemetry" },
-      { from: "insights", to: "rose" },
-    ],
-    /** Plain-language fallback for screen readers and reduced layouts. */
-    summary:
-      "Org context and skills feed OllyGarden Rose. Rose opens a pull request against your service. Your service sends telemetry to the OpenTelemetry Collector, which forwards it to your observability backend and, optionally, to OllyGarden Insights. Insights findings flow back into Rose.",
-  },
+  diagramLabel:
+    "How Rose works: Rose reviews your code using your org context and skills, then opens a pull request on your service. The service sends telemetry through the OpenTelemetry Collector to your observability backend and, optionally, to OllyGarden Insights.",
   steps: [
     {
       n: "1",

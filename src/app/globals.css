@@ -1457,6 +1457,23 @@ body {
   font-size: calc(14 * var(--u));
 }
 
+.hh-node--dashed {
+  gap: calc(8 * var(--u));
+  border: 1.5px dashed #34520b;
+  background: transparent;
+}
+
+.hh-node em {
+  padding: calc(2 * var(--u)) calc(8 * var(--u));
+  border-radius: calc(4 * var(--u));
+  background: #e3e27014;
+  color: #9ca703;
+  font-size: calc(10 * var(--u));
+  font-style: normal;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
 .hh-rose {
   top: 0;
   left: 0;
@@ -2103,6 +2120,31 @@ body {
 
 .hh-flow.is-done .hh-rose {
   animation: 4.5s ease-in-out infinite hh-breathe;
+}
+
+/* Rose uses the open path: Insights stays optional, and the return arrow is absent. */
+.hh-flow--rose {
+  margin: 0 auto;
+}
+
+.hh-flow--rose .hh-a1,
+.hh-flow--rose .hh-ad {
+  opacity: 1;
+}
+
+.hh-flow--rose .hh-a1 {
+  justify-content: flex-start;
+  gap: calc(6 * var(--u));
+}
+
+.hh-flow--rose.is-playing .hh-rose {
+  animation:
+    0.5s cubic-bezier(0.16, 1, 0.3, 1) 80ms both hh-in,
+    0.8s ease-in-out 1.7s hh-glow;
+}
+
+.hh-flow--rose.is-playing .hh-a1 .hh-num {
+  animation: 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.9s both hh-pop;
 }
 
 @media (prefers-reduced-motion: reduce) {

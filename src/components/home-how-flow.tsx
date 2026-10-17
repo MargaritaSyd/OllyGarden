@@ -5,7 +5,18 @@ import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
 const PLAY_MS = 8200;
 
-export function HomeHowFlow({ label, children }: { label: string; children: ReactNode }) {
+export function HomeHowFlow({
+  label,
+  children,
+  duration = PLAY_MS,
+  flowClassName = "",
+}: {
+  label: string;
+  children: ReactNode;
+  /** Rose plays the open path once; the home loop waits for the return arrow. */
+  duration?: number;
+  flowClassName?: string;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
   const [phase, setPhase] = useState<"idle" | "playing" | "done">("idle");
@@ -28,7 +39,7 @@ export function HomeHowFlow({ label, children }: { label: string; children: Reac
         }
         observer.disconnect();
         setPhase("playing");
-        timer = window.setTimeout(() => setPhase("done"), PLAY_MS);
+        timer = window.setTimeout(() => setPhase("done"), duration);
       },
       { threshold: 0.5 },
     );
@@ -38,10 +49,11 @@ export function HomeHowFlow({ label, children }: { label: string; children: Reac
       observer.disconnect();
       window.clearTimeout(timer);
     };
-  }, [prefersReducedMotion]);
+  }, [duration, prefersReducedMotion]);
 
   const className = [
     "hh-flow",
+    flowClassName,
     phase === "playing" && "is-playing",
     phase === "done" && "is-done",
   ]

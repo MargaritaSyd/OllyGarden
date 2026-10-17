@@ -1,20 +1,6 @@
-import Link from "next/link";
+import { HomeHowFlow } from "@/components/home-how-flow";
 import { InView } from "@/components/in-view";
 import { roseHow } from "@/lib/rose";
-
-type FlowEdge = {
-  n?: string;
-  label?: string;
-  from: string;
-  to: string;
-};
-
-const { nodes, edges } = roseHow.diagram;
-const edge = (index: number) => edges[index] as FlowEdge;
-
-/** Figma 2371:31522. Rose and Insights centers sit half a 247px column into a 1080px grid. */
-const LOOP_INSET = "11.435%";
-const LOOP_RISE = "45px";
 
 export function RoseHow() {
   return (
@@ -35,32 +21,26 @@ export function RoseHow() {
             <p className="max-w-[640px] text-base leading-[1.4] tracking-[0.02em] text-mist">
               {roseHow.sub}
             </p>
-            <Link
-              href={roseHow.skillsHref}
-              className="inline-block font-semibold text-sunflower underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-bitmap-highlight"
-            >
-              {roseHow.skillsLink}
-            </Link>
           </div>
 
-          <figure
-            role="group"
-            aria-labelledby="rose-flow-label"
-            aria-describedby="rose-flow-summary"
-            className="relative w-full rounded-3xl border border-bitmap-highlight/40 bg-[#0c2317]/60 px-6 py-8 shadow-[0_8px_32px_rgba(227,226,112,0.05)] lg:px-10 lg:pt-[88px] lg:pb-12"
-          >
-            <figcaption id="rose-flow-label" className="sr-only">
-              {roseHow.diagram.label}
-            </figcaption>
-            <FlowGrid />
-            <FlowList />
-            <p
-              id="rose-flow-summary"
-              className="mt-6 text-sm leading-[1.5] text-mist/75 lg:sr-only"
-            >
-              {roseHow.diagram.summary}
-            </p>
-          </figure>
+          <div className="hh-panel surface-grain">
+            <HomeHowFlow duration={7000} flowClassName="hh-flow--rose" label={roseHow.diagramLabel}>
+              <FlowNode className="hh-rose hh-node--lime" title="OllyGarden Rose" detail="AI instrumentation agent" />
+              <FlowLink className="hh-a2" label="open pull request" n="2" arrow="long" />
+              <FlowNode className="hh-service hh-node--lime" title="Your service" />
+              <FlowLink className="hh-a1" n="1" arrow="step1" flip />
+              <FlowLink className="hh-a3" label="telemetry" n="3" arrow="step3" />
+              <FlowNode className="hh-org" title="Org context & skills" />
+              <FlowNode className="hh-collector" title="Collector" detail="OpenTelemetry Collector" />
+              <FlowLink className="hh-ad" label="telemetry" arrow="down" small />
+              <FlowNode className="hh-backend hh-node--soft" title="Your observability backend" />
+              <FlowLink className="hh-ai" label="telemetry" arrow="insights" />
+              <div className="hh-node hh-insights hh-node--dashed">
+                <strong>OllyGarden Insights</strong>
+                <em>Optional</em>
+              </div>
+            </HomeHowFlow>
+          </div>
 
           <ol className="ov-stagger grid grid-cols-1 gap-8 lg:grid-cols-3">
             {roseHow.steps.map((step) => (
@@ -90,332 +70,69 @@ export function RoseHow() {
   );
 }
 
-/** Desktop layout (≥1024px): five columns, four rows, CSS return loop. Figma 2371:31523. */
-function FlowGrid() {
-  return (
-    <div
-      className="relative mx-auto hidden w-full max-w-[1080px] grid-cols-[247fr_135fr_220fr_135fr_247fr] grid-rows-[auto_130px_auto_auto] gap-x-[2.22%] lg:grid"
-      aria-hidden="true"
-    >
-      {/* Insights → Rose return loop (Figma Vector 24, 2371:31569) */}
-      <div className="pointer-events-none relative col-span-full col-start-1 row-start-1 row-end-3">
-        <div
-          className="absolute border-t-2 border-r-2 border-bitmap-highlight"
-          style={{
-            top: `-${LOOP_RISE}`,
-            left: LOOP_INSET,
-            right: `calc(${LOOP_INSET} - 1px)`,
-            bottom: "23.5px",
-          }}
-        />
-        <div
-          className="absolute border-l-2 border-bitmap-highlight"
-          style={{
-            top: `-${LOOP_RISE}`,
-            left: `calc(${LOOP_INSET} - 1px)`,
-            height: LOOP_RISE,
-          }}
-        >
-          <ArrowHead className="absolute bottom-0 left-0 -translate-x-1/2 translate-y-[3px] rotate-90" />
-        </div>
-      </div>
-
-      {/* Row 1 */}
-      <FlowNode
-        tone="rose"
-        className="col-start-1 row-start-1"
-        {...nodes.rose}
-      />
-      <div className="col-start-2 row-start-1 flex items-center gap-1.5 self-center">
-        <ArrowH dir="left" className="flex-1" />
-        <StepBadge n={edge(0).n} />
-      </div>
-      <FlowNode
-        tone="context"
-        className="col-start-3 row-start-1"
-        {...nodes.context}
-      />
-
-      {/* Row 2: Rose → Your service */}
-      <div className="col-start-1 row-start-2 flex flex-col items-center gap-1 py-2">
-        <div className="flex h-6 items-center gap-2">
-          <StepBadge n={edge(1).n} />
-          <EdgeLabel>{edge(1).label}</EdgeLabel>
-        </div>
-        <ArrowV className="flex-1" />
-      </div>
-
-      {/* Row 3 */}
-      <FlowNode
-        tone="service"
-        className="col-start-1 row-start-3"
-        {...nodes.service}
-      />
-      <div className="col-start-2 row-start-3 flex items-center gap-1.5 self-center">
-        <StepBadge n={edge(2).n} />
-        <EdgeLabel>{edge(2).label}</EdgeLabel>
-        <ArrowH dir="right" className="min-w-6 flex-1" />
-      </div>
-      <FlowNode
-        tone="collector"
-        className="col-start-3 row-start-3"
-        {...nodes.collector}
-      />
-      <div className="relative col-start-4 row-start-3 self-center">
-        <EdgeLabel className="absolute bottom-full left-0 mb-1.5 w-full text-center">
-          {edge(4).label}
-        </EdgeLabel>
-        <ArrowH dir="right" />
-      </div>
-      <div className="relative col-start-5 row-start-3 h-[73px]">
-        <FlowNode
-          tone="insights"
-          className="absolute inset-x-0 top-1/2 -translate-y-1/2"
-          {...nodes.insights}
-        />
-      </div>
-
-      {/* Row 4: Collector → backend */}
-      <div className="col-start-3 row-start-4 flex flex-col gap-2 pt-2">
-        <div className="flex h-[34px] items-center justify-center gap-1">
-          <ArrowV className="h-full" />
-          <EdgeLabel className="text-[11px]">{edge(3).label}</EdgeLabel>
-        </div>
-        <FlowNode tone="backend" {...nodes.backend} />
-      </div>
-    </div>
-  );
-}
-
-/** Below 1024px the loop reads top-down; the visible summary stands in for the return edge. */
-function FlowList() {
-  return (
-    <ol
-      className="mx-auto flex max-w-[360px] flex-col lg:hidden"
-      aria-hidden="true"
-    >
-      <li>
-        <FlowNode tone="context" {...nodes.context} />
-        <FlowConnector n={edge(0).n} />
-      </li>
-      <li>
-        <FlowNode tone="rose" {...nodes.rose} />
-        <FlowConnector n={edge(1).n} label={edge(1).label} />
-      </li>
-      <li>
-        <FlowNode tone="service" {...nodes.service} />
-        <FlowConnector n={edge(2).n} label={edge(2).label} />
-      </li>
-      <li>
-        <FlowNode tone="collector" {...nodes.collector} />
-        <FlowConnector label={edge(3).label} />
-      </li>
-      <li>
-        <FlowNode tone="backend" {...nodes.backend} />
-      </li>
-      <li className="mt-6 border-t border-dashed border-bitmap-shadow pt-6">
-        <FlowConnector
-          label={edge(4).label}
-          hint={nodes.collector.title}
-          dashed
-        />
-        <FlowNode tone="insights" {...nodes.insights} />
-      </li>
-    </ol>
-  );
-}
-
-type FlowTone =
-  "rose" | "service" | "context" | "collector" | "backend" | "insights";
-
-const toneClass: Record<
-  FlowTone,
-  { frame: string; title: string; sub: string }
-> = {
-  rose: {
-    frame:
-      "gap-1.5 border border-bitmap-highlight bg-bitmap-highlight/[0.07] px-5 py-4",
-    title: "text-base text-bitmap-highlight",
-    sub: "text-bitmap-mid",
-  },
-  service: {
-    frame:
-      "h-[73px] justify-center border border-bitmap-highlight bg-bitmap-highlight/[0.07] px-5 py-4",
-    title: "text-base text-bitmap-highlight",
-    sub: "",
-  },
-  context: {
-    frame:
-      "h-[73px] justify-center border border-bitmap-shadow bg-[#0c2317] px-5 py-4",
-    title: "text-[15px] text-white",
-    sub: "",
-  },
-  collector: {
-    frame:
-      "h-[73px] gap-1.5 border border-bitmap-shadow bg-[#0c2317] px-5 py-4",
-    title: "text-[15px] text-white",
-    sub: "text-bitmap-highlight",
-  },
-  backend: {
-    frame: "border border-bitmap-shadow/50 bg-[#0c2317] px-5 py-3.5",
-    title: "text-sm text-white",
-    sub: "",
-  },
-  insights: {
-    frame:
-      "h-[120px] justify-center gap-2 border-[1.5px] border-dashed border-bitmap-shadow p-5",
-    title: "text-[15px] text-white",
-    sub: "",
-  },
-};
-
 function FlowNode({
-  tone,
+  className,
   title,
-  sub,
-  tag,
-  className = "",
+  detail,
 }: {
-  tone: FlowTone;
+  className: string;
   title: string;
-  sub?: string;
-  tag?: string;
-  className?: string;
+  detail?: string;
 }) {
-  const styles = toneClass[tone];
   return (
-    <div
-      className={`flex w-full flex-col items-center rounded-xl text-center leading-[normal] ${styles.frame} ${className}`}
-    >
-      <p className={`w-full leading-[normal] font-bold ${styles.title}`}>
-        {title}
-      </p>
-      {sub ? (
-        <p className={`w-full text-xs leading-[normal] ${styles.sub}`}>{sub}</p>
-      ) : null}
-      {tag ? (
-        <span className="rounded bg-bitmap-highlight/[0.08] px-2 py-0.5 text-[10px] font-bold text-bitmap-mid uppercase">
-          {tag}
-        </span>
-      ) : null}
+    <div className={`hh-node ${className}`}>
+      <strong>{title}</strong>
+      {detail ? <span>{detail}</span> : null}
     </div>
   );
 }
 
-function StepBadge({ n }: { n?: string }) {
-  if (!n) {
-    return null;
-  }
-  return (
-    <span className="flex size-6 shrink-0 items-center justify-center rounded-full border-[1.29px] border-bitmap-highlight bg-[#1a3d2b] text-[11px] leading-none font-bold text-bitmap-highlight">
-      {n}
-    </span>
-  );
-}
-
-function EdgeLabel({
-  children,
-  className = "",
-}: {
-  children?: string;
-  className?: string;
-}) {
-  if (!children) {
-    return null;
-  }
-  return (
-    <span
-      className={`text-xs leading-[normal] font-medium whitespace-nowrap text-bitmap-highlight ${className}`}
-    >
-      {children}
-    </span>
-  );
-}
-
-/** Vertical connector with its badge and label inline, used by the stacked layout. */
-function FlowConnector({
-  n,
+function FlowLink({
+  className,
   label,
-  hint,
-  dashed = false,
+  n,
+  arrow,
+  flip = false,
+  small = false,
 }: {
-  n?: string;
+  className: string;
   label?: string;
-  hint?: string;
-  dashed?: boolean;
+  n?: string;
+  arrow: "long" | "step1" | "step3" | "down" | "insights";
+  flip?: boolean;
+  small?: boolean;
 }) {
+  const src = {
+    long: "/images/rose/arr-down-long.svg",
+    step1: "/images/rose/arr-step1.svg",
+    step3: "/images/rose/arr-step3.svg",
+    down: "/images/rose/arr-down-short.svg",
+    insights: "/images/rose/arr-insights.svg",
+  }[arrow];
+
+  const tag = label ? (
+    <span className={`hh-tag${small ? " hh-tag--sm" : ""}`}>
+      {n ? <b className="hh-num">{n}</b> : null}
+      {label}
+    </span>
+  ) : null;
+  const arrowImg = (
+    /* eslint-disable-next-line @next/next/no-img-element */
+    <img className={`hh-arrow${flip ? " hh-arrow--flip" : ""}`} src={src} alt="" />
+  );
+
   return (
-    <div className="grid h-16 grid-cols-[1fr_auto_1fr] items-center">
-      <span />
-      <ArrowV className="h-full" dashed={dashed} />
-      <span className="flex items-center gap-2 pl-3">
-        <StepBadge n={n} />
-        <span className="flex flex-col">
-          <EdgeLabel>{label}</EdgeLabel>
-          {hint ? (
-            <span className="text-[11px] leading-[normal] text-mist/60">
-              from {hint}
-            </span>
-          ) : null}
-        </span>
-      </span>
+    <div className={`hh-link ${className}`}>
+      {arrow === "down" ? arrowImg : null}
+      {tag}
+      {arrow === "down" ? null : arrowImg}
+      {n && !label ? <b className="hh-num">{n}</b> : null}
+      {arrow === "down" ? null : (
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img className="hh-down" src="/images/rose/arr-down-short.svg" alt="" />
+      )}
+      <span className="hh-pk" aria-hidden="true" />
     </div>
-  );
-}
-
-/* Connectors: 2px highlight stroke with the Figma arrowhead (2371:31546). */
-
-function ArrowHead({ className = "" }: { className?: string }) {
-  return (
-    <svg
-      width="8"
-      height="13"
-      viewBox="0 0 7.25 12.5"
-      fill="none"
-      className={`shrink-0 ${className}`}
-      aria-hidden="true"
-    >
-      <path
-        d="M1 11.5012L6.2506 6.2506L1 1"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        className="text-bitmap-highlight"
-      />
-    </svg>
-  );
-}
-
-function ArrowH({
-  dir,
-  className = "",
-}: {
-  dir: "left" | "right";
-  className?: string;
-}) {
-  return (
-    <span className={`flex items-center ${className}`}>
-      {dir === "left" ? <ArrowHead className="-mr-[7px] rotate-180" /> : null}
-      <span className="h-0.5 min-w-4 flex-1 rounded-full bg-bitmap-highlight" />
-      {dir === "right" ? <ArrowHead className="-ml-[7px]" /> : null}
-    </span>
-  );
-}
-
-function ArrowV({
-  className = "",
-  dashed = false,
-}: {
-  className?: string;
-  dashed?: boolean;
-}) {
-  return (
-    <span className={`flex flex-col items-center ${className}`}>
-      <span
-        className={`w-0 flex-1 border-l-2 border-bitmap-highlight ${dashed ? "border-dashed" : ""}`}
-      />
-      <ArrowHead className="-mt-[7px] rotate-90" />
-    </span>
   );
 }
 
