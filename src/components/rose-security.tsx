@@ -43,7 +43,7 @@ export function RoseSecurity() {
           </h2>
         </div>
 
-        <div className={`${bandClass} lg:flex-row lg:items-center`}>
+        <div className={`${bandClass} min-[900px]:flex-row min-[900px]:items-center`}>
           <div className="flex flex-1 flex-col gap-2">
             <h3 className="text-[clamp(1.75rem,2.6vw,2.25rem)] leading-[1.16] font-bold tracking-[-0.02em] text-mist">
               {roseSecurity.run.title}
@@ -56,7 +56,7 @@ export function RoseSecurity() {
           </div>
           <ul
             aria-label="Deployment options"
-            className="flex w-full flex-wrap gap-5 lg:w-[374px] lg:justify-end"
+            className="flex w-full flex-wrap justify-start gap-3 min-[900px]:w-auto min-[900px]:max-w-[300px] min-[900px]:justify-end min-[900px]:gap-5 min-[1100px]:w-[374px] min-[1100px]:max-w-none"
           >
             {roseSecurity.run.chips.map((chip) => (
               <li
@@ -69,7 +69,7 @@ export function RoseSecurity() {
           </ul>
         </div>
 
-        <ul className="grid gap-6 sm:grid-cols-2 sm:gap-10 sm:[&>:last-child]:col-span-2 lg:grid-cols-3 lg:[&>:last-child]:col-span-1">
+        <ul className="grid grid-cols-1 gap-6 min-[900px]:grid-cols-3 min-[1100px]:gap-10">
           {roseSecurity.cards.map((card) => (
             <li
               key={card.title}

@@ -31,7 +31,7 @@ export function RoseMviStrip({ href, section, className = "" }: RoseMviStripProp
 
   return (
     <div
-      className={`relative isolate flex w-full max-w-[910px] flex-col gap-4 overflow-hidden rounded-[25.6px] border border-bitmap-highlight/40 bg-[#00280e]/60 px-6 py-6 text-left sm:px-[34px] lg:flex-row lg:items-center lg:gap-[17px] ${className}`}
+      className={`relative isolate flex w-full max-w-[910px] flex-col gap-4 overflow-hidden rounded-[25.6px] border border-bitmap-highlight/40 bg-[#00280e]/60 px-6 py-6 text-left sm:px-[34px] min-[900px]:flex-row min-[900px]:items-center min-[900px]:gap-[17px] ${className}`}
     >
       <div
         aria-hidden="true"

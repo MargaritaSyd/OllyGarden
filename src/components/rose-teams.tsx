@@ -45,7 +45,7 @@ export function RoseTeams() {
             </h2>
           </div>
 
-          <ul className="ov-stagger grid grid-cols-1 gap-6 min-[640px]:grid-cols-2 min-[640px]:gap-10 min-[640px]:[&>:last-child]:col-span-2 min-[1140px]:grid-cols-3 min-[1140px]:[&>:last-child]:col-span-1">
+          <ul className="ov-stagger grid grid-cols-1 gap-6 min-[900px]:grid-cols-3 min-[1100px]:gap-10">
             {roseTeams.cards.map((card) => (
               <li key={card.title}>
                 <article className={cardClass}>
@@ -76,7 +76,7 @@ export function RoseTeams() {
           </ul>
 
           {/* Figma 2371:31787 — stat band */}
-          <div className="flex flex-col items-start gap-8 rounded-3xl border border-bitmap-highlight/40 bg-[#00280e]/60 p-8 md:flex-row md:items-center md:gap-14">
+          <div className="flex flex-col items-start gap-8 rounded-3xl border border-bitmap-highlight/40 bg-[#00280e]/60 p-8 min-[900px]:flex-row min-[900px]:items-center min-[900px]:gap-14">
             <p className="flex shrink-0 flex-col gap-3 whitespace-nowrap">
               <span className="text-base leading-[normal] font-bold tracking-[0.1em] text-bitmap-mid uppercase">
                 {stat.label}

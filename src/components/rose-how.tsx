@@ -42,7 +42,7 @@ export function RoseHow() {
             </HomeHowFlow>
           </div>
 
-          <ol className="ov-stagger grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <ol className="ov-stagger grid grid-cols-1 gap-8 min-[900px]:grid-cols-3">
             {roseHow.steps.map((step) => (
               <li key={step.n} className="flex">
                 <article className="flex w-full flex-col gap-4 rounded-3xl border border-bitmap-highlight/40 bg-[#00280e]/60 bg-[radial-gradient(125%_80%_at_50%_-10%,rgba(156,167,3,0.14),transparent_60%)] p-8 shadow-[inset_0_1px_rgba(255,255,255,0.05)]">

@@ -49,11 +49,13 @@ export function RoseMvi() {
           <p className="text-base leading-[1.4] tracking-[0.02em] text-mist">{roseMvi.body}</p>
         </div>
 
-        {/* Three steps; the arrow tiles hang off the first two cards, centred in the 24px gaps. */}
-        <ol className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {roseMvi.steps.map((step, index) => (
-            <StepCard key={step.title} step={step} withArrow={index < roseMvi.steps.length - 1} />
+        {/* Arrows sit on the row, over the 24px gaps. They are hidden once the steps stack. */}
+        <ol className="relative grid grid-cols-1 gap-6 min-[900px]:grid-cols-3">
+          {roseMvi.steps.map((step) => (
+            <StepCard key={step.title} step={step} />
           ))}
+          <StepArrow className="left-[calc(33.333%-28px)]" />
+          <StepArrow className="left-[calc(66.666%-20px)]" />
         </ol>
 
         <div className="grid grid-cols-1 items-stretch gap-6 min-[900px]:grid-cols-2 min-[1100px]:gap-10">
@@ -87,7 +89,7 @@ export function RoseMvi() {
           </Waterfall>
         </div>
 
-        <div className="rz-banner flex flex-col items-start gap-5 p-6 sm:p-8 md:flex-row md:items-center">
+        <div className="rz-banner rz-mvi-band flex flex-col items-start gap-6 p-6 min-[900px]:flex-row min-[900px]:items-center min-[900px]:gap-5 min-[900px]:p-8">
           <div className="flex flex-1 flex-col gap-2">
             <h3 className="text-xl leading-[normal] font-bold tracking-[-0.01em] text-mist">
               {roseMvi.band.title}
@@ -110,13 +112,7 @@ export function RoseMvi() {
   );
 }
 
-function StepCard({
-  step,
-  withArrow,
-}: {
-  step: { title: string; body: string };
-  withArrow: boolean;
-}) {
+function StepCard({ step }: { step: { title: string; body: string } }) {
   return (
     <li className={bentoCard}>
       <div aria-hidden="true" className={bentoGlow} />
@@ -124,21 +120,27 @@ function StepCard({
         {step.title}
       </h3>
       <p className="text-base leading-[1.5] text-mist/75">{step.body}</p>
-      {withArrow ? (
-        /* The export is the 48px tile plus its glow margin (72px). Figma places the tile 8px below
-           the card top, centred in the gap: tile right edge = card right + 12 + 36 = 48px outside.
-           Below lg it sits under the card, pointing down. */
-        /* eslint-disable-next-line @next/next/no-img-element */
-        <img
-          src="/images/rose/icon-arrow-step.svg"
-          alt=""
-          aria-hidden="true"
-          width={72}
-          height={72}
-          className="mx-auto -mb-[60px] size-[72px] max-w-none rotate-90 lg:absolute lg:top-[41px] lg:-right-12 lg:m-0 lg:rotate-0"
-        />
-      ) : null}
     </li>
+  );
+}
+
+/** Solid white tile. The exported SVG carries a noise filter that reads as grain. */
+function StepArrow({ className }: { className: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`absolute top-[calc(50%-24px)] z-2 hidden size-12 place-items-center rounded-lg border border-[#34520b]/15 bg-white shadow-[0_4px_12px_rgba(0,40,14,0.1)] min-[900px]:grid ${className}`}
+    >
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path
+          d="M4 10h12M12 6l4 4-4 4"
+          stroke="#75A105"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </span>
   );
 }
 
