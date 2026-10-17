@@ -9,21 +9,21 @@ export const roseHero = {
   scopeLead: "Across your repositories: ",
   scopeStrong:
     "autonomously in the background, locally on your machine, or inside your favorite coding agent.",
-  cta: "Scan Your Repo for Free",
+  cta: "Scan your Repo for Free",
   ctaHref: siteConfig.appUrl,
   secondaryCta: "Book a Demo",
   secondaryHref: "/contact",
 } as const;
 
 export const roseProblem = {
-  eyebrow: "The problem",
+  eyebrow: "The Problem",
   title: "Why good instrumentation is so hard to get right",
   body: "An observability engineer knows exactly what good instrumentation should look like. What they cannot do is sit with every team, in every repository, on every pull request.",
   highlight: "Rose is the telemetry expert for all your teams.",
   cards: [
     {
       title: "Inconsistent patterns",
-      body: "Different teams, frameworks and vendor SDKs lead to inconsistent instrumentation across your codebase.",
+      body: "Different teams, frameworks and vendor SDKs lead to inconsistent instrumentation across your codebase",
       place: "tl",
     },
     {
@@ -255,7 +255,7 @@ export const roseSecurity = {
     {
       icon: "shield",
       title: "Isolated, credential-free sandbox",
-      body: "Every run happens in an environment created for that run and destroyed when it ends.",
+      body: "Every run happens in an environment created for that run and destroyed when it ends",
     },
     {
       icon: "branch",
@@ -363,7 +363,7 @@ export const roseFaq = {
 export const roseCta = {
   title: ["Telemetry your teams and", "their agents can trust"],
   sub: "Start with the right instrumentation. Improve what you already have.",
-  primary: { label: "Scan Your Repo for Free", href: siteConfig.appUrl },
+  primary: { label: "Scan your Repo for Free", href: siteConfig.appUrl },
   secondary: { label: "Book a Demo", href: "/contact" },
   buttonSize: "lg",
   variant: "product",

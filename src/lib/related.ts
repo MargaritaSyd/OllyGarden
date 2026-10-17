@@ -18,7 +18,13 @@ const pricingLink = { href: "/pricing", label: "Compare Insights and Rose pricin
 /** Each product page's section title, recommended posts (best first), and follow-up links. */
 const productReadingContent: Record<
   ProductHref,
-  { title: string; posts: readonly string[]; more: readonly { href: string; label: string }[] }
+  {
+    title: string;
+    posts: readonly string[];
+    more: readonly { href: string; label: string }[];
+    eyebrow?: string;
+    explore?: { eyebrow: string; title: string; body: string };
+  }
 > = {
   "/products/insights": {
     title: "See Insights at work",
@@ -37,6 +43,12 @@ const productReadingContent: Record<
       "how-to-name-your-spans",
     ],
     more: [qualityGuideLink, pricingLink, faqLink],
+    eyebrow: "Learn more",
+    explore: {
+      eyebrow: "Keep exploring",
+      title: "More on telemetry quality",
+      body: "What good telemetry looks like, how Rose and Insights are priced, and answers to common questions.",
+    },
   },
 };
 
@@ -69,10 +81,12 @@ function productLink(href: ProductHref): RelatedLink {
 
 /** The product page's related section: case studies that used it, then its recommended posts. */
 export function productReading(href: ProductHref) {
-  const { title, posts, more } = productReadingContent[href];
+  const { title, posts, more, eyebrow, explore } = productReadingContent[href];
   return {
     title,
     more,
+    eyebrow,
+    explore,
     links: [
       ...caseStudies.filter((study) => study.products.includes(href)).map(caseStudyLink),
       ...postLinks(posts),

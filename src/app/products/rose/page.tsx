@@ -36,8 +36,8 @@ export default function RosePage() {
       <RoseClients />
       <RoseSecurity />
       <RosePlans />
-      <RoseFaq />
       <RelatedReading {...productReading(roseMeta.path)} />
+      <RoseFaq />
       <SiteCta content={roseCta} />
     </>
   );

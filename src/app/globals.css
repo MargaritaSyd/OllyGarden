@@ -4661,6 +4661,245 @@ section[id] {
   color: var(--color-forest);
 }
 
+.rz-work-inner {
+  display: flex;
+  max-width: 1328px;
+  flex-direction: column;
+  gap: 40px;
+  margin: 0 auto;
+  padding: clamp(64px, 6.7vw, 96px) clamp(20px, 5vw, 48px);
+}
+
+.rz-work-head,
+.rz-work-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.rz-work-head {
+  gap: 16px;
+}
+
+.rz-work-copy {
+  flex: 1 1 0;
+  gap: 8px;
+  min-width: 0;
+}
+
+.rz-work-eyebrow {
+  color: #9ca703;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.rz-work-title {
+  color: var(--color-mist);
+  font-size: clamp(32px, 3.34vw, 48px);
+  font-weight: 700;
+  line-height: 1.27;
+  letter-spacing: -0.02em;
+}
+
+.rz-work-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+  list-style: none;
+}
+
+.rz-work-list > li {
+  display: flex;
+  min-width: 0;
+}
+
+.rz-work-card {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  border: 1px solid #e3e27066;
+  border-radius: 24px;
+  background-color: #19321e;
+  background-image:
+    linear-gradient(#011e0c6b 0%, #011e0cc7 100%),
+    url("/images/texture-grain.png");
+  background-repeat: no-repeat, repeat;
+  background-size: 100% 100%, 328px 140px;
+  padding: 24px;
+  text-decoration: none;
+  transition:
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.5s;
+}
+
+.rz-work-card:focus-visible {
+  outline: 2px solid #e3e270;
+  outline-offset: 3px;
+}
+
+@media (hover: hover) {
+  .rz-work-card:hover {
+    border-color: #e3e270cc;
+    box-shadow:
+      0 24px 50px #0006,
+      0 0 30px #d9e5331f,
+      inset 0 1px #ffffff14;
+    transform: translateY(-6px);
+  }
+}
+
+.rz-work-kind {
+  color: #9ca703;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rz-work-card-title {
+  color: var(--color-mist);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.44;
+  letter-spacing: -0.01em;
+}
+
+.rz-work-card-desc {
+  color: #faf9f0bf;
+  font-size: 15px;
+  line-height: 1.47;
+}
+
+.rz-work-read {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+  color: #d1d100;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 25px;
+}
+
+.rz-work-read .arrow {
+  transition: transform 0.16s;
+}
+
+.rz-work-card:hover .rz-work-read > span:first-child {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.rz-work-card:hover .rz-work-read .arrow {
+  transform: translateX(2px);
+}
+
+.rz-banner.rz-work-more {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding: 32px;
+}
+
+.rz-work-more .rz-work-eyebrow {
+  font-size: 14px;
+}
+
+.rz-work-more-title {
+  color: var(--color-mist);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.28;
+  letter-spacing: -0.01em;
+}
+
+.rz-work-more-desc {
+  color: #bbc4b7;
+  font-size: 16px;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+}
+
+.rz-work-links {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+}
+
+.rz-work-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  color: #e3e270;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+
+.rz-work-link > span {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.rz-work-link:focus-visible {
+  border-radius: 4px;
+  outline: 2px solid #e3e270;
+  outline-offset: 3px;
+}
+
+@media (width <= 1100px) {
+  .rz-work-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (width <= 899px) {
+  .rz-banner.rz-work-more {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+}
+
+@media (width <= 767px) {
+  .rz-banner.rz-work-more {
+    padding: 24px;
+  }
+}
+
+@media (width <= 640px) {
+  .rz-work-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rz-work-card,
+  .rz-work-read .arrow {
+    transition: none;
+  }
+
+  .rz-work-card:hover {
+    transform: none;
+  }
+
+  .rz-work-card:hover .rz-work-read .arrow {
+    transform: none;
+  }
+}
+
 .rz-mvx-attrs + .rz-term-note {
   margin-top: 0;
 }
