@@ -94,7 +94,7 @@ export function RoseSecurity() {
           ))}
         </ul>
 
-        <div className={`${bandClass} md:flex-row md:items-center`}>
+        <div className={`${bandClass} rz-enterprise-band md:flex-row md:items-center`}>
           <div className="flex flex-1 flex-col gap-2">
             <h3 className="text-xl font-bold tracking-[-0.01em] text-mist">
               {roseSecurity.enterprise.title}
@@ -105,7 +105,7 @@ export function RoseSecurity() {
           </div>
           <GetStartedLink
             href={roseSecurity.enterprise.href}
-            className="rounded-xl"
+            className="rz-banner-cta rounded-xl"
             analytics={{ id: "rose_security_data_handling", section: "security" }}
           >
             {roseSecurity.enterprise.cta}

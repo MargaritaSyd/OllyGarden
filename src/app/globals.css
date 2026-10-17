@@ -4667,10 +4667,29 @@ section[id] {
   color: var(--color-forest);
 }
 
-@media (width <= 640px) {
+@media (width <= 899px) {
   .rz-mvi-band .rz-banner-cta {
+    box-sizing: border-box;
     width: 100%;
     max-width: none;
+    min-width: 0;
+    height: auto;
+    padding: 14px 24px;
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+@media (width <= 767px) {
+  .rz-enterprise-band .rz-banner-cta {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    height: 48px;
+    padding: 0 24px;
+    white-space: nowrap;
+    text-align: center;
   }
 }
 

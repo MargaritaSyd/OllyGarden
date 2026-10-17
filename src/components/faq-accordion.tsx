@@ -83,7 +83,7 @@ function FaqRow({
 
   return (
     <details
-      open={variant === "rose" || index === 0}
+      open={variant !== "rose" && index === 0}
       style={{ "--i": index } as CSSProperties}
       className={`faq-accordion-item fq-item overflow-hidden ${s.row} border border-sunflower/32 bg-[#002810] bg-[url('/images/texture-grain.png')] bg-repeat [background-size:328px_140px] transition-[border-color,box-shadow,opacity,transform] duration-200 ease-out hover:border-sunflower/55 hover:shadow-[0_14px_34px_rgba(0,0,0,0.26)]`}
     >
@@ -92,7 +92,7 @@ function FaqRow({
       >
         <h3 className={s.question}>{item.q}</h3>
         <svg
-          className={`${variant === "rose" ? "hidden " : ""}size-5 shrink-0 text-bitmap-mid transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+          className="size-5 shrink-0 text-bitmap-mid transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
           viewBox="0 0 20 20"
           fill="none"
           aria-hidden="true"

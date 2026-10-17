@@ -151,31 +151,31 @@ export function RoseClients() {
                 return (
                   <figure
                     key={`${quote.name}-${slideIndex}`}
-                    className="client-slide flex w-full flex-col bg-[#011307] md:flex-row md:items-center md:gap-2"
+                    className="client-slide grid w-full min-w-0 grid-cols-1 bg-[#011307] min-[900px]:grid-cols-[minmax(240px,398px)_minmax(0,1fr)] min-[900px]:items-stretch min-[900px]:gap-x-2"
                     aria-hidden={!active}
                     {...(!active ? { inert: true } : {})}
                   >
-                    <div className="client-photo relative z-10 flex w-full shrink-0 flex-col justify-end md:w-[397px] md:self-stretch">
+                    <div className="client-photo relative z-10 flex w-full max-w-[400px] flex-col justify-end min-[900px]:max-w-none">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={quote.image}
                         alt={quote.imageAlt}
-                        width={199}
-                        height={177}
+                        width={398}
+                        height={352}
                         loading={slideIndex <= 1 ? "eager" : "lazy"}
                         decoding="async"
-                        className="h-[177px] w-[199px] shrink-0 object-cover"
+                        className="aspect-[199/177] h-auto w-1/2 object-cover"
                       />
-                      <p className="w-[262px] max-w-full bg-olive px-3 py-4 text-base font-bold whitespace-nowrap text-white">
+                      <p className="w-[66%] min-w-[200px] max-w-full bg-olive px-3 py-4 text-base font-bold whitespace-nowrap text-white">
                         {quote.name}
                       </p>
-                      <p className="w-full bg-[#d6d620] px-3 py-4 text-base font-bold text-[#394813] md:whitespace-nowrap">
+                      <p className="w-full bg-[#d6d620] px-3 py-4 text-base font-bold whitespace-nowrap text-[#394813]">
                         {quote.role}
                       </p>
                     </div>
-                    <blockquote className="client-quote flex min-w-0 flex-1 flex-col gap-3 px-5 py-5 md:px-10 md:py-6">
+                    <blockquote className="client-quote flex min-w-0 flex-col justify-center gap-3 px-10 py-6">
                       <QuoteMark />
-                      <div className="space-y-2 text-xl leading-[1.3] text-mist">
+                      <div className="space-y-2 text-[clamp(17px,1.39vw,20px)] leading-[1.28] text-mist">
                         {quote.paragraphs.map((paragraph) => (
                           <p key={paragraph}>{paragraph}</p>
                         ))}
