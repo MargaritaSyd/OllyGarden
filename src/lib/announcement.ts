@@ -1,5 +1,5 @@
 /**
- * Site-wide announcement bar above the header (Figma 2383:42299).
+ * Home-page announcement bar above the header (Figma 2383:42299).
  *
  * `href` is the launch post. The Rose MVI section's "Read the Announcement"
  * button reuses it so both land on the same post; update it here only.

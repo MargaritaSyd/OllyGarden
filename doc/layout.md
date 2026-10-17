@@ -28,7 +28,7 @@ Header chrome uses **two splits**.
 
 ## Announcement bar
 
-`AnnouncementBar` (`src/components/announcement-bar.tsx`) is the first child of `body` on every page: a full-width `bitmap-highlight` bar with a forest **NEW** pill and one sentence whose trailing link is underlined (Figma 2383:42299). The whole bar is the link. Copy and the destination live in `src/lib/announcement.ts`; the Rose MVI section reuses the same destination. It is in normal flow, so it scrolls away with the header. It publishes its measured height as `--announcement-height` on `html` for the mobile nav cap.
+`AnnouncementBar` (`src/components/announcement-bar.tsx`) is the first child of `body`, and it renders only on `/`: a full-width `bitmap-highlight` bar with a forest **NEW** pill and one sentence whose trailing link is underlined (Figma 2383:42299). The whole bar is the link. Copy and the destination live in `src/lib/announcement.ts`; the Rose MVI section reuses the same destination. It is in normal flow, so it scrolls away with the header. On home it publishes its measured height as `--announcement-height` on `html` for the mobile nav cap, and removes that variable on every other route.
 
 ## Header position and mobile scroll
 

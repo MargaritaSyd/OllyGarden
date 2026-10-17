@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { announcement } from "@/lib/announcement";
 import { captureCtaClick } from "@/lib/posthog";
@@ -9,22 +10,30 @@ import { captureCtaClick } from "@/lib/posthog";
 const ANNOUNCEMENT_HEIGHT_VAR = "--announcement-height";
 
 /**
- * Full-width highlight bar above the header on every page. Figma 2383:42299: 40px tall,
+ * Full-width highlight bar above the header on the home page only. Figma 2383:42299: 40px tall,
  * 16px/10px padding, 8px gap, centred; forest "NEW" pill (11px bold, 0.1em tracking) and
  * 14.5px medium forest copy with the trailing link underlined. The whole bar is the link,
  * as in the design. In normal flow, so it scrolls away with the header. The pill is inline
  * with the copy so phone widths wrap it with the sentence instead of giving it its own row.
- * Client component for the click event and the measured height.
+ * Client component for the route check, the click event, and the measured height.
  */
 export function AnnouncementBar() {
+  const pathname = usePathname();
+  const visible = pathname === "/";
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const bar = ref.current;
-    if (!bar) {
+    const root = document.documentElement;
+    if (!visible) {
+      root.style.removeProperty(ANNOUNCEMENT_HEIGHT_VAR);
       return;
     }
-    const root = document.documentElement;
+
+    const bar = ref.current;
+    if (!bar) {
+      root.style.removeProperty(ANNOUNCEMENT_HEIGHT_VAR);
+      return;
+    }
     const update = () =>
       root.style.setProperty(ANNOUNCEMENT_HEIGHT_VAR, `${bar.offsetHeight}px`);
     update();
@@ -34,7 +43,11 @@ export function AnnouncementBar() {
       observer.disconnect();
       root.style.removeProperty(ANNOUNCEMENT_HEIGHT_VAR);
     };
-  }, []);
+  }, [visible]);
+
+  if (!visible) {
+    return null;
+  }
 
   return (
     <div ref={ref} className="bg-bitmap-highlight text-forest">
