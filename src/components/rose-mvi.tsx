@@ -6,7 +6,7 @@ import { roseMvi } from "@/lib/rose";
 
 /* Figma 2371:31604: translucent forest card with an olive glow bleeding in from above. */
 const bentoCard =
-  "relative isolate flex flex-col gap-2 rounded-3xl border border-bitmap-highlight/40 bg-[#00280e]/60 p-8";
+  "rz-card relative isolate flex flex-col gap-2 rounded-3xl border border-bitmap-highlight/40 bg-[#00280e]/60 p-8";
 const bentoGlow =
   "pointer-events-none absolute inset-0 -z-10 rounded-[inherit] bg-[linear-gradient(182deg,rgba(120,126,39,0.28)_0%,rgba(14,45,25,0)_55%)]";
 

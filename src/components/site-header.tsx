@@ -21,6 +21,7 @@ function SiteHeaderBar() {
   const pathname = usePathname();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [tucked, setTucked] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activeMenu = headerMenus.find((menu) => menu.id === openMenu);
@@ -45,6 +46,55 @@ function SiteHeaderBar() {
   useEffect(() => {
     return () => cancelClose();
   }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    let last = window.scrollY;
+    let frame = 0;
+
+    function update() {
+      frame = 0;
+      const y = window.scrollY;
+      const delta = y - last;
+      if (y < 0 || y + window.innerHeight > root.scrollHeight + 1) {
+        last = y;
+        return;
+      }
+      if (y <= 120) {
+        setTucked(false);
+      } else if (delta > 6) {
+        setTucked(true);
+      } else if (delta < -6) {
+        setTucked(false);
+      }
+      if (Math.abs(delta) > 6 || y <= 120) {
+        last = y;
+      }
+    }
+
+    function onScroll() {
+      if (!frame) {
+        frame = requestAnimationFrame(update);
+      }
+    }
+
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      if (frame) {
+        cancelAnimationFrame(frame);
+      }
+      window.removeEventListener("scroll", onScroll);
+      root.classList.remove("nav-tucked");
+    };
+  }, []);
+
+  const hidden = tucked && !openMenu && !mobileOpen;
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("nav-tucked", hidden);
+    return () => document.documentElement.classList.remove("nav-tucked");
+  }, [hidden]);
 
   useEffect(() => {
     if (!openMenu && !mobileOpen) {
@@ -76,7 +126,9 @@ function SiteHeaderBar() {
   }, [openMenu, mobileOpen]);
 
   return (
-    <header className="absolute inset-x-0 top-0 z-50 px-4 pt-4 pb-2 sm:px-6">
+    <header
+      className={`site-header inset-x-0 z-50 px-4 pb-2 sm:px-6${hidden ? " nav-tucked" : ""}`}
+    >
       <div
         ref={panelRef}
         className={`nav-grain texture-grain relative mx-auto max-w-7xl rounded-2xl border border-mist/20 shadow-[0_8px_40px_rgba(1,30,12,0.45)] ${

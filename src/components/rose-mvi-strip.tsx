@@ -30,8 +30,9 @@ export function RoseMviStrip({ href, section, className = "" }: RoseMviStripProp
   }
 
   return (
+    <div className={`w-full max-w-[910px] ${className}`}>
     <div
-      className={`relative isolate flex w-full max-w-[910px] flex-col gap-4 overflow-hidden rounded-[25.6px] border border-bitmap-highlight/40 bg-[#00280e]/60 px-6 py-6 text-left sm:px-[34px] min-[900px]:flex-row min-[900px]:items-center min-[900px]:gap-[17px] ${className}`}
+      className="rz-card group relative isolate flex w-full flex-col gap-4 overflow-hidden rounded-[25.6px] border border-bitmap-highlight/40 bg-[#00280e]/60 px-6 py-6 text-left sm:px-[34px] min-[900px]:flex-row min-[900px]:items-center min-[900px]:gap-[17px]"
     >
       <div
         aria-hidden="true"
@@ -50,7 +51,7 @@ export function RoseMviStrip({ href, section, className = "" }: RoseMviStripProp
       <a
         href={href}
         onClick={onClick}
-        className="group inline-flex shrink-0 items-center gap-[8.5px] text-[17.07px] leading-[normal] font-bold tracking-[-0.01em] text-bitmap-highlight transition-colors hover:text-sunflower focus-visible:rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-bitmap-highlight"
+        className="inline-flex shrink-0 items-center gap-[8.5px] text-[17.07px] leading-[normal] font-bold tracking-[-0.01em] text-bitmap-highlight focus-visible:rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-bitmap-highlight"
       >
         {strip.link}
         {/* Figma rotates the right-pointing arrow 90° so it points at the section below. */}
@@ -61,9 +62,10 @@ export function RoseMviStrip({ href, section, className = "" }: RoseMviStripProp
           aria-hidden="true"
           width={12}
           height={12}
-          className="size-[11.2px] rotate-90 transition-transform motion-safe:group-hover:translate-y-0.5"
+          className="size-[11.2px] rotate-90 transition-transform motion-safe:group-hover:translate-y-[3px]"
         />
       </a>
+    </div>
     </div>
   );
 }

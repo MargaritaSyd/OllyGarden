@@ -80,7 +80,7 @@ export function RoseOpenSourceApplication({ label }: { label: string }) {
       <button
         type="button"
         onClick={openDialog}
-        className="inline-flex h-12 items-center justify-center rounded-xl bg-mist px-8 text-base font-medium tracking-[0.02em] text-forest transition-colors hover:bg-sunflower lg:justify-self-end"
+        className="plan-os-cta rz-cta-steady inline-flex h-12 items-center justify-center rounded-xl bg-mist px-8 text-base font-medium tracking-[0.02em] text-forest transition-colors"
       >
         {label}
       </button>

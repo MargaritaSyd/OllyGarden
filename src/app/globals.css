@@ -38,6 +38,35 @@ body {
   font-family: var(--font-sans), Arial, ui-sans-serif, system-ui, sans-serif;
 }
 
+/* Fixed header. Scroll down tucks it off the top; scroll up brings it back. */
+.site-header {
+  --nav-inset: 24px;
+  --nav-tuck: calc(100% + var(--nav-inset) + 8px);
+  position: fixed;
+  top: calc(var(--nav-inset) + var(--announcement-height, 0px));
+  transition: transform 0.62s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.site-header.nav-tucked {
+  transform: translateY(calc(var(--nav-tuck) * -1));
+}
+
+@media (width <= 767px) {
+  .site-header {
+    --nav-inset: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header {
+    transition: none;
+  }
+
+  .site-header.nav-tucked {
+    transform: none;
+  }
+}
+
 .surface-grain {
   isolation: isolate;
   position: relative;
@@ -68,11 +97,11 @@ body {
 }
 
 .m-b {
-  --rot: 8.1deg;
+  --rot: 8deg;
 }
 
 .m-c {
-  --rot: 7.24deg;
+  --rot: 6deg;
 }
 
 .m-d {
@@ -81,49 +110,63 @@ body {
 
 .rose-card-float {
   transform: rotate(var(--rot, 0deg));
+  box-shadow: 0 18px 44px #00000059;
+  transition:
+    border-color 0.5s,
+    box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (hover: hover) {
+  .m-card:hover .rose-card-float {
+    border-color: #e3e270cc;
+    animation-play-state: paused;
+    box-shadow:
+      0 24px 50px #0006,
+      0 0 30px #d9e53324;
+  }
+}
+
+.m-a .rose-card-float {
+  animation: mFloatA 9s ease-in-out infinite;
+}
+
+.m-b .rose-card-float {
+  animation: mFloatB 11s ease-in-out 0.8s infinite;
+}
+
+.m-c .rose-card-float {
+  animation: mFloatC 8s ease-in-out 0.4s infinite;
+}
+
+.m-d .rose-card-float {
+  animation: mFloatD 10s ease-in-out 1.2s infinite;
 }
 
 @media (min-width: 1140px) {
+  .m-card {
+    position: absolute;
+    width: min(296px, 22vw);
+    pointer-events: auto;
+  }
+
   .m-a {
-    top: 21.2%;
-    left: 7.4%;
+    top: 18.7%;
+    left: 7.2%;
   }
 
   .m-b {
-    bottom: 28.2%;
-    left: 4.9%;
+    top: 67.9%;
+    left: 5.8%;
   }
 
   .m-c {
-    top: 21.4%;
-    right: 4.5%;
+    top: 18.7%;
+    right: 3.6%;
   }
 
   .m-d {
-    bottom: 20%;
-    right: 7.1%;
-  }
-
-  .m-a .rose-card-float {
-    animation: mFloatA 9s ease-in-out infinite;
-  }
-
-  .m-b .rose-card-float {
-    animation: mFloatB 11s ease-in-out 0.8s infinite;
-  }
-
-  .m-c .rose-card-float {
-    animation: mFloatC 8s ease-in-out 0.4s infinite;
-  }
-
-  .m-d .rose-card-float {
-    animation: mFloatD 10s ease-in-out 1.2s infinite;
-  }
-}
-
-@media (min-width: 1140px) and (width <= 1279px) {
-  .m-card {
-    width: min(300px, 23vw);
+    top: 68.7%;
+    right: 6.6%;
   }
 }
 
@@ -176,6 +219,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .rose-card-float {
     animation: none;
+    transition: none;
   }
 }
 
@@ -2777,6 +2821,11 @@ body {
 }
 
 .plan-os {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 20px;
   background-color: #002810;
   background-image:
     linear-gradient(
@@ -2790,6 +2839,31 @@ body {
   background-size:
     100% 100%,
     328px 140px;
+}
+
+/* Title, note, and checks stay in column one. The button spans both rows on the right. */
+.plan-os .plan-os-cta {
+  grid-area: 1 / 2 / span 2;
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+.plan-os-list {
+  grid-column: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 32px;
+}
+
+@media (width <= 899px) {
+  .plan-os {
+    grid-template-columns: 1fr;
+  }
+
+  .plan-os .plan-os-cta {
+    grid-area: auto / 1;
+    justify-self: start;
+  }
 }
 
 /* Excludes dialog: this rule is unlayered, so it beats Tailwind's utilities and
@@ -4651,6 +4725,87 @@ section[id] {
   line-height: 1.5;
 }
 
+/* Rose hero mosaic. The offset grows as the viewport shrinks so fewer clusters stay in frame. */
+.rz-hero-deco {
+  pointer-events: none;
+  position: absolute;
+  z-index: -10;
+  top: 50%;
+  aspect-ratio: 608.717 / 949.713;
+  width: auto;
+  height: min(100%, 950px);
+  max-width: none;
+  --rz-deco-off: 66.8%;
+  user-select: none;
+}
+
+.rz-hero-deco--right {
+  right: 0;
+  translate: var(--rz-deco-off) -50%;
+}
+
+.rz-hero-deco--left {
+  right: auto;
+  left: 0;
+  translate: calc(-1 * var(--rz-deco-off)) -50%;
+  scale: -1 1;
+}
+
+.rz-teams-deco {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 627.62px;
+  height: 228.139px;
+  user-select: none;
+}
+
+@media (width <= 1279px) {
+  .rz-hero-deco {
+    --rz-deco-off: 77.8%;
+  }
+}
+
+@media (width <= 1100px) {
+  .rz-hero-deco {
+    --rz-deco-off: 88.9%;
+  }
+}
+
+@media (width <= 767px) {
+  .rz-hero-deco,
+  .rz-teams-deco {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rz-hero-deco,
+  .rz-teams-deco {
+    display: none;
+  }
+}
+
+/* Shared Rose card hover: lift 6px and brighten the border. Banners only brighten. */
+.rz-card {
+  transition:
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.5s;
+}
+
+@media (hover: hover) {
+  .rz-card:hover {
+    border-color: #e3e270cc;
+    transform: translateY(-6px);
+    box-shadow:
+      0 24px 50px #0006,
+      0 0 30px #d9e5331f,
+      inset 0 1px #ffffff14;
+  }
+}
+
 .rz-banner {
   border: 1px solid #d1d10052;
   border-radius: 24px;
@@ -4660,9 +4815,31 @@ section[id] {
     url("/images/texture-grain.png");
   background-repeat: no-repeat, repeat;
   background-size: 100% 100%, 328px 140px;
+  transition:
+    border-color 0.5s,
+    box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.rz-banner .rz-banner-cta:hover {
+@media (hover: hover) {
+  .rz-banner:hover {
+    border-color: #d1d10099;
+    box-shadow: 0 14px 34px #00000042;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rz-card,
+  .rz-banner {
+    transition: none;
+  }
+
+  .rz-card:hover {
+    transform: none;
+  }
+}
+
+.rz-banner .rz-banner-cta:hover,
+.rz-cta-steady:hover {
   background-color: var(--color-mist);
   color: var(--color-forest);
 }
@@ -4746,6 +4923,19 @@ section[id] {
 .rz-work-list > li {
   display: flex;
   min-width: 0;
+}
+
+.js-anim .rz-work-list > li {
+  opacity: 0;
+  translate: 0 32px;
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i, 0) * 90ms),
+    translate 0.7s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i, 0) * 90ms);
+}
+
+.js-anim.in-view .rz-work-list > li {
+  opacity: 1;
+  translate: none;
 }
 
 .rz-work-card {
@@ -4918,6 +5108,13 @@ section[id] {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .js-anim .rz-work-list > li,
+  .js-anim.in-view .rz-work-list > li {
+    opacity: 1;
+    translate: none;
+    transition: none;
+  }
+
   .rz-work-card,
   .rz-work-read .arrow {
     transition: none;

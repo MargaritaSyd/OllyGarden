@@ -73,7 +73,7 @@ export function RoseSecurity() {
           {roseSecurity.cards.map((card) => (
             <li
               key={card.title}
-              className="flex flex-col rounded-3xl border border-bitmap-highlight/40 bg-[#00280e]/60 p-8"
+              className="rz-card flex flex-col rounded-3xl border border-bitmap-highlight/40 bg-[#00280e]/60 p-8"
             >
               <div className="grid size-12 place-items-center rounded-lg border border-bitmap-shadow/15 bg-bitmap-mid/20 shadow-[0_4px_12px_rgba(0,40,14,0.1)]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -105,7 +105,7 @@ export function RoseSecurity() {
           </div>
           <GetStartedLink
             href={roseSecurity.enterprise.href}
-            className="rz-banner-cta rounded-xl"
+            className="rz-banner-cta rz-cta-steady rounded-xl"
             analytics={{ id: "rose_security_data_handling", section: "security" }}
           >
             {roseSecurity.enterprise.cta}

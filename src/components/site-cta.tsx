@@ -8,6 +8,7 @@ export type SiteCtaAction = {
   label: string;
   href?: string;
   arrow?: boolean;
+  className?: string;
 };
 
 export type SiteCtaContent = {
@@ -79,6 +80,7 @@ export function SiteCta({ content = homeCta }: { content?: SiteCtaContent }) {
             <GetStartedLink
               href={primary.href}
               size={content.buttonSize}
+              className={primary.className}
               analytics={{ id: "closing_cta_primary", section: "closing_cta" }}
             >
               {primary.label}

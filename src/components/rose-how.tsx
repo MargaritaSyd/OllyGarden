@@ -45,7 +45,7 @@ export function RoseHow() {
           <ol className="ov-stagger grid grid-cols-1 gap-8 min-[900px]:grid-cols-3">
             {roseHow.steps.map((step) => (
               <li key={step.n} className="flex">
-                <article className="flex w-full flex-col gap-4 rounded-3xl border border-bitmap-highlight/40 bg-[#00280e]/60 bg-[radial-gradient(125%_80%_at_50%_-10%,rgba(156,167,3,0.14),transparent_60%)] p-8 shadow-[inset_0_1px_rgba(255,255,255,0.05)]">
+                <article className="rz-card flex w-full flex-col gap-4 rounded-3xl border border-bitmap-highlight/40 bg-[#00280e]/60 bg-[radial-gradient(125%_80%_at_50%_-10%,rgba(156,167,3,0.14),transparent_60%)] p-8 shadow-[inset_0_1px_rgba(255,255,255,0.05)]">
                   <span
                     className="flex size-12 items-center justify-center rounded-lg border border-bitmap-shadow/15 bg-white text-2xl leading-[normal] font-bold tracking-[-0.02em] text-[#75a105] shadow-[0_4px_12px_rgba(0,40,14,0.1)]"
                     aria-hidden="true"

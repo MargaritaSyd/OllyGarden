@@ -62,7 +62,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="relative isolate flex min-h-full flex-col bg-forest font-sans text-mist">
         <AnnouncementBar />
-        {/* The header and motif are absolute at the top of this wrapper, so they start below the bar. */}
+        {/* The motif is absolute at the top of this wrapper. The header is fixed over the page. */}
         <div className="relative flex flex-1 flex-col">
           <PageMotif />
           <SiteHeader />

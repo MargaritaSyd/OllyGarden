@@ -28,15 +28,15 @@ Header chrome uses **two splits**.
 
 ## Announcement bar
 
-`AnnouncementBar` (`src/components/announcement-bar.tsx`) is the first child of `body`, and it renders only on `/`: a full-width `bitmap-highlight` bar with a forest **NEW** pill and one sentence whose trailing link is underlined (Figma 2383:42299). The whole bar is the link. Copy and the destination live in `src/lib/announcement.ts`; the Rose MVI section reuses the same destination. It is in normal flow, so it scrolls away with the header. On home it publishes its measured height as `--announcement-height` on `html` for the mobile nav cap, and removes that variable on every other route.
+`AnnouncementBar` (`src/components/announcement-bar.tsx`) is the first child of `body`, and it renders only on `/`: a full-width `bitmap-highlight` bar with a forest **NEW** pill and one sentence whose trailing link is underlined (Figma 2383:42299). The whole bar is the link. Copy and the destination live in `src/lib/announcement.ts`; the Rose MVI section reuses the same destination. It is in normal flow, so it scrolls away. On home it publishes the bar's visible bottom as `--announcement-height` on `html` (the header sits under that edge, and the mobile nav cap uses it). It removes that variable on every other route.
 
 ## Header position and mobile scroll
 
-The header is `absolute` at the top of the wrapper that holds it together with `PageMotif` and `main`, directly below the announcement bar. It sits above page content instead of pushing it down. It is **not** `sticky` or `fixed`: scrolling the page moves the header away with the document.
+The header is `fixed` on every page. It overlays the content instead of pushing it down. Its top is 24px (16px below 768px) plus `--announcement-height`, so on home it rides just under the announcement until that bar leaves the viewport. Scrolling down more than 6px past 120px tucks the header off the top. Scrolling up more than 6px brings it back, at any point on the page. An open desktop menu or the mobile nav keeps it visible. `prefers-reduced-motion: reduce` leaves it in place.
 
-`MobileNav` sizes to its content (titles only stay short). If an expanded section would overflow the viewport, the card caps at `100dvh` minus header padding minus the announcement bar (`--announcement-height`, measured by `AnnouncementBar`) and the **list** scrolls first. After the last item, further scroll moves the page: the open menu leaves the viewport and the rest of the app is visible.
+`MobileNav` sizes to its content (titles only stay short). If an expanded section would overflow the viewport, the card caps at `100dvh` minus header padding minus the announcement bar (`--announcement-height`, measured by `AnnouncementBar`) and the **list** scrolls first.
 
-Do not use `sticky`/`fixed` on the header, and do not stretch the open mobile menu to full screen when the title list is enough.
+Do not stretch the open mobile menu to full screen when the title list is enough.
 
 ## Surface
 

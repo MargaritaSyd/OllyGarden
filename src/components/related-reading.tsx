@@ -1,6 +1,8 @@
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { ArrowLinks } from "@/components/blog-ui";
 import { CtaArrow } from "@/components/cta-arrow";
+import { InView } from "@/components/in-view";
 import type { RelatedLink } from "@/lib/related";
 
 /** Server-rendered links to the case studies, products, and posts that go with a page. */
@@ -19,7 +21,7 @@ export function RelatedReading({
 }) {
   if (eyebrow && explore) {
     return (
-      <section aria-labelledby="related-reading" className="rz-work">
+      <InView as="section" aria-labelledby="related-reading" className="rz-work">
         <div className="rz-work-inner">
           <div className="rz-work-head">
             <p className="rz-work-eyebrow">{eyebrow}</p>
@@ -28,8 +30,8 @@ export function RelatedReading({
             </h2>
           </div>
           <ul className="rz-work-list">
-            {links.map((link) => (
-              <li key={link.href}>
+            {links.map((link, index) => (
+              <li key={link.href} style={{ "--i": index } as CSSProperties}>
                 <Link href={link.href} className="rz-work-card">
                   <span className="rz-work-kind">{link.kicker}</span>
                   <span className="rz-work-card-title">{link.title}</span>
@@ -62,7 +64,7 @@ export function RelatedReading({
             </ul>
           </div>
         </div>
-      </section>
+      </InView>
     );
   }
 

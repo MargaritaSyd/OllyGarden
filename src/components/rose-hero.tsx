@@ -1,4 +1,5 @@
 import { GetStartedLink } from "@/components/get-started-link";
+import { RoseHeroDeco } from "@/components/rose-pixels";
 import { RoseMascot } from "@/components/rose-mascot";
 import { RoseMviStrip } from "@/components/rose-mvi-strip";
 import { roseHero, roseMvi } from "@/lib/rose";
@@ -6,38 +7,15 @@ import { roseHero, roseMvi } from "@/lib/rose";
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-bitmap-highlight";
 
-/**
- * Figma 2371:32331 (centered variant). The pixel motif (Group 216, 609×950) sits on both
- * sides with 406.72px of its width pushed past the frame edge, so only the outer 202px show;
- * the left copy is the same asset mirrored. 406.72 / 608.717 = 66.8% of the image width.
- */
-const pixelImg =
-  "ov-fade-up-slow pointer-events-none absolute top-1/2 -z-10 hidden h-[950px] w-auto max-w-none -translate-y-1/2 select-none [animation-delay:0.3s] min-[1140px]:block";
-
 export function RoseHero() {
   return (
     <section
       aria-labelledby="rose-hero-title"
       className="relative isolate min-h-svh overflow-hidden"
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/images/rose/hero-pixels.svg"
-        alt=""
-        aria-hidden="true"
-        width={609}
-        height={950}
-        className={`${pixelImg} right-0 translate-x-[66.8%]`}
-      />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/images/rose/hero-pixels.svg"
-        alt=""
-        aria-hidden="true"
-        width={609}
-        height={950}
-        className={`${pixelImg} left-0 -translate-x-[66.8%] -scale-x-100`}
-      />
+      {/* The same mosaic is mirrored. Most of it sits past the frame, so each side shows the outer clusters. */}
+      <RoseHeroDeco side="right" />
+      <RoseHeroDeco side="left" />
 
       <div className="relative mx-auto flex min-h-svh w-full max-w-[1440px] items-center justify-center px-5 pt-[130px] pb-16 sm:px-12 xl:px-[104px]">
         <div className="flex w-full max-w-[1070px] flex-col items-center py-6 text-center">
@@ -78,7 +56,7 @@ export function RoseHero() {
               size="lg"
               href={roseHero.ctaHref}
               analytics={{ id: "rose_hero_primary", section: "hero" }}
-              className={focusRing}
+              className={`${focusRing} rz-cta-steady`}
             >
               {roseHero.cta}
             </GetStartedLink>

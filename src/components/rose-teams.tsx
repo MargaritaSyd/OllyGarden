@@ -1,4 +1,5 @@
 import { InView } from "@/components/in-view";
+import { RoseTeamsDeco } from "@/components/rose-pixels";
 import { roseTeams, type RoseTeamsIcon } from "@/lib/rose";
 
 /** Figma 2371:31768 / 31775 / 31782, exported as-is (lucide chevrons, sliders, parasol). */
@@ -9,7 +10,7 @@ const iconSrc: Record<RoseTeamsIcon, string> = {
 };
 
 const cardClass =
-  "flex h-full flex-col gap-4 rounded-3xl border border-bitmap-highlight/40 bg-[#00280e]/60 p-8";
+  "rz-card flex h-full flex-col gap-4 rounded-3xl border border-bitmap-highlight/40 bg-[#00280e]/60 p-8";
 
 export function RoseTeams() {
   const { stat } = roseTeams;
@@ -21,15 +22,7 @@ export function RoseTeams() {
       className="relative overflow-hidden"
     >
       {/* Figma 2371:31740 — decorative pixel cluster, flush top-right. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/images/rose/teams-pixels.svg"
-        alt=""
-        aria-hidden="true"
-        width={628}
-        height={228}
-        className="pointer-events-none absolute top-0 right-0 hidden h-auto w-[min(628px,44vw)] select-none min-[1140px]:block"
-      />
+      <RoseTeamsDeco />
       <div className="relative mx-auto w-full max-w-[1328px] px-5 py-[clamp(3.5rem,6.7vw,6rem)] sm:px-12">
         <div className="ov-stagger flex flex-col gap-10">
           <div className="flex max-w-[571px] flex-col items-start gap-4">

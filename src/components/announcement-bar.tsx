@@ -13,8 +13,9 @@ const ANNOUNCEMENT_HEIGHT_VAR = "--announcement-height";
  * Full-width highlight bar above the header on the home page only. Figma 2383:42299: 40px tall,
  * 16px/10px padding, 8px gap, centred; forest "NEW" pill (11px bold, 0.1em tracking) and
  * 14.5px medium forest copy with the trailing link underlined. The whole bar is the link,
- * as in the design. In normal flow, so it scrolls away with the header. The pill is inline
- * with the copy so phone widths wrap it with the sentence instead of giving it its own row.
+ * as in the design. In normal flow, so it scrolls away. The header reads the bar's
+ * visible bottom as `--announcement-height` and sits just under it until it is gone.
+ * The pill is inline with the copy so phone widths wrap it with the sentence instead of giving it its own row.
  * Client component for the route check, the click event, and the measured height.
  */
 export function AnnouncementBar() {
@@ -34,13 +35,31 @@ export function AnnouncementBar() {
       root.style.removeProperty(ANNOUNCEMENT_HEIGHT_VAR);
       return;
     }
-    const update = () =>
-      root.style.setProperty(ANNOUNCEMENT_HEIGHT_VAR, `${bar.offsetHeight}px`);
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      root.style.setProperty(
+        ANNOUNCEMENT_HEIGHT_VAR,
+        `${Math.max(0, bar.getBoundingClientRect().bottom)}px`,
+      );
+    };
+    const schedule = () => {
+      if (!frame) {
+        frame = requestAnimationFrame(update);
+      }
+    };
     update();
-    const observer = new ResizeObserver(update);
+    const observer = new ResizeObserver(schedule);
     observer.observe(bar);
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
     return () => {
+      if (frame) {
+        cancelAnimationFrame(frame);
+      }
       observer.disconnect();
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
       root.style.removeProperty(ANNOUNCEMENT_HEIGHT_VAR);
     };
   }, [visible]);

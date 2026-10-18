@@ -31,7 +31,7 @@ export function RoseDoes() {
         <ul className="ov-stagger mt-16 grid grid-cols-1 gap-6 min-[640px]:grid-cols-2 min-[640px]:gap-8 min-[1140px]:grid-cols-4">
           {roseDoes.cards.map((card) => (
             <li key={card.title} className="flex">
-              <article className="texture-grain paper-grain relative flex w-full flex-col gap-4 overflow-hidden rounded-3xl border border-bitmap-highlight/40 p-8 shadow-[inset_0_1px_rgba(255,255,255,0.05)] before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(125%_80%_at_50%_-10%,rgba(156,167,3,0.14),transparent_60%)]">
+              <article className="rz-card texture-grain paper-grain relative flex w-full flex-col gap-4 overflow-hidden rounded-3xl border border-bitmap-highlight/40 p-8 shadow-[inset_0_1px_rgba(255,255,255,0.05)] before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(125%_80%_at_50%_-10%,rgba(156,167,3,0.14),transparent_60%)]">
                 <span
                   aria-hidden="true"
                   className="relative flex size-12 items-center justify-center rounded-lg border border-bitmap-shadow/15 bg-bitmap-mid/20 shadow-[0_4px_12px_rgba(0,40,14,0.1)]"

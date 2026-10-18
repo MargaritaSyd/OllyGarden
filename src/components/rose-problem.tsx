@@ -43,7 +43,7 @@ export function RoseProblem() {
           {roseProblem.cards.map((card) => (
             <li
               key={card.title}
-              className={`m-card ${placeClass[card.place]} min-[1140px]:pointer-events-auto min-[1140px]:absolute min-[1280px]:w-[287px]`}
+              className={`m-card ${placeClass[card.place]} min-[1140px]:absolute`}
             >
               {/* Figma card is the 24/32 standard card scaled to 80.7%: w 287, p 26, r 19.4. */}
               <article className="rose-card-float texture-grain paper-grain h-full rounded-[19.4px] border-[0.8px] border-bitmap-highlight/40 p-[26px]">

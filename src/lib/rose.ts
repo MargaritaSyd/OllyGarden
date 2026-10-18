@@ -363,7 +363,11 @@ export const roseFaq = {
 export const roseCta = {
   title: ["Telemetry your teams and", "their agents can trust"],
   sub: "Start with the right instrumentation. Improve what you already have.",
-  primary: { label: "Scan your Repo for Free", href: siteConfig.appUrl },
+  primary: {
+    label: "Scan your Repo for Free",
+    href: siteConfig.appUrl,
+    className: "rz-cta-steady",
+  },
   secondary: { label: "Book a Demo", href: "/contact" },
   buttonSize: "lg",
   variant: "product",

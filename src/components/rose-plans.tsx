@@ -39,7 +39,7 @@ export function RosePlans({
         <div className="grid gap-6 lg:grid-cols-2 lg:gap-10">
           <PlanCard plan={rosePlans.free} />
           <PlanCard plan={rosePlans.enterprise} darker />
-          <article className="plan-os relative grid items-center gap-x-10 gap-y-5 overflow-hidden rounded-2xl border border-sunflower/32 p-5 sm:p-6 lg:col-span-2 lg:grid-cols-[minmax(0,1fr)_auto]">
+          <article className="plan-os relative overflow-hidden rounded-2xl border border-sunflower/32 p-5 sm:p-6">
             <div>
               <h3 className={planTitleClass}>{rosePlans.openSource.title}</h3>
               <p className="mt-2 text-sm leading-[1.4] tracking-[0.02em] text-mist/90">
@@ -47,7 +47,7 @@ export function RosePlans({
               </p>
             </div>
             <RoseOpenSourceApplication label={rosePlans.openSource.cta} />
-            <ul className="flex flex-wrap gap-x-8 gap-y-3 lg:col-span-2">
+            <ul className="plan-os-list">
               {rosePlans.openSource.items.map((item) => (
                 <li key={item} className={featureClass}>
                   <CheckIcon />
@@ -94,7 +94,7 @@ function PlanCard({
       <GetStartedLink
         href={plan.href}
         fullWidth
-        className="mt-auto rounded-xl"
+        className="rz-cta-steady mt-auto rounded-xl"
         analytics={{
           id: `rose_pricing_${plan.title.toLowerCase()}`,
           section: "pricing",
