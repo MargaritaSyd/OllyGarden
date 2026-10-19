@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
-import { GetStartedLink } from "@/components/get-started-link";
 import { JsonLd } from "@/components/json-ld";
-import { PageHero } from "@/components/page-hero";
+import { QuizLanding } from "@/components/quiz-landing";
 import { createPageMetadata } from "@/lib/metadata";
 import {
   quizCardPath,
@@ -40,26 +39,7 @@ export default async function QuizResultPage({ params }: { params: Params }) {
   return (
     <>
       <JsonLd data={quizGraph()} />
-      <PageHero
-        eyebrow="OpenTelemetry quiz result"
-        titleId="quiz-result-title"
-        title={
-          <>
-            <span className="text-sunflower">
-              {score}/{quizQuestionCount}
-            </span>
-            : {quizTier(score).name}
-          </>
-        }
-        lede={`Someone shared their score on OllyGarden's OpenTelemetry quiz. ${quizPitch}`}
-      >
-        <GetStartedLink
-          href="/otel-quiz"
-          analytics={{ id: "quiz_result_take_quiz", section: "quiz_result_hero" }}
-        >
-          Take the quiz
-        </GetStartedLink>
-      </PageHero>
+      <QuizLanding sharedScore={score} />
     </>
   );
 }

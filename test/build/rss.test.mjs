@@ -174,6 +174,7 @@ test("shared quiz results carry their score card and stay out of search", async 
   const sitemap = await (await fetch(`${origin}/sitemap.xml`)).text();
 
   assert.equal(response.status, 200);
+  assert.match(html, /Someone scored 7\/10: sprouting nicely\. Your turn\./);
   assert.match(html, /<meta name="robots" content="noindex, nofollow"/);
   assert.match(
     html,

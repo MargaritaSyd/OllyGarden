@@ -16,6 +16,11 @@ type PageHeroProps = {
   lede?: ReactNode;
   /** Anything that belongs with the title, usually a CTA. */
   children?: ReactNode;
+  /** Sits beside the title on wide screens and below it on narrow ones. */
+  aside?: ReactNode;
+  /** Painted behind the title block. The quiz uses this for its mosaic. */
+  decoration?: ReactNode;
+  className?: string;
 };
 
 /**
@@ -33,40 +38,62 @@ export function PageHero({
   titleId,
   lede,
   children,
+  aside,
+  decoration,
+  className,
 }: PageHeroProps) {
+  const copy = (
+    <>
+      {eyebrow ? (
+        <div className="text-sm font-bold tracking-[.14em] text-bitmap-mid uppercase">
+          {eyebrow}
+        </div>
+      ) : null}
+      <h1
+        id={titleId}
+        className="mt-4 max-w-4xl text-[clamp(2.5rem,6vw,5rem)] font-bold leading-[.98] tracking-[-.04em] text-mist"
+      >
+        {title}
+      </h1>
+      {lede ? (
+        <p className="mt-7 max-w-3xl text-xl leading-8 text-mist/75">{lede}</p>
+      ) : null}
+      {children ? <div className="mt-8 max-w-max">{children}</div> : null}
+    </>
+  );
+
   return (
     <section
-      className={`relative flex min-h-dvh flex-col justify-center ${inset} pt-32 pb-16 lg:pt-40`}
+      className={`relative flex min-h-dvh flex-col ${aside ? "justify-start lg:justify-center" : "justify-center"} ${inset} pt-32 pb-16 lg:pt-40 ${className ?? ""}`}
       aria-labelledby={titleId}
     >
-      <div className="mx-auto w-full max-w-5xl">
-        {eyebrow ? (
-          <div className="text-sm font-bold tracking-[.14em] text-bitmap-mid uppercase">
-            {eyebrow}
-          </div>
-        ) : null}
-        <h1
-          id={titleId}
-          className="mt-4 max-w-4xl text-[clamp(2.5rem,6vw,5rem)] font-bold leading-[.98] tracking-[-.04em] text-mist"
-        >
-          {title}
-        </h1>
-        {lede ? (
-          <p className="mt-7 max-w-3xl text-xl leading-8 text-mist/75">
-            {lede}
-          </p>
-        ) : null}
-        {children ? <div className="mt-8 max-w-max">{children}</div> : null}
-      </div>
+      {decoration}
+      {aside ? (
+        <div className="relative z-[1] mx-auto flex w-full max-w-[1232px] flex-col gap-12 lg:flex-row lg:items-center">
+          <div className="min-w-0 flex-1">{copy}</div>
+          {aside}
+        </div>
+      ) : (
+        <div className="relative z-[1] mx-auto w-full max-w-5xl">{copy}</div>
+      )}
     </section>
   );
 }
 
 /** Body container that shares `PageHero`'s inset and column width. */
-export function PageBody({ children }: { children: ReactNode }) {
+export function PageBody({
+  children,
+  width = "default",
+}: {
+  children: ReactNode;
+  /** "wide" fills the motif inset. The quiz topic grid needs the extra room. */
+  width?: "default" | "wide";
+}) {
   return (
     <div className={`${inset} pt-12 pb-24`}>
-      <div className="mx-auto max-w-5xl">{children}</div>
+      <div className={width === "wide" ? "mx-auto max-w-6xl" : "mx-auto max-w-5xl"}>
+        {children}
+      </div>
     </div>
   );
 }

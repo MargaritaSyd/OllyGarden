@@ -29,7 +29,8 @@ export function PageMotif() {
     pathname.startsWith("/resources/") ||
     pathname === "/company" ||
     pathname === "/contact" ||
-    pathname === "/careers"
+    pathname === "/careers" ||
+    pathname.startsWith("/otel-quiz")
   ) {
     return null;
   }

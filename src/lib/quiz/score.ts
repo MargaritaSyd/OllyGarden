@@ -12,35 +12,46 @@ export const quizPitch = "Ten OpenTelemetry questions, one per topic. How deep a
 const quizTiers = [
   {
     min: 10,
+    stage: 4,
     name: "deep roots",
     emoji: "🌳",
     message: "A perfect score. Your OpenTelemetry knowledge runs all the way down.",
   },
   {
     min: 8,
+    stage: 3,
     name: "in full bloom",
     emoji: "🌸",
     message: "Strong roots. Your OpenTelemetry fundamentals are in excellent shape.",
   },
   {
     min: 6,
+    stage: 2,
     name: "sprouting nicely",
     emoji: "🌿",
     message: "Solid growth. Review the explanations and keep cultivating the details.",
   },
   {
     min: 4,
+    stage: 1,
     name: "a healthy seedling",
     emoji: "🌱",
     message: "A healthy start. The explanations point to the concepts worth revisiting.",
   },
   {
     min: 0,
+    stage: 0,
     name: "seeds planted",
     emoji: "🪴",
     message: "Every expert starts somewhere. The explanations point to the concepts worth revisiting.",
   },
 ] as const;
+
+/** Lowest score first, with the inclusive top of each band, for the ladder on the quiz. */
+export const quizLadder = [...quizTiers].reverse().map((tier, index, tiers) => {
+  const next = tiers[index + 1];
+  return { ...tier, max: next ? next.min - 1 : quizQuestionCount };
+});
 
 export function quizTier(score: number) {
   return quizTiers.find((tier) => score >= tier.min)!;

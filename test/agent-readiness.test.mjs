@@ -172,6 +172,22 @@ test("quiz selects ten questions with every topic and does not collect lead data
   );
 });
 
+test("quiz ladder covers every score once", async () => {
+  const { quizLadder, quizQuestionCount, quizTier } = await import("../src/lib/quiz/score.ts");
+
+  assert.equal(quizLadder.length, 5);
+  const covered = quizLadder.flatMap((tier) =>
+    Array.from({ length: tier.max - tier.min + 1 }, (_, offset) => tier.min + offset),
+  );
+  assert.deepEqual(
+    covered,
+    Array.from({ length: quizQuestionCount + 1 }, (_, score) => score),
+  );
+  for (const score of covered) {
+    assert.equal(quizTier(score).name, quizLadder.find((tier) => score >= tier.min && score <= tier.max).name);
+  }
+});
+
 test("quiz result links hide the score in a token that maps back to it", async () => {
   const quiz = await import("../src/lib/quiz/score.ts");
   for (const score of quiz.quizScores) {
