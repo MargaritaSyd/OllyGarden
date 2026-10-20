@@ -778,6 +778,166 @@ body {
   }
 }
 
+/* Instrumentation Score worked example: the points a fix adds or takes back. */
+@keyframes is-score-pop {
+  0% {
+    opacity: 0;
+    translate: 0 10px;
+  }
+  15%,
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    translate: 0 -36px;
+  }
+}
+
+.is-score-pop {
+  animation: is-score-pop 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-score-pop {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* Instrumentation Score steps: a dashed connector from each number square to the
+   next card, with a dot hopping along it. Offsets follow the card padding and the
+   44px square. */
+.is-step {
+  --is-step-pad: clamp(1.25rem, 3vw, 2rem);
+}
+
+.is-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  top: calc(var(--is-step-pad) + 21px);
+  right: -33px;
+  width: 32px;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, rgb(209 209 0 / 0.6) 0 4px, transparent 4px 8px);
+}
+
+.is-step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  top: calc(var(--is-step-pad) + 19px);
+  right: -33px;
+  width: 6px;
+  height: 6px;
+  background: var(--color-sunflower);
+  box-shadow: 0 0 10px rgb(209 209 0 / 0.8);
+  opacity: 0;
+}
+
+.in-view .is-step:not(:last-child)::before {
+  animation: is-step-hop 2.6s ease-in-out 1s infinite;
+}
+
+.in-view .is-step:nth-child(2)::before {
+  animation-delay: 1.9s;
+}
+
+@keyframes is-step-hop {
+  0% {
+    opacity: 0;
+    translate: -26px 0;
+  }
+  15%,
+  45% {
+    opacity: 1;
+  }
+  60%,
+  100% {
+    opacity: 0;
+    translate: 0 0;
+  }
+}
+
+@media (max-width: 1023px) {
+  .is-step:not(:last-child)::after {
+    top: auto;
+    right: auto;
+    bottom: -21px;
+    left: calc(var(--is-step-pad) + 21px);
+    width: 2px;
+    height: 20px;
+    background: repeating-linear-gradient(rgb(209 209 0 / 0.6) 0 4px, transparent 4px 8px);
+  }
+
+  .is-step:not(:last-child)::before {
+    display: none;
+  }
+}
+
+/* The formula's fraction bar draws in, then the two terms rise into place. */
+.is-frac::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -6px;
+  left: -6px;
+  height: 2px;
+  margin-top: -1px;
+  background: var(--color-sunflower);
+  transform-origin: 0 50%;
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.35s;
+}
+
+.is-formula.js-anim .is-frac::before {
+  transform: scaleX(0);
+}
+
+.is-formula.js-anim .is-frac > span {
+  opacity: 0;
+  translate: 0 6px;
+  transition:
+    opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s,
+    translate 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s;
+}
+
+.is-formula.js-anim .is-frac > span + span {
+  transition-delay: 0.7s;
+}
+
+.is-formula.js-anim.in-view .is-frac::before {
+  transform: none;
+}
+
+.is-formula.js-anim.in-view .is-frac > span {
+  opacity: 1;
+  translate: none;
+}
+
+/* Weights card: each bar grows and each rule square pops in, row by row. */
+.is-weights.js-anim .is-wbar {
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) calc(0.25s + 0.1s * var(--i, 0));
+}
+
+.is-weights.js-anim .is-sq {
+  transform: scale(0);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) calc(0.35s + 0.1s * var(--i, 0) + 30ms * var(--n, 0));
+}
+
+.is-weights.js-anim.in-view .is-wbar,
+.is-weights.js-anim.in-view .is-sq {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .in-view .is-step:not(:last-child)::before {
+    animation: none;
+  }
+}
+
 @keyframes ov-mask-in {
   from {
     clip-path: inset(0 100% 0 0);
@@ -4923,6 +5083,24 @@ section[id] {
 .rz-work-list > li {
   display: flex;
   min-width: 0;
+}
+
+/* Three cards span the banner below them, as in the reference. */
+.rz-work-list.rz-work-list--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 40px;
+}
+
+@media (width <= 1100px) {
+  .rz-work-list.rz-work-list--3 {
+    gap: 24px;
+  }
+}
+
+@media (width <= 899px) {
+  .rz-work-list.rz-work-list--3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .js-anim .rz-work-list > li {

@@ -123,6 +123,12 @@ export const instrumentationScoreReading = {
     { href: "/resources/webinars-conferences", label: "Watch the KubeCon talk on the score" },
     { href: "/resources/faq", label: "Read the FAQ" },
   ],
+  eyebrow: "Learn more",
+  explore: {
+    eyebrow: "Keep exploring",
+    title: "More on telemetry quality",
+    body: "What telemetry quality is, the KubeCon talk on the score, and answers to common questions.",
+  },
 };
 
 /** The telemetry quality guide's closing links: the posts it grew out of, then how to measure it. */

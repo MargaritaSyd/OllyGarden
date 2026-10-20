@@ -29,7 +29,7 @@ export function RelatedReading({
               {title}
             </h2>
           </div>
-          <ul className="rz-work-list">
+          <ul className={links.length === 3 ? "rz-work-list rz-work-list--3" : "rz-work-list"}>
             {links.map((link, index) => (
               <li key={link.href} style={{ "--i": index } as CSSProperties}>
                 <Link href={link.href} className="rz-work-card">

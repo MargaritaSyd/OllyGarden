@@ -8,6 +8,7 @@ type FinancialStatProps = {
   suffix: string;
   sep: boolean;
   prefix?: string;
+  className?: string;
 };
 
 function formatStat(value: number, sep: boolean, suffix: string, prefix = "") {
@@ -16,7 +17,13 @@ function formatStat(value: number, sep: boolean, suffix: string, prefix = "") {
   return `${prefix}${digits}${suffix}`;
 }
 
-export function FinancialStat({ end, suffix, sep, prefix = "" }: FinancialStatProps) {
+export function FinancialStat({
+  end,
+  suffix,
+  sep,
+  prefix = "",
+  className = "mb-[22px] text-[clamp(3rem,5vw,4.5rem)] leading-none font-bold tracking-[-0.02em] text-sunflower",
+}: FinancialStatProps) {
   const ref = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
   const [value, setValue] = useState(0);
@@ -74,10 +81,7 @@ export function FinancialStat({ end, suffix, sep, prefix = "" }: FinancialStatPr
   const shown = prefersReducedMotion || !hydrated ? end : started ? value : 0;
 
   return (
-    <div
-      ref={ref}
-      className="mb-[22px] text-[clamp(3rem,5vw,4.5rem)] leading-none font-bold tracking-[-0.02em] text-sunflower"
-    >
+    <div ref={ref} className={className}>
       {formatStat(shown, sep, suffix, prefix)}
     </div>
   );

@@ -40,7 +40,8 @@ the visual language. For historical URL migrations only, compare the sitemap in 
   `src/lib/instrumentation-score.ts`. Its rules table comes from the generated
   `src/lib/instrumentation-score-rules.ts`; refresh it with
   `node scripts/sync-instrumentation-score-rules.mjs` when the spec changes, then give any new rule
-  its one-line rationale in `ruleNotes` (a missing one is a type error).
+  its one-line rationale in `ruleNotes` (a missing one is a type error). A rule target the
+ filters do not know yet fails the build until it is added to `scoreTargets`.
 - The telemetry quality guide (`/resources/telemetry-quality`) takes its definition, dimensions,
   and FAQ from `src/lib/telemetry-quality.ts`. Its numbers come only from the published case
   studies; bump `updated` there when the copy changes, since it feeds the sitemap and JSON-LD.

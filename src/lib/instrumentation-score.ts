@@ -24,6 +24,7 @@ export const impactWeights: Record<ScoreImpact, number> = {
 };
 
 const impactOrder = Object.keys(impactWeights) as ScoreImpact[];
+const maxPoints = specRules.reduce((sum, rule) => sum + impactWeights[rule.impact], 0);
 
 export function rulesWithImpact(impact: ScoreImpact) {
   return specRules.filter((rule) => rule.impact === impact);
@@ -74,26 +75,39 @@ const ruleNotes: Record<SpecRuleId, RuleNote> = {
   "MET-003": { why: "When one metric name carries different units, every query across services mixes them.", post: metricNamesPost },
   "MET-004": { why: "Different buckets for the same histogram make aggregated quantiles less precise." },
   "MET-005": { why: "The unit belongs in the unit field; a name that repeats it breaks when the unit changes.", post: metricNamesPost },
-  "MET-006": { why: "A metric named like a semantic convention attribute, such as http.response.status_code, confuses queries and readers." },
+  "MET-006": { why: "A metric named like a semantic convention attribute, such as `http.response.status_code`, confuses queries and readers." },
   "MET-008": { why: "Personal data in metric names, labels, or exemplars reaches everyone with dashboard access.", post: sensitiveDataPost },
-  "RES-001": { why: "service.instance.id tells instances of a service apart without combining other attributes.", post: instanceIdPost },
+  "RES-001": { why: "`service.instance.id` tells instances of a service apart without combining other attributes.", post: instanceIdPost },
   "RES-002": { why: "An instance ID shared by several pods is worse than none: it merges their telemetry.", post: instanceIdPost },
-  "RES-003": { why: "k8s.pod.uid lets the Collector attach Kubernetes metadata reliably, even behind a service mesh." },
-  "RES-004": { why: "Attributes at the wrong level, such as service.name on a span, break queries that look where the conventions say they live." },
-  "RES-005": { why: "service.name is required by the semantic conventions; without it, telemetry belongs to nobody." },
+  "RES-003": { why: "`k8s.pod.uid` lets the Collector attach Kubernetes metadata reliably, even behind a service mesh." },
+  "RES-004": { why: "Attributes at the wrong level, such as `service.name` on a span, break queries that look where the conventions say they live." },
+  "RES-005": { why: "`service.name` is required by the semantic conventions; without it, telemetry belongs to nobody." },
   "RES-006": { why: "Standard criticality values let tooling rank alerts and incidents consistently across teams." },
   "RES-007": { why: "Without an environment, staging and production data mix in the same views and alerts." },
   "RES-010": { why: "Credentials in resource attributes, often from command-line arguments, are copied onto every record a process sends.", post: sensitiveDataPost },
   "SDK-001": { why: "Languages and runtimes outside the SDK's support window miss fixes and current semantic conventions." },
-  "SPA-001": { why: "Many INTERNAL spans in one trace usually mean over-instrumented code paths that add noise and cost.", post: "what-deserves-a-span" },
+  "SPA-001": { why: "Many `INTERNAL` spans in one trace usually mean over-instrumented code paths that add noise and cost.", post: "what-deserves-a-span" },
   "SPA-002": { why: "A span whose parent never arrives means context propagation broke and the trace is incomplete.", post: "you-dont-have-too-much-telemetry-you-have-bad-telemetry" },
   "SPA-003": { why: "Span names with IDs or literal URLs defeat grouping and can blow up backend indexes.", post: "how-to-name-your-spans" },
-  "SPA-004": { why: "A trace that starts with a CLIENT span is missing the work that caused the call, or lost its context." },
+  "SPA-004": { why: "A trace that starts with a `CLIENT` span is missing the work that caused the call, or lost its context." },
   "SPA-005": { why: "Dozens of spans shorter than 5 ms in one trace add overhead and hide the operations that matter.", post: "what-deserves-a-span" },
   "SPA-006": { why: "Spans record query text, URLs, and headers, which is where personal data and tokens leak.", post: sensitiveDataPost },
 };
 
-export type ScoreRule = SpecRule & RuleNote & { weight: number; href: string; postHref?: string };
+/** What a rule can apply to, in the order the rules filter lists them. */
+export const scoreTargets = ["Resource", "Span", "Metric", "Log", "SDK"] as const;
+export type ScoreTarget = (typeof scoreTargets)[number];
+
+export type ScoreRule = SpecRule &
+  RuleNote & { targets: ScoreTarget[]; weight: number; href: string; postHref?: string };
+
+function ruleTargets(rule: SpecRule) {
+  return rule.target.split(", ").map((target) => {
+    const known = scoreTargets.find((name) => name === target);
+    if (!known) throw new Error(`Unknown target ${target} on ${rule.id}`);
+    return known;
+  });
+}
 
 /** Every rule with its weight and our notes, most severe first. */
 export const scoreRules: readonly ScoreRule[] = impactOrder.flatMap((impact) =>
@@ -102,6 +116,7 @@ export const scoreRules: readonly ScoreRule[] = impactOrder.flatMap((impact) =>
     return {
       ...rule,
       ...note,
+      targets: ruleTargets(rule),
       weight: impactWeights[rule.impact],
       href: `${specRepository}/blob/${specSource.commit}/rules/${rule.id}.md`,
       postHref: note.post ? blogPostHref(note.post) : undefined,
@@ -131,16 +146,22 @@ export const instrumentationScoreHero = {
   lede: instrumentationScoreDefinition,
   spec: { label: "Read the specification", href: specRepository },
   cta: { label: "Get your score", href: siteConfig.appUrl },
+  facts: [
+    { value: String(ruleCount), label: "open rules" },
+    { value: String(impactOrder.length), label: "impact levels" },
+    { value: "0–100", label: "one comparable number" },
+  ],
 } as const;
 
 export const scoreCalculation = {
   eyebrow: "How it is calculated",
+  mark: "/images/instrumentation-score/mark-dimensions.svg",
   title: "Weighted rules, one number",
   lede: "The score is a meta-signal: a signal about the quality of your signals. Every rule passes or fails for a service, and failed rules cost points in proportion to their impact, so one Critical failure costs four times as much as one Low failure. Nothing is capped, and fixing the most severe problems first always moves the score the most.",
   steps: [
     {
       title: "Analyze the telemetry",
-      body: "An implementation reads the OTLP data a service already sends, grouped by service.name, over a sliding window that defaults to 30 days. The score follows the service as it changes: spans that helped during development can become noise once it is stable.",
+      body: "An implementation reads the OTLP data a service already sends, grouped by `service.name`, over a sliding window that defaults to 30 days. The score follows the service as it changes: spans that helped during development can become noise once it is stable.",
     },
     {
       title: "Check every rule",
@@ -151,29 +172,57 @@ export const scoreCalculation = {
       body: "The score is the weighted share of passed rules: the sum of passed rules times their weight, divided by the sum of all rules times their weight, times 100.",
     },
   ],
-  formula: "Score = Σ (passed rules × weight) ÷ Σ (all rules × weight) × 100",
+  formula: {
+    tag: "The formula",
+    label:
+      "Score equals the sum of passed rules times their weight, divided by the sum of all rules times their weight, times 100.",
+    numerator: "passed rules",
+    denominator: "all rules",
+  },
   weightsTitle: "Impact levels and weights",
+  weightsTotal: { label: "All rules passing:", points: maxPoints, unit: "weighted points" },
   categoriesTitle: "What a score means",
+  scaleTicks: [0, 50, 75, 90, 100],
   conformance:
     "The design borrows from scores engineers already trust: CVSS for vulnerabilities, Google Lighthouse for web pages, and SSL Labs for TLS configuration. Like them, it is strict about comparability. An implementation must not add its own rules to the score, and must tell users when it does not implement every rule, so the same telemetry gets the same score in any tool.",
+  priorArt: [
+    { name: "CVSS", for: "vulnerabilities" },
+    { name: "Google Lighthouse", for: "web pages" },
+    { name: "SSL Labs", for: "TLS configuration" },
+  ],
 } as const;
 
 export const scoreRulesSection = {
   eyebrow: "The rules",
+  mark: "/images/instrumentation-score/mark-how.svg",
   title: `All ${ruleCount} rules`,
   lede: `The rules come from OpenTelemetry semantic conventions and community practice. This table is generated from the specification repository, most severe first; each rule ID links to its full definition and criteria.`,
-  synced: `Synced from the specification on ${specSource.date} (commit ${specSource.commit.slice(0, 7)}).`,
+  synced: {
+    label: `Synced from the specification on ${specSource.date} (commit`,
+    commit: specSource.commit.slice(0, 7),
+    href: `${specRepository}/tree/${specSource.commit}`,
+  },
   pending: "Criteria still being defined in the specification.",
   howTo: "How-to",
+  opensRule: "(opens the rule definition on GitHub)",
+  filters: {
+    impact: "Filter by impact",
+    impactLabel: "Impact",
+    target: "Filter by what the rule applies to",
+    targetLabel: "Applies to",
+    all: "All",
+    empty: "No rule matches both filters.",
+    reset: "Show all rules",
+  },
 } as const;
 
 /** A sample checkout service; its numbers are computed from the current rule set. */
 const exampleFailures = ["SPA-006", "RES-007", "MET-002", "RES-001"] as const satisfies readonly SpecRuleId[];
 const exampleFindings: Record<(typeof exampleFailures)[number], string> = {
-  "SPA-006": "url.full on password-reset spans carries the reset token in its query string.",
-  "RES-007": "No deployment.environment.name, so staging and production share dashboards.",
+  "SPA-006": "`url.full` on password-reset spans carries the reset token in its query string.",
+  "RES-007": "No `deployment.environment.name`, so staging and production share dashboards.",
   "MET-002": "Custom queue metrics are exported without a unit.",
-  "RES-001": "No service.instance.id, so the three replicas cannot be told apart.",
+  "RES-001": "No `service.instance.id`, so the three replicas cannot be told apart.",
 };
 
 const exampleScore = instrumentationScore(exampleFailures);
@@ -181,20 +230,28 @@ const afterCritical = instrumentationScore(exampleFailures.filter((id) => getSco
 const afterImportant = instrumentationScore(
   exampleFailures.filter((id) => !["Critical", "Important"].includes(getScoreRule(id).impact)),
 );
-const maxPoints = specRules.reduce((sum, rule) => sum + impactWeights[rule.impact], 0);
 const lostPoints = exampleFailures.reduce((sum, id) => sum + getScoreRule(id).weight, 0);
 
 export const scoreExample = {
   eyebrow: "Worked example",
+  mark: "/images/rose/glyph-mvi.svg",
   title: "Scoring a checkout service",
-  lede: `A checkout service sends traces, metrics, and logs and fails ${exampleFailures.length} of the ${ruleCount} rules. Here is how those findings become its score.`,
+  lede: `A checkout service sends traces, metrics, and logs and fails ${exampleFailures.length} of the ${ruleCount} rules. Here is how those findings become its score. Fix them one by one to see what each is worth.`,
   service: "checkout",
-  findings: exampleFailures.map((id) => ({ rule: getScoreRule(id), finding: exampleFindings[id] })),
+  ruleCount,
+  findings: exampleFailures.map((id) => {
+    const { impact, weight } = getScoreRule(id);
+    return { id, impact, weight, finding: exampleFindings[id] };
+  }),
   maxPoints,
-  lostPoints,
-  score: formatScore(exampleScore),
-  category: scoreCategory(exampleScore).name,
-  math: `(${maxPoints} − ${lostPoints}) ÷ ${maxPoints} × 100 = ${formatScore(exampleScore)}`,
+  labels: {
+    scoreKicker: "Instrumentation Score",
+    fix: "Fix",
+    fixed: "Fixed",
+    play: "Fix in order of impact",
+    stop: "Stop",
+    reset: "Reset",
+  },
   steps: [
     `With every rule passing, the service would hold all ${maxPoints} weighted points. The ${exampleFailures.length} failures cost ${lostPoints}, which leaves ${formatScore(exampleScore)}: ${scoreCategory(exampleScore).name}.`,
     `Fixing the Critical token leak alone raises the score to ${formatScore(afterCritical)}. Adding the two Important fixes reaches ${formatScore(afterImportant)}, which is ${scoreCategory(afterImportant).name}.`,
@@ -202,31 +259,49 @@ export const scoreExample = {
   ],
 } as const;
 
+const treeFiles = 5;
+
 export const scoreGetYours = {
   eyebrow: "Get your score",
+  mark: "/images/solutions/financial/glyph.svg",
   title: "Compute it yourself, or let Insights do it",
   lede: "The specification is open, so anyone can implement it. OllyGarden Insights is a hosted implementation that keeps the score current for every service.",
   spec: {
+    kicker: "Open source · Apache 2.0",
     title: "Use the open specification",
-    body: "Read the rules and the formula on GitHub, run them against your own OTLP data, and propose changes. Discussion happens in the #instrumentation-score channel on the CNCF Slack.",
+    body: "Read the rules and the formula on GitHub, run them against your own OTLP data, and propose changes. Discussion happens in the `#instrumentation-score` channel on the CNCF Slack.",
     link: "instrumentation-score/spec on GitHub",
     href: specRepository,
     slackHref: "https://cloud-native.slack.com/archives/C090FEG5R0F",
     slackLabel: "Join #instrumentation-score",
+    tree: {
+      label: "instrumentation-score/spec/rules",
+      files: specRules.slice(0, treeFiles).map(({ id, impact }) => ({ name: `${id}.md`, impact })),
+      more: `+ ${ruleCount - treeFiles} more rules`,
+    },
   },
   insights: {
+    kicker: "Free plan · No credit card",
     title: "Get it continuously with Insights",
     body: "Send a sample of your OTLP data to OllyGarden Insights and get a score for every service, the findings behind it, and remediation guidance. The Free plan includes the Instrumentation Score, with no credit card.",
     cta: "Get your score",
     href: siteConfig.appUrl,
     link: "Learn more about Insights",
     productHref: "/products/insights",
+    shot: {
+      src: "/images/insights/service-view.png",
+      alt: "An OllyGarden Insights service view: an Instrumentation Score of 89, its version history, and a semantic convention finding marked Important",
+      width: 1128,
+      height: 636,
+    },
   },
 } as const;
 
 type ScoreProof = {
   study: string;
-  value: string;
+  /** The figure counts up to `value`; `suffix` follows it, as in "12 of ~70". */
+  value: number;
+  suffix: string;
   label: string;
   rules: readonly SpecRuleId[];
 };
@@ -235,25 +310,29 @@ type ScoreProof = {
 const proofItems: readonly ScoreProof[] = [
   {
     study: "enterprise-platform-half-the-spans-had-no-name",
-    value: "9%",
-    label: "of about 500 services set a deployment environment; 56% set service.instance.id.",
+    value: 9,
+    suffix: "%",
+    label: "of about 500 services set a deployment environment; 56% set `service.instance.id`.",
     rules: ["RES-007", "RES-001"],
   },
   {
     study: "digital-health-pii-leak-was-a-logger-setting",
-    value: "12 of ~70",
+    value: 12,
+    suffix: " of ~70",
     label: "services were flagged for personal data in logs in the first week.",
     rules: ["LOG-003"],
   },
   {
     study: "digital-health-pii-leak-was-a-logger-setting",
-    value: "100%",
+    value: 100,
+    suffix: "%",
     label: "of log records arrived with no severity, because the log bridge dropped the level.",
     rules: ["LOG-002"],
   },
   {
     study: "b2b-saas-cuts-logs-and-metrics-at-the-source",
-    value: "1 day",
+    value: 1,
+    suffix: " day",
     label: "to catch real user email addresses copied into a metric label by a new log-to-metric rule.",
     rules: ["MET-008"],
   },
@@ -261,6 +340,7 @@ const proofItems: readonly ScoreProof[] = [
 
 export const scoreProof = {
   eyebrow: "In real fleets",
+  mark: "/images/rose/glyph-security.svg",
   title: "What the rules catch",
   lede: "These findings come from our anonymized case studies. Each one is a rule that failed in production or staging telemetry, and a real cost behind it.",
   items: proofItems.map((item) => ({ ...item, href: caseStudyHref(item.study) })),

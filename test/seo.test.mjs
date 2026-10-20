@@ -57,7 +57,8 @@ const { posts } = await import("../src/lib/posts.ts");
 const { ogCards } = await import("../src/lib/og-cards.ts");
 const { pricingMeta } = await import("../src/lib/pricing.ts");
 const { telemetryQualityMeta } = await import("../src/lib/telemetry-quality.ts");
-const { instrumentationScoreMeta } = await import("../src/lib/instrumentation-score.ts");
+const { instrumentationScoreMeta, scoreExample, scoreRules, scoreTargets } = await import("../src/lib/instrumentation-score.ts");
+const { specRules } = await import("../src/lib/instrumentation-score-rules.ts");
 const { agentSkillsMeta } = await import("../src/lib/agent-skills.ts");
 // Next.js matches redirect sources with its bundled path-to-regexp; use the same one.
 const { pathToRegexp } = (await import("next/dist/compiled/path-to-regexp/index.js")).default;
@@ -610,5 +611,24 @@ describe("sitemap, robots, navigation, and redirects", () => {
     assert.equal(redirectFor("/blog")?.destination, blogMeta.path);
     assert.equal(redirectFor(`/blog/${blogPosts[0].slug}`)?.destination, "/resources/blog/:slug");
     assert.equal(redirectFor(blogPostHref(blogPosts[0].slug)), undefined);
+  });
+});
+
+describe("instrumentation score", () => {
+  test("every spec rule renders, and each target filter finds it", () => {
+    assert.deepEqual(scoreRules.map((rule) => rule.id).sort(), specRules.map((rule) => rule.id).sort());
+    for (const rule of scoreRules) {
+      assert.equal(rule.targets.join(", "), rule.target, `${rule.id} targets drift from the spec`);
+    }
+    assert.deepEqual(scoreRules.find((rule) => rule.id === "RES-004").targets, ["Resource", "Log", "Span"]);
+    for (const target of scoreTargets) {
+      assert.ok(scoreRules.some((rule) => rule.targets.includes(target)), `the ${target} filter is always empty`);
+    }
+  });
+
+  test("the worked example starts at the score its copy quotes", () => {
+    const lost = scoreExample.findings.reduce((sum, finding) => sum + finding.weight, 0);
+    assert.equal(scoreExample.maxPoints, scoreRules.reduce((sum, rule) => sum + rule.weight, 0));
+    assert.equal(Math.round(((scoreExample.maxPoints - lost) / scoreExample.maxPoints) * 1000) / 10, 83.3);
   });
 });

@@ -36,8 +36,13 @@ export default function InstrumentationScorePage() {
       <ScoreExample />
       <ScoreGetYours />
       <ScoreProof />
-      <FaqAccordion content={instrumentationScoreFaq} />
-      <RelatedReading {...instrumentationScoreReading} />
+      <div className="relative overflow-hidden">
+        <div className="tulip-grid" aria-hidden="true" />
+        <div className="relative z-[1]">
+          <FaqAccordion content={instrumentationScoreFaq} />
+          <RelatedReading {...instrumentationScoreReading} />
+        </div>
+      </div>
       <SiteCta content={instrumentationScoreCta} />
     </>
   );

@@ -6,6 +6,10 @@ export const sectionPad =
 
 export const card = "rounded-2xl border border-sunflower/25 bg-[#002810] p-[clamp(1.25rem,3vw,2rem)]";
 
+/** `card` on the reference's grain surface. */
+export const grainCard =
+  "rounded-2xl border border-sunflower/25 bg-[#19321e] bg-[url('/images/texture-grain.png')] bg-repeat [background-size:328px_140px] p-[clamp(1.25rem,3vw,2rem)]";
+
 export const textLink = "font-semibold text-sunflower underline-offset-2 hover:underline";
 
 export function SectionHeader({
@@ -13,16 +17,23 @@ export function SectionHeader({
   eyebrow,
   title,
   lede,
+  mark,
   children,
 }: {
   id: string;
   eyebrow: string;
   title: string;
   lede: string;
+  /** Path of the 32px section glyph shown above the eyebrow. */
+  mark?: string;
   children?: ReactNode;
 }) {
   return (
     <header className="ov-stagger flex max-w-[760px] flex-col gap-4">
+      {mark ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={mark} alt="" width={32} height={32} className="size-8" />
+      ) : null}
       <p className="text-sm font-bold tracking-[0.14em] text-bitmap-mid uppercase">{eyebrow}</p>
       <h2
         id={id}
