@@ -9,7 +9,12 @@ import { quizTopicGuide } from "@/lib/quiz/topics";
 const quizCta = {
   title: ["Turn OpenTelemetry knowledge", "into better instrumentation"],
   sub: "OllyGarden Insights scores the telemetry you already send, and Rose fixes it at the source.",
-  primary: { label: "Explore OllyGarden Insights", href: "/products/insights" },
+  primary: {
+    label: "Explore OllyGarden Insights",
+    href: "/products/insights",
+    // GetStartedLink paints sunflower on hover. This button stays mist and only glows.
+    className: "hover:!bg-mist",
+  },
   secondary: { label: "Meet OllyGarden Rose", href: "/products/rose" },
 } as const;
 

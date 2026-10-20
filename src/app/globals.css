@@ -5186,29 +5186,60 @@ section[id] {
   }
 }
 
-@keyframes quiz-bob {
+.quiz-hero-card-pos {
+  position: absolute;
+  z-index: 1;
+  width: 24.41em;
+}
+
+.quiz-hero-card-pos-top {
+  top: 0;
+  left: 0;
+}
+
+.quiz-hero-card-pos-bottom {
+  right: 0;
+  bottom: 0;
+}
+
+.quiz-hero-card-par {
+  will-change: transform;
+}
+
+@keyframes quiz-bob-a {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 
   50% {
-    transform: translateY(-8px);
+    transform: translateY(-8px) scale(1.004);
   }
 }
 
-.quiz-bob {
-  animation: quiz-bob 6.5s ease-in-out infinite;
+@keyframes quiz-bob-b {
+  0%,
+  100% {
+    transform: translateY(0) scale(1.003);
+  }
+
+  50% {
+    transform: translateY(7px) scale(0.997);
+  }
 }
 
-.quiz-bob-slow {
-  animation: quiz-bob 7.8s ease-in-out infinite;
+.quiz-hero-card-bob {
+  animation: quiz-bob-a 6.5s ease-in-out infinite;
+}
+
+.quiz-hero-card-bob-slow {
+  animation: quiz-bob-b 7.8s ease-in-out infinite;
   animation-delay: -2.4s;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .quiz-bob,
-  .quiz-bob-slow {
+  .quiz-hero-card-bob,
+  .quiz-hero-card-bob-slow {
     animation: none;
   }
 }

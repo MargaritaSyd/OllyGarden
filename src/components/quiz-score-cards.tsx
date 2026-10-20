@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { QuizMark } from "@/components/quiz-mark";
 import { quizTier } from "@/lib/quiz/score";
 
@@ -72,13 +72,80 @@ function ScoreCard({ score, delay }: { score: number; delay: number }) {
 
 /** Decorative scores beside the quiz hero. They are not the visitor's result. */
 export function QuizScoreCards() {
+  const visualRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const visual = visualRef.current;
+    const hero = visual?.closest(".quiz-hero");
+    if (!visual || !(hero instanceof HTMLElement)) return;
+    if (
+      !window.matchMedia("(hover: hover) and (pointer: fine)").matches ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
+
+    const wide = window.matchMedia("(min-width: 1024px)");
+    const layers = [...visual.querySelectorAll<HTMLElement>(".quiz-hero-card-par")].map(
+      (el, index) => ({
+        el,
+        fx: index === 0 ? -9 : -15,
+        fy: index === 0 ? -7 : -12,
+      }),
+    );
+    let targetX = 0;
+    let targetY = 0;
+    let x = 0;
+    let y = 0;
+    let frame = 0;
+
+    const onMove = (event: MouseEvent) => {
+      const box = hero.getBoundingClientRect();
+      targetX = (event.clientX - box.left) / box.width - 0.5;
+      targetY = (event.clientY - box.top) / box.height - 0.5;
+    };
+    const onLeave = () => {
+      targetX = 0;
+      targetY = 0;
+    };
+    const tick = () => {
+      if (wide.matches) {
+        x += (targetX - x) * 0.06;
+        y += (targetY - y) * 0.06;
+        for (const layer of layers) {
+          layer.el.style.transform = `translate3d(${(x * layer.fx).toFixed(2)}px, ${(y * layer.fy).toFixed(2)}px, 0)`;
+        }
+      } else {
+        for (const layer of layers) layer.el.style.transform = "";
+      }
+      frame = requestAnimationFrame(tick);
+    };
+
+    hero.addEventListener("mousemove", onMove);
+    hero.addEventListener("mouseleave", onLeave);
+    frame = requestAnimationFrame(tick);
+    return () => {
+      hero.removeEventListener("mousemove", onMove);
+      hero.removeEventListener("mouseleave", onLeave);
+      cancelAnimationFrame(frame);
+    };
+  }, []);
+
   return (
-    <div className="quiz-hero-visual" aria-hidden="true">
-      <div className="quiz-bob absolute top-0 left-0 w-[24.41em]">
-        <ScoreCard score={10} delay={700} />
+    <div ref={visualRef} className="quiz-hero-visual" aria-hidden="true">
+      <div className="quiz-hero-card-pos quiz-hero-card-pos-top">
+        <div className="quiz-hero-card-par">
+          <div className="quiz-hero-card-bob">
+            <ScoreCard score={10} delay={700} />
+          </div>
+        </div>
       </div>
-      <div className="quiz-bob-slow absolute right-0 bottom-0 w-[24.41em]">
-        <ScoreCard score={2} delay={900} />
+      <div className="quiz-hero-card-pos quiz-hero-card-pos-bottom">
+        <div className="quiz-hero-card-par">
+          <div className="quiz-hero-card-bob quiz-hero-card-bob-slow">
+            <ScoreCard score={2} delay={900} />
+          </div>
+        </div>
       </div>
     </div>
   );
