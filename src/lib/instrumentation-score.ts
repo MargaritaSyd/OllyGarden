@@ -409,7 +409,7 @@ export const instrumentationScoreFaq = {
     },
     {
       q: "Can I propose a new rule?",
-      a: "Yes. Open an issue or pull request in the instrumentation-score/spec repository on GitHub, or start a discussion in the #instrumentation-score channel on the CNCF Slack. Every rule needs a rationale, pass or fail criteria, a target, and an impact level.",
+      a: "Yes. Open an issue or pull request in the `instrumentation-score/spec` repository on GitHub, or start a discussion in the `#instrumentation-score` channel on the CNCF Slack. Every rule needs a rationale, pass or fail criteria, a target, and an impact level.",
     },
   ],
 } as const satisfies FaqContent;

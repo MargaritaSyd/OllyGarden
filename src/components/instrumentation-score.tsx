@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { GitHubMark } from "@/components/company-opensource";
@@ -31,6 +31,17 @@ import { registerOpenTelemetry } from "@/lib/trademarks";
 const kicker = "text-[13px] font-bold leading-[1.3] tracking-[0.1em] text-bitmap-mid uppercase";
 const specLink =
   "inline-flex items-center gap-2 text-[18px] font-bold leading-[1.28] text-sunflower underline-offset-4 hover:text-bitmap-highlight hover:underline";
+
+function GetCardIcon({ children }: { children: ReactNode }) {
+  return (
+    <span
+      className="mb-1.5 grid size-12 flex-none place-items-center rounded-lg border border-bitmap-shadow/15 bg-bitmap-mid/20 text-sunflower shadow-[0_4px_12px_rgba(0,40,14,0.1)]"
+      aria-hidden="true"
+    >
+      {children}
+    </span>
+  );
+}
 
 function ScoreFormula() {
   const { tag, label, numerator, denominator } = scoreCalculation.formula;
@@ -321,6 +332,9 @@ export function ScoreGetYours() {
         />
         <div className="grid gap-6 lg:grid-cols-2">
           <article className={`${grainCard} rz-card flex min-w-0 flex-col gap-3.5 overflow-hidden`} aria-labelledby="get-spec-title">
+            <GetCardIcon>
+              <GitHubMark className="size-[22px]" />
+            </GetCardIcon>
             <p className={kicker}>{spec.kicker}</p>
             <h3 id="get-spec-title" className="text-[clamp(24px,2vw,28px)] leading-[1.25] font-bold tracking-[-0.02em] text-mist">
               {spec.title}
@@ -373,6 +387,10 @@ export function ScoreGetYours() {
             </div>
           </article>
           <article className={`${grainCard} rz-card flex flex-col gap-4`} aria-labelledby="get-insights-title">
+            <GetCardIcon>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/solutions/financial/insights.svg" alt="" width={24} height={24} className="size-6" />
+            </GetCardIcon>
             <p className={kicker}>{insights.kicker}</p>
             <h3 id="get-insights-title" className="text-[clamp(24px,2vw,28px)] leading-[1.25] font-bold tracking-[-0.02em] text-mist">
               {insights.title}

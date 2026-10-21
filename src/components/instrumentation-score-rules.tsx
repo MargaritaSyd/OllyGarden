@@ -200,11 +200,11 @@ export function ScoreRulesTable({
                     <ExternalIcon />
                     <span className="sr-only"> {copy.opensRule}</span>
                   </a>
-                  <p className="mt-1 mb-0 leading-[1.5] text-mist">
+                  <p className="is-rule-text">
                     <RuleText text={rule.description} />
                   </p>
                   {rule.criteriaDefined ? null : (
-                    <p className="mt-1 mb-0 text-[13px] text-mist/55">{copy.pending}</p>
+                    <p className="is-rule-note">{copy.pending}</p>
                   )}
                 </div>
                 <div className="is-rule-targets">

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { InView } from "@/components/in-view";
+import { RuleText } from "@/components/instrumentation-score-ui";
 import type { FaqContent, FaqItem } from "@/lib/faq";
 
 type FaqVariant = "default" | "rose";
@@ -107,7 +108,7 @@ function FaqRow({
         </svg>
       </summary>
       <p className={s.answer}>
-        {item.a}
+        <RuleText text={item.a} />
         {item.link ? (
           <>
             {" "}

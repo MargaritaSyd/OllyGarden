@@ -917,6 +917,53 @@ body {
   }
 }
 
+/* Inline spec identifiers (`service.name`, `CLIENT`, …) as lime chips. */
+.tq-code {
+  overflow-wrap: anywhere;
+  border: 1px solid rgb(227 226 112 / 0.22);
+  border-radius: 6px;
+  background: rgb(227 226 112 / 0.1);
+  padding: 0.12em 0.4em;
+  font-family: var(--font-jetbrains-mono), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.86em;
+  font-weight: 500;
+  color: var(--color-bitmap-highlight);
+}
+
+.is-rule-text .tq-code,
+.is-rule-why .tq-code,
+.is-ex-text .tq-code {
+  font-size: 0.84em;
+}
+
+.is-rule-text {
+  margin-top: 6px;
+  margin-bottom: 0;
+  font-size: 15.5px;
+  line-height: 1.5;
+  color: var(--color-mist);
+}
+
+.is-rule-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  margin-bottom: 0;
+  font-size: 13px;
+  font-style: italic;
+  color: rgb(250 249 240 / 0.6);
+}
+
+.is-rule-note::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  rotate: 45deg;
+  border: 1px solid #f1b530;
+}
+
 /* Spec card file tree: Rose terminal chrome, more rows as the column widens.
    `.rz-term` sets height: 100% for the MVI waterfall; that would overflow this card. */
 .rz-term.is-tree {

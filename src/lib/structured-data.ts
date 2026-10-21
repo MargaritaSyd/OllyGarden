@@ -52,6 +52,7 @@ import {
   instrumentationScoreDefinition,
   instrumentationScoreFaq,
   instrumentationScoreMeta,
+  plainRuleText,
   specSource,
 } from "@/lib/instrumentation-score";
 import { legalPages, type LegalPath } from "@/lib/legal";
@@ -102,7 +103,7 @@ function faqQuestions(items: readonly FaqItem[]) {
   return items.map((item) => ({
     "@type": "Question" as const,
     name: item.q,
-    acceptedAnswer: { "@type": "Answer" as const, text: item.a },
+    acceptedAnswer: { "@type": "Answer" as const, text: plainRuleText(item.a) },
   }));
 }
 

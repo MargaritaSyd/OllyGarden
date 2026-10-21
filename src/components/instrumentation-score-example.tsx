@@ -253,7 +253,7 @@ export function ScoreExampleDemo({ example, categories }: { example: Example; ca
                     </span>
                   </div>
                   <p
-                    className={`mt-1.5 text-[15px] leading-[1.45] line-through transition-colors duration-300 motion-reduce:transition-none ${isFixed ? "text-mist/50 decoration-[#9be07a]/70" : "text-mist decoration-transparent"}`}
+                    className={`is-ex-text mt-1.5 text-[15px] leading-[1.45] line-through transition-colors duration-300 motion-reduce:transition-none ${isFixed ? "text-mist/50 decoration-[#9be07a]/70" : "text-mist decoration-transparent"}`}
                   >
                     <RuleText text={item.finding} />
                   </p>

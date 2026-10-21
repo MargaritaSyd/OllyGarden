@@ -27,7 +27,7 @@ export const impactDot: Record<ScoreImpact, string> = {
 export function RuleText({ text }: { text: string }) {
   return text.split("`").map((part, index) =>
     index % 2 === 1 ? (
-      <code key={index} className="font-mono text-[0.92em] text-bitmap-highlight">
+      <code key={index} className="tq-code">
         {part}
       </code>
     ) : (
