@@ -20,7 +20,7 @@ type GetStartedLinkProps = {
 
 const variants = {
   primary:
-    "bg-mist text-forest hover:bg-sunflower motion-safe:hover:scale-[1.04] motion-safe:hover:shadow-[0_0_28px_rgba(227,226,112,0.4)]",
+    "bg-mist text-forest motion-safe:hover:scale-[1.04] hover:shadow-[0_0_28px_rgba(227,226,112,0.4)]",
   secondary:
     "border border-mist/50 bg-white/20 text-mist hover:bg-white/30 motion-safe:hover:scale-[1.03]",
 } as const;

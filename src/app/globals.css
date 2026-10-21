@@ -805,6 +805,15 @@ body {
   }
 }
 
+@keyframes is-blob-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* Instrumentation Score steps: a dashed connector from each number square to the
    next card, with a dot hopping along it. Offsets follow the card padding and the
    44px square. */
@@ -876,6 +885,115 @@ body {
   }
 }
 
+/* Worked-example takeaway: larger type with a lime rule on the left. */
+.is-ex-notes {
+  max-width: 860px;
+  font-size: 16px;
+  line-height: 1.55;
+  color: rgb(250 249 240 / 0.86);
+}
+
+.is-ex-notes p {
+  margin: 0;
+}
+
+.is-ex-notes p + p {
+  margin-top: 12px;
+}
+
+.is-ex-notes .is-ex-point {
+  margin-top: 20px;
+  border-left: 3px solid var(--color-sunflower);
+  padding-left: 18px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--color-mist);
+}
+
+@media (width <= 767px) {
+  .is-ex-notes .is-ex-point {
+    font-size: 18px;
+  }
+}
+
+/* Spec card file tree: Rose terminal chrome, more rows as the column widens.
+   `.rz-term` sets height: 100% for the MVI waterfall; that would overflow this card. */
+.rz-term.is-tree {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+  margin-top: 8px;
+  box-shadow: none;
+}
+
+.is-tree .rz-term-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.is-tree-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 14px 20px 16px;
+  list-style: none;
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--color-bitmap-highlight);
+}
+
+.is-tree-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.is-tree-sq {
+  flex: none;
+  width: 7px;
+  height: 7px;
+}
+
+.is-tree-more {
+  display: block;
+  padding-left: 17px;
+  color: rgb(250 249 240 / 0.45);
+}
+
+.is-tree-n--7,
+.is-tree-n--6 {
+  display: none;
+}
+
+@media (width >= 1050px) and (width <= 1169px) {
+  .is-tree-list .is-tree-r8,
+  .is-tree-n--8 {
+    display: none;
+  }
+
+  .is-tree-n--7 {
+    display: inline;
+  }
+}
+
+@media (width >= 1024px) and (width <= 1049px) {
+  .is-tree-list .is-tree-r7,
+  .is-tree-list .is-tree-r8,
+  .is-tree-n--8 {
+    display: none;
+  }
+
+  .is-tree-n--6 {
+    display: inline;
+  }
+}
+
 /* The formula's fraction bar draws in, then the two terms rise into place. */
 .is-frac::before {
   content: "";
@@ -932,9 +1050,244 @@ body {
   transform: none;
 }
 
+/* Rules list: four columns on desktop, a stacked card from 1023px down. */
+.is-rule-wrap {
+  overflow: hidden;
+  border: 1px solid rgb(227 226 112 / 0.24);
+  border-radius: 20px;
+  background-color: #19321e;
+  background-image:
+    linear-gradient(rgb(1 30 12 / 0.42), rgb(1 30 12 / 0.8)),
+    url("/images/texture-grain.png");
+  background-repeat: no-repeat, repeat;
+  background-size:
+    100% 100%,
+    328px 140px;
+}
+
+.is-rule-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.is-rule {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) 120px 128px minmax(0, 1.3fr);
+  gap: 28px;
+  padding: 22px 28px;
+  border-top: 1px solid rgb(250 249 240 / 0.08);
+  scroll-margin-top: 140px;
+  transition: background-color 0.25s;
+}
+
+.is-rule--head {
+  border-top: 0;
+  background: rgb(1 20 7 / 0.4);
+  padding-block: 16px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9ca703;
+}
+
+.is-rule-list .is-rule:not(.is-rule--head)::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: var(--c);
+  transform: scaleY(0);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.is-rule-list .is-rule:not(.is-rule--head):hover {
+  background-color: rgb(217 229 51 / 0.04);
+}
+
+.is-rule-list .is-rule:not(.is-rule--head):hover::before,
+.is-rule-list .is-rule.is-flash::before {
+  transform: none;
+}
+
+@keyframes is-flash {
+  0%,
+  30% {
+    background-color: rgb(217 229 51 / 0.16);
+  }
+
+  to {
+    background-color: transparent;
+  }
+}
+
+.is-rule-list .is-rule.is-flash {
+  animation: is-flash 2.4s ease-out;
+}
+
+.is-rule-main {
+  min-width: 0;
+}
+
+.is-rule-id {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-sunflower);
+  text-decoration: none;
+}
+
+.is-rule-id:hover {
+  text-underline-offset: 4px;
+  text-decoration: underline;
+}
+
+.is-rule-id:focus-visible {
+  border-radius: 4px;
+  outline: 2px solid var(--color-bitmap-highlight);
+  outline-offset: 3px;
+}
+
+.is-ext {
+  display: block;
+  opacity: 0.45;
+  transition:
+    opacity 0.2s ease,
+    transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.is-rule-id:hover .is-ext {
+  opacity: 1;
+  transform: translate(2px, -2px);
+}
+
+.is-rule-targets {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 6px;
+}
+
+.is-target {
+  border: 1px solid rgb(250 249 240 / 0.16);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 12.5px;
+  line-height: 1.3;
+  color: rgb(250 249 240 / 0.82);
+}
+
+.is-rule-impact {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.is-pts {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  color: rgb(250 249 240 / 0.5);
+  white-space: nowrap;
+}
+
+.is-rule-why p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: rgb(250 249 240 / 0.75);
+}
+
+.is-howto {
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.is-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 48px 24px;
+  color: rgb(250 249 240 / 0.7);
+  text-align: center;
+}
+
+@media (width <= 1199px) {
+  .is-rule {
+    grid-template-columns: minmax(0, 1.2fr) 104px 116px minmax(0, 1.2fr);
+    gap: 20px;
+    padding-inline: 24px;
+  }
+}
+
+@media (width <= 1023px) {
+  .is-rule--head {
+    display: none;
+  }
+
+  .is-rule {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 14px 16px;
+    padding: 20px 24px;
+  }
+
+  .is-rule-main,
+  .is-rule-why {
+    grid-column: 1 / -1;
+  }
+
+  .is-rule-impact {
+    grid-area: 2 / 1;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .is-rule-targets {
+    grid-area: 2 / 2;
+    align-items: center;
+  }
+}
+
+@media (width <= 767px) {
+  .is-rule {
+    padding: 18px;
+  }
+
+  .is-rule-impact {
+    grid-column: 1 / -1;
+  }
+
+  .is-rule-targets {
+    grid-area: auto / 1 / auto / -1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .in-view .is-step:not(:last-child)::before {
     animation: none;
+  }
+
+  .is-rule-list .is-rule:not(.is-rule--head)::before,
+  .is-ext {
+    transition: none;
+  }
+
+  .is-rule-id:hover .is-ext {
+    transform: none;
+  }
+
+  .is-rule-list .is-rule.is-flash {
+    animation: none;
+    background-color: rgb(217 229 51 / 0.1);
   }
 }
 

@@ -13,15 +13,15 @@ const styles = {
     column: "flex w-full max-w-[1232px] flex-col gap-8 lg:gap-12",
     head: "fq-head flex flex-col gap-4",
     title:
-      "text-[clamp(1.75rem,3.6vw,2.75rem)] leading-[1.18] font-bold tracking-[-0.02em] text-mist",
-    sub: "max-w-[500px] text-base leading-[1.45] tracking-[0.02em] text-[#9db4a0]",
+      "text-[44px] leading-[1.18] font-bold tracking-[-0.02em] text-mist max-[1279px]:text-[40px] max-[1279px]:leading-[1.2] max-[1023px]:text-[36px] max-[1023px]:leading-[1.22] max-[767px]:text-[28px] max-[767px]:leading-[1.29]",
+    sub: "max-w-[500px] text-base leading-[1.45] tracking-[0.02em] text-[#9db4a0] max-[767px]:text-[15px] max-[767px]:leading-[1.47]",
     list: "flex flex-col gap-[18px] sm:gap-[26px]",
     row: "rounded-xl",
     summary: "px-[18px] py-5 sm:px-6 sm:py-[26px] focus-visible:rounded-xl",
     question:
-      "text-[17px] leading-[1.3] font-semibold tracking-[-0.01em] text-mist sm:text-lg",
+      "text-lg leading-[1.3] font-semibold tracking-[-0.01em] text-mist max-[767px]:text-[17px]",
     answer:
-      "max-w-[1160px] px-[18px] pb-5 text-sm leading-[1.5] tracking-[0.01em] text-mist/82 sm:px-6 sm:pb-[26px] sm:text-[15px]",
+      "max-w-[1160px] px-[18px] pb-5 text-[15px] leading-[1.5] tracking-[0.01em] text-mist/82 max-[767px]:text-sm sm:px-6 sm:pb-[26px]",
   },
   rose: {
     section:

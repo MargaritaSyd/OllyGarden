@@ -23,7 +23,7 @@ export function ScoreCategoriesCard({
 
   return (
     <div className={className} onMouseLeave={() => setHot(null)}>
-      <h3 className="text-lg font-bold text-mist">{title}</h3>
+      <h3 className="text-xl leading-[1.28] font-bold tracking-[-0.01em] text-mist">{title}</h3>
 
       <div className="mt-5" aria-hidden="true">
         <div className="flex h-3 gap-1">
@@ -69,7 +69,7 @@ export function ScoreCategoriesCard({
               onBlur={() => setHot(null)}
               className={`border-b border-mist/8 align-top transition-colors duration-200 last:border-0 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-sunflower motion-reduce:transition-none ${hot === category.name ? "bg-mist/6" : ""}`}
             >
-              <td className="py-2.5 pr-3 font-mono whitespace-nowrap text-mist">{category.range}</td>
+              <td className="py-2.5 pr-3 font-mono whitespace-nowrap text-mist max-[767px]:text-[12.5px]">{category.range}</td>
               <th scope="row" className="py-2.5 pr-3 font-semibold text-mist">
                 <span
                   className="mr-2 inline-block size-2 rounded-full"

@@ -34,14 +34,14 @@ export function SectionHeader({
         // eslint-disable-next-line @next/next/no-img-element
         <img src={mark} alt="" width={32} height={32} className="size-8" />
       ) : null}
-      <p className="text-sm font-bold tracking-[0.14em] text-bitmap-mid uppercase">{eyebrow}</p>
+      <p className="text-base leading-none font-bold tracking-[0.1em] text-bitmap-mid uppercase">{eyebrow}</p>
       <h2
         id={id}
-        className="text-[clamp(2rem,4vw,3rem)] leading-[1.08] font-bold tracking-[-0.02em] text-mist"
+        className="text-[clamp(32px,3.34vw,48px)] leading-[1.27] font-bold tracking-[-0.02em] text-mist"
       >
         {title}
       </h2>
-      <p className="text-base leading-[1.6] text-mist/75">{lede}</p>
+      <p className="text-base leading-[1.4] tracking-[0.02em] text-mist/75">{lede}</p>
       {children}
     </header>
   );

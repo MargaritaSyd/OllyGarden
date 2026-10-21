@@ -28,7 +28,9 @@ import {
 } from "@/lib/instrumentation-score";
 import { registerOpenTelemetry } from "@/lib/trademarks";
 
-const kicker = "text-[12px] font-bold tracking-[0.1em] text-bitmap-mid uppercase";
+const kicker = "text-[13px] font-bold leading-[1.3] tracking-[0.1em] text-bitmap-mid uppercase";
+const specLink =
+  "inline-flex items-center gap-2 text-[18px] font-bold leading-[1.28] text-sunflower underline-offset-4 hover:text-bitmap-highlight hover:underline";
 
 function ScoreFormula() {
   const { tag, label, numerator, denominator } = scoreCalculation.formula;
@@ -76,21 +78,21 @@ export function ScoreHero() {
 
   return (
     <section
-      className="relative overflow-hidden px-[clamp(1.5rem,7.25vw,6.5rem)] pt-[clamp(7.5rem,13vw,11rem)] pb-[clamp(2.5rem,5vw,4rem)] max-[880px]:px-6 max-[880px]:pt-[132px] max-[880px]:pb-12"
+      className="relative flex min-h-[814px] items-center overflow-hidden px-[clamp(1.5rem,7.25vw,6.5rem)] pt-[120px] pb-20 max-lg:min-h-0 max-lg:pt-[clamp(7.5rem,13vw,11rem)] max-lg:pb-16 max-[880px]:px-6 max-[880px]:pt-[132px] max-[880px]:pb-12"
       aria-labelledby="score-title"
     >
-      <HeroBlob />
-      <div className="relative z-[1] mx-auto max-w-[1232px]">
+      <HeroBlob variant="guide" />
+      <div className="relative z-[1] mx-auto w-full max-w-[1232px] max-[1199px]:pr-[calc(341px-clamp(24px,7.25vw,104px))] max-[767px]:pr-0">
         <div className="ov-fade-up surface-grain inline-flex items-center gap-2 rounded-full border border-white/14 bg-[#19321e] px-4 py-1 text-[13px] font-medium tracking-[0.01em] whitespace-nowrap text-bitmap-highlight [animation-delay:0.15s]">
           {badge}
         </div>
         <h1
           id="score-title"
-          className="ov-blur-rise mt-5 max-w-[880px] text-[clamp(2.25rem,6vw,4rem)] leading-[1.06] font-bold tracking-[-0.02em] text-mist max-[880px]:text-[clamp(2.25rem,9.5vw,2.75rem)] [animation-delay:0.25s]"
+          className="ov-blur-rise mt-6 max-w-[900px] text-[clamp(36px,4.45vw,64px)] leading-[1.125] font-bold tracking-[-0.02em] text-mist [animation-delay:0.25s]"
         >
           {title}
         </h1>
-        <p className="ov-fade-up mt-4 max-w-[760px] text-lg leading-[1.5] text-mist/80 [animation-delay:0.7s]">
+        <p className="ov-fade-up mt-4 max-w-[698px] text-base leading-[1.4] tracking-[0.02em] text-mist/80 [animation-delay:0.7s]">
           {registerOpenTelemetry(lede)}
         </p>
         <div className="ov-fade-up mt-8 flex flex-wrap gap-3 [animation-delay:0.85s] max-sm:flex-col">
@@ -138,7 +140,7 @@ export function ScoreCalculation() {
 
         <ol className="grid gap-5 lg:grid-cols-3 lg:gap-8">
           {scoreCalculation.steps.map((step, index) => (
-            <li key={step.title} className={`${grainCard} is-step group relative flex flex-col gap-3`}>
+            <li key={step.title} className={`${grainCard} rz-card is-step group relative flex flex-col gap-3`}>
               <span
                 className="mb-2 grid size-11 place-items-center border border-sunflower/50 bg-sunflower/8 font-mono text-sm font-semibold text-sunflower transition-colors duration-300 group-hover:border-sunflower group-hover:bg-sunflower group-hover:text-forest motion-reduce:transition-none"
                 aria-hidden="true"
@@ -156,7 +158,7 @@ export function ScoreCalculation() {
         <ScoreFormula />
 
         <div className="grid gap-6 lg:grid-cols-2">
-          <InView threshold={0.3} className={`${grainCard} is-weights flex flex-col gap-5`}>
+          <InView threshold={0.3} className={`${grainCard} rz-card is-weights flex flex-col gap-5`}>
             <h3 className="text-xl leading-[1.28] font-bold tracking-[-0.01em] text-mist">{scoreCalculation.weightsTitle}</h3>
             <table className="w-full border-collapse text-left text-[15px] leading-[1.45] text-mist max-md:text-[13.5px]">
               <thead>
@@ -215,7 +217,7 @@ export function ScoreCalculation() {
           </InView>
 
           <ScoreCategoriesCard
-            className={grainCard}
+            className={`${grainCard} rz-card`}
             title={scoreCalculation.categoriesTitle}
             categories={scoreCategories}
             ticks={scoreCalculation.scaleTicks}
@@ -292,9 +294,9 @@ export function ScoreExample() {
 
         <ScoreExampleDemo example={scoreExample} categories={scoreCategories} />
 
-        <div className="flex max-w-[760px] flex-col gap-3 text-base leading-[1.6] text-mist/80">
+        <div className="is-ex-notes">
           {scoreExample.steps.map((step, index) => (
-            <p key={step} className={index === scoreExample.steps.length - 1 ? "font-semibold text-mist" : undefined}>
+            <p key={step} className={index === scoreExample.steps.length - 1 ? "is-ex-point" : undefined}>
               {step}
             </p>
           ))}
@@ -318,53 +320,64 @@ export function ScoreGetYours() {
           mark={scoreGetYours.mark}
         />
         <div className="grid gap-6 lg:grid-cols-2">
-          <article className={`${grainCard} flex flex-col gap-4`} aria-labelledby="get-spec-title">
+          <article className={`${grainCard} rz-card flex min-w-0 flex-col gap-3.5 overflow-hidden`} aria-labelledby="get-spec-title">
             <p className={kicker}>{spec.kicker}</p>
-            <h3 id="get-spec-title" className="text-[clamp(1.375rem,2.4vw,1.75rem)] leading-[1.2] font-bold text-mist">
+            <h3 id="get-spec-title" className="text-[clamp(24px,2vw,28px)] leading-[1.25] font-bold tracking-[-0.02em] text-mist">
               {spec.title}
             </h3>
-            <p className="text-[15px] leading-[1.6] text-mist/80">
+            <p className="text-base leading-[1.5] text-mist/75">
               <RuleText text={spec.body} />
             </p>
-            <ul className="mt-auto flex flex-col gap-2 text-[15px]">
+            <ul className="mt-auto flex flex-col gap-3.5 pt-1">
               <li>
-                <a href={spec.href} target="_blank" rel="noopener noreferrer" className={`${textLink} inline-flex items-center gap-2`}>
-                  <GitHubMark />
-                  {spec.link}
+                <a href={spec.href} target="_blank" rel="noopener noreferrer" className={specLink}>
+                  <GitHubMark className="size-4" />
+                  <span>{spec.link}</span>
                 </a>
               </li>
               <li>
-                <a href={spec.slackHref} target="_blank" rel="noopener noreferrer" className={textLink}>
+                <a href={spec.slackHref} target="_blank" rel="noopener noreferrer" className={specLink}>
                   {spec.slackLabel} →
                 </a>
               </li>
             </ul>
-            <div className="overflow-hidden rounded-xl border border-white/10 bg-[#0d1117] font-mono text-[13px]" aria-hidden="true">
-              <div className="flex items-center gap-3 border-b border-white/10 px-4 py-2.5">
-                <span className="flex gap-1.5">
-                  <span className="size-2.5 rounded-full bg-[#ff5f57]" />
-                  <span className="size-2.5 rounded-full bg-[#febc2e]" />
-                  <span className="size-2.5 rounded-full bg-[#28c840]" />
+            <div className="rz-term is-tree" aria-hidden="true">
+              <div className="rz-term-bar">
+                <span className="rz-term-dots">
+                  <i />
+                  <i />
+                  <i />
                 </span>
-                <span className="text-mist/55">{spec.tree.label}</span>
+                <span className="rz-term-label">{spec.tree.label}</span>
               </div>
-              <ul className="flex flex-col gap-1.5 px-4 py-3 text-mist/80">
-                {spec.tree.files.map((file) => (
-                  <li key={file.name} className="flex items-center gap-2.5">
-                    <span className={`size-2 shrink-0 rounded-[2px] ${impactDot[file.impact]}`} />
+              <ul className="is-tree-list">
+                {spec.tree.files.map((file, index) => (
+                  <li
+                    key={file.id}
+                    className={index >= spec.tree.visible[2] ? `is-tree-r${index + 1}` : undefined}
+                  >
+                    <span className={`is-tree-sq ${impactDot[file.impact]}`} />
                     {file.name}
                   </li>
                 ))}
-                <li className="text-mist/50">{spec.tree.more}</li>
+                <li className="is-tree-more">
+                  +{" "}
+                  {spec.tree.visible.map((shown) => (
+                    <span key={shown} className={`is-tree-n is-tree-n--${shown}`}>
+                      {spec.tree.total - shown}
+                    </span>
+                  ))}{" "}
+                  more rules
+                </li>
               </ul>
             </div>
           </article>
-          <article className={`${grainCard} flex flex-col gap-4`} aria-labelledby="get-insights-title">
+          <article className={`${grainCard} rz-card flex flex-col gap-4`} aria-labelledby="get-insights-title">
             <p className={kicker}>{insights.kicker}</p>
-            <h3 id="get-insights-title" className="text-[clamp(1.375rem,2.4vw,1.75rem)] leading-[1.2] font-bold text-mist">
+            <h3 id="get-insights-title" className="text-[clamp(24px,2vw,28px)] leading-[1.25] font-bold tracking-[-0.02em] text-mist">
               {insights.title}
             </h3>
-            <p className="text-[15px] leading-[1.6] text-mist/80">{insights.body}</p>
+            <p className="text-base leading-[1.5] text-mist/75">{insights.body}</p>
             <div className="mt-auto flex flex-wrap items-center gap-x-6 gap-y-3">
               <GetStartedLink href={insights.href} analytics={{ id: "score_get_yours_insights", section: "get_score" }}>
                 {insights.cta}
@@ -405,12 +418,12 @@ export function ScoreProof() {
         </SectionHeader>
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {scoreProof.items.map((item) => (
-            <li key={`${item.study}-${item.rules.join()}`} className={`${grainCard} flex flex-col gap-3`}>
+            <li key={`${item.study}-${item.rules.join()}`} className={`${grainCard} rz-card flex flex-col gap-3`}>
               <FinancialStat
                 end={item.value}
                 suffix={item.suffix}
                 sep={false}
-                className="text-[clamp(1.75rem,3vw,2.25rem)] leading-none font-bold tracking-[-0.02em] text-bitmap-highlight tabular-nums"
+                className="text-[clamp(36px,3.1vw,44px)] leading-[1.15] font-bold tracking-[-0.02em] text-bitmap-highlight tabular-nums"
               />
               <p className="text-[15px] leading-[1.5] text-mist/80">
                 <RuleText text={item.label} />

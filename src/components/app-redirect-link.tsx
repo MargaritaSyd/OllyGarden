@@ -184,7 +184,7 @@ export function AppRedirectLink({
             onAuxClick={(event) => {
               if (event.button === 1) confirmHandoff(event);
             }}
-            className={`${dialogButton} bg-mist text-forest hover:bg-sunflower motion-safe:hover:scale-[1.04] motion-safe:hover:shadow-[0_0_28px_rgba(227,226,112,0.4)]`}
+            className={`${dialogButton} bg-mist text-forest motion-safe:hover:scale-[1.04] hover:shadow-[0_0_28px_rgba(227,226,112,0.4)]`}
           >
             {appRedirectDialog.confirm}
           </a>

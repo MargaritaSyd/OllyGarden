@@ -24,8 +24,8 @@ export function InView({
   as: Tag = "div",
   mark = "in-view",
   once = true,
-  threshold = 0.16,
-  rootMargin = "0px 0px -10% 0px",
+  threshold = 0.05,
+  rootMargin = "0px",
   className = "",
   children,
   ...rest
@@ -46,21 +46,51 @@ export function InView({
     if (!node) {
       return;
     }
+    const target = node;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) {
-          setInView(true);
-          if (once) {
-            observer.disconnect();
-          }
+    let revealed = false;
+    let observer: IntersectionObserver | undefined;
+    let poll = 0;
+
+    function reveal() {
+      if (once) {
+        if (revealed) {
+          return;
         }
-      },
-      { threshold, rootMargin },
-    );
-    observer.observe(node);
+        revealed = true;
+        observer?.disconnect();
+        clearInterval(poll);
+      }
+      setInView(true);
+    }
 
-    return () => observer.disconnect();
+    if ("IntersectionObserver" in window) {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry?.isIntersecting) {
+            reveal();
+          }
+        },
+        { threshold, rootMargin },
+      );
+      observer.observe(target);
+    }
+
+    function pollOnce() {
+      const box = target.getBoundingClientRect();
+      const viewport = window.innerHeight || 1;
+      if (box.top < viewport * 0.92 && box.bottom > 0) {
+        reveal();
+      }
+    }
+
+    pollOnce();
+    poll = window.setInterval(pollOnce, 400);
+
+    return () => {
+      observer?.disconnect();
+      clearInterval(poll);
+    };
   }, [once, prefersReducedMotion, threshold, rootMargin]);
 
   const classes = [armed && "js-anim", visible && mark, className]

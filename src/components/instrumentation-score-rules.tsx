@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { ImpactBadge, RuleText, impactDot } from "@/components/instrumentation-score-ui";
 import { textLink } from "@/components/guide-ui";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
@@ -11,13 +11,29 @@ import type { ScoreImpact } from "@/lib/instrumentation-score-rules";
 const FLASH_MS = 2400;
 
 const chip =
-  "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-[13px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sunflower";
-const chipOff = "border-mist/20 text-mist/75 hover:border-sunflower/60 hover:text-mist";
-const chipOn = "border-sunflower bg-sunflower/12 text-mist";
+  "inline-flex items-center gap-2 rounded-full border px-3.5 py-[7px] text-sm leading-[18px] font-medium transition-[color,border-color,background-color,transform] duration-200 active:scale-96 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bitmap-highlight motion-reduce:transition-none max-md:px-3 max-md:py-1.5 max-md:text-[13px]";
+const chipOff =
+  "border-mist/16 bg-[#011407]/40 text-mist/85 hover:border-bitmap-highlight/55 hover:text-bitmap-highlight";
+const chipOn = "border-sunflower bg-sunflower text-[#0b1f0f]";
+
+/** A pressed impact filter takes its level's color. */
+const impactOn: Record<ScoreImpact, string> = {
+  Critical: "border-[#e54b4b] bg-[#e54b4b] text-[#0b1f0f]",
+  Important: "border-[#f1b530] bg-[#f1b530] text-[#0b1f0f]",
+  Normal: "border-[#a7b93b] bg-[#a7b93b] text-[#0b1f0f]",
+  Low: "border-mist bg-mist text-[#0b1f0f]",
+};
+
+const impactBar: Record<ScoreImpact, string> = {
+  Critical: "#e54b4b",
+  Important: "#f1b530",
+  Normal: "#a7b93b",
+  Low: "#faf9f08c",
+};
 
 function ExternalIcon() {
   return (
-    <svg className="inline-block size-3 opacity-70" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+    <svg className="is-ext size-3" viewBox="0 0 14 14" fill="none" aria-hidden="true">
       <path d="M4 10 10 4M5 4h5v5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -26,20 +42,22 @@ function ExternalIcon() {
 function FilterButton({
   pressed,
   onClick,
+  on = chipOn,
   children,
 }: {
   pressed: boolean;
   onClick: () => void;
+  on?: string;
   children: ReactNode;
 }) {
   return (
-    <button type="button" aria-pressed={pressed} onClick={onClick} className={`${chip} ${pressed ? chipOn : chipOff}`}>
+    <button type="button" aria-pressed={pressed} onClick={onClick} className={`${chip} ${pressed ? on : chipOff}`}>
       {children}
     </button>
   );
 }
 
-const Count = ({ n }: { n: number }) => <span className="font-mono text-[12px] text-mist/55">{n}</span>;
+const Count = ({ n }: { n: number }) => <span className="text-xs tabular-nums opacity-60">{n}</span>;
 
 /**
  * The rules table with impact and target filters. Every rule is in the server-rendered HTML;
@@ -120,8 +138,16 @@ export function ScoreRulesTable({
             {filters.all} <Count n={rules.length} />
           </FilterButton>
           {impacts.map((level) => (
-            <FilterButton key={level} pressed={impact === level} onClick={() => setImpact(impact === level ? null : level)}>
-              <span className={`size-2 rounded-full ${impactDot[level]}`} aria-hidden="true" />
+            <FilterButton
+              key={level}
+              pressed={impact === level}
+              on={impactOn[level]}
+              onClick={() => setImpact(impact === level ? null : level)}
+            >
+              <span
+                className={`size-2 transition-colors duration-200 ${impact === level ? "bg-[#0b1f0f]" : impactDot[level]}`}
+                aria-hidden="true"
+              />
               {level} <Count n={rules.filter((rule) => rule.impact === level).length} />
             </FilterButton>
           ))}
@@ -144,93 +170,82 @@ export function ScoreRulesTable({
         </p>
       </div>
 
-      <div className="relative overflow-x-auto rounded-2xl border border-sunflower/25 bg-[#002810]">
-        <table className="w-full min-w-[760px] text-left text-[15px] text-mist/80">
-          <caption className="sr-only">
-            Instrumentation Score rules with their target, impact level, weight, and rationale
-          </caption>
-          <thead>
-            <tr className="border-b border-mist/12 text-[12px] tracking-[0.08em] text-mist/55 uppercase">
-              <th scope="col" className="px-5 py-3 font-bold">Rule</th>
-              <th scope="col" className="px-3 py-3 font-bold">Applies to</th>
-              <th scope="col" className="px-3 py-3 font-bold">Impact</th>
-              <th scope="col" className="px-5 py-3 font-bold">Why it matters</th>
-            </tr>
-          </thead>
-          <tbody>
-            {shown.length ? (
-              shown.map((rule) => (
-                <tr
-                  key={rule.id}
-                  id={rule.id}
-                  className={`scroll-mt-24 border-b border-mist/8 align-top transition-colors duration-700 last:border-0 motion-reduce:transition-none ${flash === rule.id ? "bg-sunflower/14" : ""}`}
-                >
-                  <th scope="row" className="w-[34%] px-5 py-4 font-normal">
-                    <a
-                      href={rule.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 font-mono text-sm font-bold text-sunflower underline-offset-2 hover:underline"
-                    >
-                      {rule.id}
-                      <ExternalIcon />
-                      <span className="sr-only"> {copy.opensRule}</span>
-                    </a>
-                    <span className="sr-only">: </span>
-                    <span className="mt-1 block leading-[1.5] text-mist">
-                      <RuleText text={rule.description} />
-                    </span>
-                    {rule.criteriaDefined ? null : (
-                      <span className="mt-1 block text-[13px] text-mist/55">{copy.pending}</span>
-                    )}
-                  </th>
-                  <td className="px-3 py-4">
-                    <span className="flex flex-wrap gap-1.5">
-                      {rule.targets.map((name) => (
-                        <span key={name} className="rounded-full border border-mist/20 px-2 py-0.5 text-[12px] text-mist/80">
-                          {name}
-                        </span>
-                      ))}
-                    </span>
-                  </td>
-                  <td className="px-3 py-4">
-                    <ImpactBadge impact={rule.impact} />
-                    <span className="mt-1 block font-mono text-[13px] whitespace-nowrap text-mist/55">
-                      weight {rule.weight} pts
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 leading-[1.5]">
-                    <RuleText text={rule.why} />
-                    {rule.postHref ? (
-                      <>
-                        {" "}
-                        <Link href={rule.postHref} className={`${textLink} whitespace-nowrap`}>
-                          {copy.howTo} →
-                        </Link>
-                      </>
-                    ) : null}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={4} className="px-5 py-10 text-center">
-                  <p className="text-mist/75">{filters.empty}</p>
-                  <button
-                    type="button"
-                    className={`${textLink} mt-2`}
-                    onClick={() => {
-                      setImpact(null);
-                      setTarget(null);
-                    }}
+      <div className="is-rule-wrap">
+        <ul
+          className="is-rule-list"
+          aria-label="Instrumentation Score rules with their target, impact level, weight, and rationale"
+        >
+          <li className="is-rule is-rule--head" aria-hidden="true">
+            <span>Rule</span>
+            <span>Applies to</span>
+            <span>Impact</span>
+            <span>Why it matters</span>
+          </li>
+          {shown.length ? (
+            shown.map((rule) => (
+              <li
+                key={rule.id}
+                id={rule.id}
+                className={`is-rule${flash === rule.id ? " is-flash" : ""}`}
+                style={{ "--c": impactBar[rule.impact] } as CSSProperties}
+              >
+                <div className="is-rule-main">
+                  <a
+                    href={rule.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="is-rule-id font-mono"
                   >
-                    {filters.reset}
-                  </button>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                    {rule.id}
+                    <ExternalIcon />
+                    <span className="sr-only"> {copy.opensRule}</span>
+                  </a>
+                  <p className="mt-1 mb-0 leading-[1.5] text-mist">
+                    <RuleText text={rule.description} />
+                  </p>
+                  {rule.criteriaDefined ? null : (
+                    <p className="mt-1 mb-0 text-[13px] text-mist/55">{copy.pending}</p>
+                  )}
+                </div>
+                <div className="is-rule-targets">
+                  {rule.targets.map((name) => (
+                    <span key={name} className="is-target">
+                      {name}
+                    </span>
+                  ))}
+                </div>
+                <div className="is-rule-impact">
+                  <ImpactBadge impact={rule.impact} />
+                  <span className="is-pts">weight {rule.weight} pts</span>
+                </div>
+                <div className="is-rule-why">
+                  <p>
+                    <RuleText text={rule.why} />
+                  </p>
+                  {rule.postHref ? (
+                    <Link href={rule.postHref} className={`${textLink} is-howto`}>
+                      {copy.howTo} →
+                    </Link>
+                  ) : null}
+                </div>
+              </li>
+            ))
+          ) : (
+            <li className="is-empty">
+              <p className="m-0">{filters.empty}</p>
+              <button
+                type="button"
+                className={textLink}
+                onClick={() => {
+                  setImpact(null);
+                  setTarget(null);
+                }}
+              >
+                {filters.reset}
+              </button>
+            </li>
+          )}
+        </ul>
       </div>
     </div>
   );

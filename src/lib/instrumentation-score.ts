@@ -259,7 +259,8 @@ export const scoreExample = {
   ],
 } as const;
 
-const treeFiles = 5;
+/** How many rule files the spec tree shows: 8 on wide cards, then 7 and 6 as the column narrows. */
+const treeVisible = [8, 7, 6] as const;
 
 export const scoreGetYours = {
   eyebrow: "Get your score",
@@ -276,8 +277,12 @@ export const scoreGetYours = {
     slackLabel: "Join #instrumentation-score",
     tree: {
       label: "instrumentation-score/spec/rules",
-      files: specRules.slice(0, treeFiles).map(({ id, impact }) => ({ name: `${id}.md`, impact })),
-      more: `+ ${ruleCount - treeFiles} more rules`,
+      visible: treeVisible,
+      total: ruleCount,
+      files: [...specRules]
+        .sort((a, b) => a.id.localeCompare(b.id))
+        .slice(0, treeVisible[0])
+        .map(({ id, impact }) => ({ id, name: `${id}.md`, impact })),
     },
   },
   insights: {

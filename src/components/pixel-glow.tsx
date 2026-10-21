@@ -43,11 +43,11 @@ function parseRgb(value: string | undefined): [number, number, number] {
 
 /** Lights nearby pixel cells as the pointer moves. Radius 200 matches the reference mosaic. */
 export function usePixelGlow(
-  svgRef: RefObject<SVGSVGElement | null>,
+  rootRef: RefObject<Element | null>,
   radius = GLOW_RADIUS,
 ) {
   useEffect(() => {
-    const svg = svgRef.current;
+    const svg = rootRef.current;
     if (!svg) {
       return;
     }
@@ -120,5 +120,5 @@ export function usePixelGlow(
       window.removeEventListener("scroll", onScrollOrResize);
       window.removeEventListener("resize", onScrollOrResize);
     };
-  }, [svgRef, radius]);
+  }, [rootRef, radius]);
 }
