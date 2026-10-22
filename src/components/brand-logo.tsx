@@ -3,10 +3,12 @@ import Link from "next/link";
 type BrandLogoProps = {
   className?: string;
   height?: number;
+  width?: number;
 };
 
-export function BrandLogo({ className, height = 32 }: BrandLogoProps) {
-  const width = Math.round((height * 556) / 87);
+export function BrandLogo({ className, height = 32, width }: BrandLogoProps) {
+  const resolvedWidth = width ?? Math.round((height * 556) / 87);
+  const resolvedHeight = width === undefined ? height : Math.round((width * 87) / 556);
 
   return (
     <Link
@@ -18,9 +20,9 @@ export function BrandLogo({ className, height = 32 }: BrandLogoProps) {
       <img
         src="/brand/logo-group.svg"
         alt=""
-        width={width}
-        height={height}
-        className="h-full w-auto max-w-full"
+        width={resolvedWidth}
+        height={resolvedHeight}
+        className={width === undefined ? "h-full w-auto max-w-full" : "h-auto w-full"}
       />
     </Link>
   );

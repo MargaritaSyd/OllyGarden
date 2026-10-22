@@ -14,9 +14,9 @@ const STRIP_COPIES = 16;
 export function SiteFooter() {
   return (
     <footer className="mt-auto bg-[#00280e]">
-      <div className="mx-auto grid w-full max-w-7xl gap-y-14 px-6 pt-16 pb-20 sm:px-8 lg:grid-cols-[minmax(240px,320px)_minmax(0,1fr)] lg:gap-x-[clamp(3rem,6.5vw,6.875rem)] lg:px-12 lg:pt-[88px] lg:pb-24">
+      <div className="mx-auto grid w-full max-w-[1328px] gap-y-14 px-6 pt-16 pb-20 sm:px-8 lg:px-12 lg:pt-[88px] lg:pb-24 min-[1200px]:grid-cols-[minmax(240px,320px)_1fr] min-[1200px]:gap-x-[clamp(48px,5vw,80px)]">
         <div>
-          <BrandLogo className="h-8" height={32} />
+          <BrandLogo className="w-[200px]" width={200} />
           <p className="mt-6 max-w-[300px] text-[15.5px] leading-[1.7] text-mist/55">
             {registerOpenTelemetry(siteConfig.tagline)}
           </p>
@@ -40,11 +40,11 @@ export function SiteFooter() {
         </div>
 
         <nav aria-label="Footer">
-          <ul className="grid grid-cols-2 gap-x-8 gap-y-11 sm:grid-cols-3 lg:grid-cols-5 lg:gap-x-8 lg:pt-1.5">
+          <ul className="grid grid-cols-2 gap-x-8 gap-y-11 pt-1.5 min-[600px]:grid-cols-[repeat(3,minmax(140px,1fr))] min-[900px]:grid-cols-[repeat(5,minmax(max-content,1fr))] min-[900px]:gap-[44px]">
             {footerColumns.map((column) => (
               <li key={column.id}>
                 <p className="text-base font-bold text-mist">{column.label}</p>
-                <ul className="mt-[18px] space-y-3">
+                <ul className="mt-[18px]">
                   {column.items.map((item) => (
                     <li key={`${column.id}-${item.href}-${item.label}`}>
                       <FooterLink item={item} />
@@ -56,12 +56,14 @@ export function SiteFooter() {
           </ul>
         </nav>
 
-        <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-4 text-sm leading-normal text-mist/55 lg:col-span-2">
+        <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-4 text-sm leading-normal text-mist/55 min-[1200px]:col-span-2">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             <p>©2026 OllyGarden, Inc. All rights reserved.</p>
             <AnalyticsPreferencesButton />
           </div>
-          <FooterMadeIn />
+          <div className="min-[1200px]:-mr-7">
+            <FooterMadeIn />
+          </div>
           <p className="w-full max-w-4xl text-xs leading-relaxed text-mist/55">{trademarkNotice}</p>
         </div>
       </div>
@@ -103,7 +105,7 @@ function StripTile({ id }: { id: number }) {
 
 function FooterLink({ item }: { item: NavLink }) {
   const className =
-    "block text-[15.5px] leading-snug text-mist/55 transition-colors hover:text-sunflower";
+    "block py-1.5 text-[15.5px] leading-normal text-mist/55 transition-colors hover:text-sunflower min-[1200px]:whitespace-nowrap";
 
   if (item.hash || isExternalHref(item.href)) {
     return (
