@@ -18,12 +18,12 @@ export const telemetryQualityDefinition =
   "Telemetry quality is how well the traces, metrics, and logs a system emits help people and tools understand it at runtime. Good telemetry belongs to a known service, is worth what it costs to keep, carries no personal data or secrets, and follows the conventions that make it correct to query.";
 
 export const telemetryQualityHero = {
-  badge: "Guide",
+  badge: "Telemetry Quality",
   title: "What is telemetry quality?",
   lede: telemetryQualityDefinition,
   sub: "Bad telemetry is the opposite: data that costs money to collect and store but does not help anyone operate a system, or that slows an investigation down. This guide covers what makes OpenTelemetry data good, the signs that it is not, and where to start.",
-  cta: { label: "Measure your telemetry", href: siteConfig.appUrl },
-  score: { label: "How to measure it", href: instrumentationScoreMeta.path },
+  cta: { label: "Measure your Telemetry", href: siteConfig.appUrl },
+  score: { label: "How to Measure it", href: instrumentationScoreMeta.path },
 } as const;
 
 function postLink(slug: string) {
@@ -33,6 +33,7 @@ function postLink(slug: string) {
 }
 
 export const qualityGood = {
+  mark: "/images/instrumentation-score/mark-dimensions.svg",
   eyebrow: "Good and bad telemetry",
   title: "Quality is alignment, not volume",
   paragraphs: [
@@ -156,12 +157,20 @@ const dimensions: readonly QualityDimension[] = [
 ];
 
 export const qualityDimensions = {
+  mark: "/images/instrumentation-score/mark-dimensions.svg",
   eyebrow: "The dimensions",
   title: "Five dimensions of telemetry quality",
   lede: "Each dimension asks one question of your telemetry. A failure in any of them makes the data slower to use, more expensive to keep, or risky to store. Every number below comes from an anonymized OllyGarden case study, measured on a customer's own telemetry.",
   signsTitle: "Signs of bad telemetry",
-  caseStudiesLink: "Read the case studies",
-  caseStudiesHref: "/resources/case-studies",
+  learnTitle: "Learn More",
+  learnIcon: "/images/tq/ic-flower.svg",
+  caseStudyLabel: "Case study",
+  more: {
+    title: "Want to learn more?",
+    body: "Go through all our use cases and learn more.",
+    label: "Read All Case Studies",
+    href: "/resources/case-studies",
+  },
   items: dimensions.map((dimension) => ({
     ...dimension,
     proofHref: caseStudyHref(dimension.proof.study),
@@ -169,7 +178,10 @@ export const qualityDimensions = {
   })),
 } as const;
 
+export type QualityDimensionItem = (typeof qualityDimensions.items)[number];
+
 export const qualityNext = {
+  mark: "/images/solutions/financial/glyph.svg",
   eyebrow: "Measure and fix",
   title: "How to measure telemetry quality, and how to fix it",
   lede: "Quality improves when it is measured per service and fixed where the telemetry is produced. The Collector is a safety net for what cannot be fixed at the source, not the primary mechanism.",

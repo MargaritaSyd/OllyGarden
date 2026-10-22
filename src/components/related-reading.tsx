@@ -12,16 +12,23 @@ export function RelatedReading({
   more = [],
   eyebrow,
   explore,
+  inset = "page",
 }: {
   title: string;
   links: readonly RelatedLink[];
   more?: readonly { href: string; label: string }[];
   eyebrow?: string;
   explore?: { eyebrow: string; title: string; body: string };
+  /** `guide` uses the same horizontal inset as the resource-guide sections. */
+  inset?: "page" | "guide";
 }) {
   if (eyebrow && explore) {
     return (
-      <InView as="section" aria-labelledby="related-reading" className="rz-work">
+      <InView
+        as="section"
+        aria-labelledby="related-reading"
+        className={inset === "guide" ? "rz-work rz-work--guide" : "rz-work"}
+      >
         <div className="rz-work-inner">
           <div className="rz-work-head">
             <p className="rz-work-eyebrow">{eyebrow}</p>

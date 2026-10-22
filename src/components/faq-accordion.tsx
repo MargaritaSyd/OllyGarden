@@ -45,14 +45,21 @@ const styles = {
 export function FaqAccordion({
   content,
   variant = "default",
+  inset = "faq",
 }: {
   content: FaqContent;
   variant?: FaqVariant;
+  /** `guide` uses the same horizontal inset as the resource-guide sections. */
+  inset?: "faq" | "guide";
 }) {
   const s = styles[variant];
+  const sectionClass =
+    inset === "guide"
+      ? "faq-accordion flex justify-center px-[clamp(1.5rem,7.25vw,6.5rem)] py-16 max-[880px]:px-6 lg:pt-24 lg:pb-[140px]"
+      : s.section;
 
   return (
-    <InView as="section" aria-labelledby="fq-title" className={s.section}>
+    <InView as="section" aria-labelledby="fq-title" className={sectionClass}>
       <div className={s.column}>
         <div className={s.head}>
           <h2 id="fq-title" className={s.title}>

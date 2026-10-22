@@ -144,4 +144,10 @@ export const telemetryQualityReading = {
     { href: "/resources/case-studies", label: "Read the case studies" },
     faqLink,
   ],
+  eyebrow: "Learn more",
+  explore: {
+    eyebrow: "Keep exploring",
+    title: "More on telemetry quality",
+    body: "How the score is calculated, what it found on real systems, and answers to common questions.",
+  },
 };

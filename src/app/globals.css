@@ -5439,6 +5439,22 @@ section[id] {
   padding: clamp(64px, 6.7vw, 96px) clamp(20px, 5vw, 48px);
 }
 
+/* Match the guide sections' horizontal inset (sectionPad) on this page only. */
+.rz-work--guide {
+  padding-inline: clamp(1.5rem, 7.25vw, 6.5rem);
+}
+
+.rz-work--guide .rz-work-inner {
+  max-width: 1232px;
+  padding-inline: 0;
+}
+
+@media (width <= 880px) {
+  .rz-work--guide {
+    padding-inline: 1.5rem;
+  }
+}
+
 .rz-work-head,
 .rz-work-copy {
   display: flex;

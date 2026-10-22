@@ -22,7 +22,7 @@ export function SectionHeader({
 }: {
   id: string;
   eyebrow: string;
-  title: string;
+  title: ReactNode;
   lede: string;
   /** Path of the 32px section glyph shown above the eyebrow. */
   mark?: string;
@@ -41,7 +41,7 @@ export function SectionHeader({
       >
         {title}
       </h2>
-      <p className="text-base leading-[1.4] tracking-[0.02em] text-mist/75">{lede}</p>
+      <p className="text-base leading-[1.4] tracking-[0.02em] text-mist">{lede}</p>
       {children}
     </header>
   );

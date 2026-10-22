@@ -32,8 +32,13 @@ export default function TelemetryQualityPage() {
       <QualityGood />
       <QualityDimensions />
       <QualityNext />
-      <FaqAccordion content={telemetryQualityFaq} />
-      <RelatedReading {...telemetryQualityReading} />
+      <div className="relative overflow-hidden">
+        <div className="tulip-grid" aria-hidden="true" />
+        <div className="relative z-[1]">
+          <FaqAccordion content={telemetryQualityFaq} inset="guide" />
+          <RelatedReading {...telemetryQualityReading} inset="guide" />
+        </div>
+      </div>
       <SiteCta content={telemetryQualityCta} />
     </>
   );
