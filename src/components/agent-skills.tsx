@@ -17,18 +17,17 @@ import {
 } from "@/lib/agent-skills";
 import { registerOpenTelemetry } from "@/lib/trademarks";
 
-const sectionPad =
-  "px-[clamp(1.5rem,7.25vw,6.5rem)] py-[clamp(4rem,8vw,6rem)] max-[880px]:px-6";
+const sectionPad = "px-[clamp(20px,5vw,48px)] py-[clamp(64px,6.7vw,96px)]";
 
 export function AgentSkillsHero() {
   return (
     <section
-      className="relative flex min-h-[814px] items-center overflow-hidden px-[clamp(1.5rem,7.25vw,6.5rem)] pt-[120px] pb-20 max-lg:min-h-0 max-lg:pt-[clamp(7.5rem,13vw,11rem)] max-lg:pb-16 max-[880px]:px-6 max-[880px]:pt-[132px] max-[880px]:pb-12"
+      className="relative flex min-h-[814px] items-center overflow-hidden px-[clamp(24px,7.25vw,104px)] pt-[120px] pb-20 max-[1023px]:min-h-0 max-[1023px]:pt-[clamp(120px,13vw,176px)] max-[1023px]:pb-16"
       aria-labelledby="skills-title"
     >
       <HeroBlob variant="guide" />
       <div className="relative z-[1] mx-auto w-full max-w-[1232px] max-[1199px]:pr-[calc(341px-clamp(24px,7.25vw,104px))] max-[767px]:pr-0">
-        <div className="ov-fade-up surface-grain inline-flex items-center gap-2 rounded-full border border-white/14 bg-[#19321e] px-4 py-1.5 text-[13px] font-medium tracking-[0.01em] whitespace-nowrap text-bitmap-highlight [animation-delay:0.15s]">
+        <div className="ov-fade-up inline-flex items-center gap-2 rounded-full border border-white/14 bg-[#19321e] bg-[url('/images/texture-grain.png')] bg-repeat [background-size:328px_140px] px-4 py-1.5 text-[13px] leading-4 font-medium tracking-[0.01em] whitespace-nowrap text-bitmap-highlight [animation-delay:0.15s]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/images/docs/badge-chevrons.svg" alt="" width={14} height={14} />
           {agentSkillsHero.badge}
@@ -39,12 +38,12 @@ export function AgentSkillsHero() {
         >
           {registerOpenTelemetry(agentSkillsHero.title)}
         </h1>
-        <p className="ov-fade-up mt-4 max-w-[698px] text-base leading-[1.4] tracking-[0.02em] text-mist [animation-delay:0.7s]">
+        <p className="ov-fade-up mt-6 max-w-[698px] text-base leading-[1.4] tracking-[0.02em] text-mist [animation-delay:0.7s]">
           {agentSkillsHero.lede}
         </p>
-        <ul className="ov-fade-up mt-8 flex flex-wrap gap-3 [animation-delay:0.85s] max-sm:flex-col">
+        <ul className="ov-fade-up mt-10 flex flex-wrap gap-6 [animation-delay:0.85s] max-[767px]:flex-col max-[767px]:gap-3">
           {skillRepositories.map((repository, index) => (
-            <li key={repository.id}>
+            <li key={repository.id} className="max-[767px]:w-full">
               <RepoButton repository={repository} primary={index === 0} />
             </li>
           ))}
@@ -66,9 +65,9 @@ function RepoButton({
       href={repository.href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex h-[51px] items-center justify-center gap-2.5 rounded-2xl px-[30px] text-base font-semibold transition-colors max-sm:w-full ${
+      className={`inline-flex h-[51px] items-center justify-center gap-2.5 rounded-2xl px-[30px] text-base font-semibold transition-[transform,box-shadow,background-color] duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none max-[767px]:h-auto max-[767px]:w-full max-[767px]:px-4 max-[767px]:py-4 max-[767px]:text-center max-[767px]:text-sm max-[767px]:whitespace-normal ${
         primary
-          ? "border border-transparent bg-white text-black hover:bg-sunflower"
+          ? "border border-transparent bg-white text-black motion-safe:hover:scale-[1.04] hover:shadow-[0_0_28px_rgba(227,226,112,0.4)]"
           : "border border-white/50 bg-white/12 text-mist hover:bg-white/20"
       }`}
     >
@@ -82,7 +81,7 @@ export function AgentSkillsLayers() {
   return (
     <InView as="section" className={`${sectionPad} relative overflow-hidden`} aria-labelledby="layers-title">
       <div className="tulip-grid" aria-hidden="true" />
-      <div className="relative z-[1] mx-auto flex max-w-[1232px] flex-col gap-12">
+      <div className="relative z-[1] mx-auto flex max-w-[1232px] flex-col gap-14 max-[1023px]:gap-10">
         <GuideHeader
           id="layers-title"
           eyebrow={agentSkillsLayers.eyebrow}
@@ -119,7 +118,7 @@ export function AgentSkillsRose() {
           </Link>
         </GuideHeader>
 
-        <figure className="m-0 flex flex-col rounded-3xl border border-bitmap-highlight/25 bg-[#19321e] bg-[linear-gradient(rgba(1,30,12,0.5),rgba(1,30,12,0.82)),url('/images/texture-grain.png')] [background-repeat:no-repeat,repeat] [background-size:100%_100%,328px_140px] p-10 max-[1023px]:p-8 max-[767px]:p-6">
+        <figure className="m-0 flex flex-col rounded-3xl border border-bitmap-highlight/25 bg-[#19321e] bg-[linear-gradient(rgba(1,30,12,0.5),rgba(1,30,12,0.82)),url('/images/texture-grain.png')] [background-repeat:no-repeat,repeat] [background-size:100%_100%,328px_140px] p-10 max-[1023px]:px-6 max-[1023px]:py-8 max-[767px]:px-4 max-[767px]:py-6">
           <ul className="m-0 grid list-none grid-cols-3 gap-4 p-0 max-[1023px]:gap-3 max-[767px]:grid-cols-1">
             {skillRepositories.map((repository) => (
               <li
@@ -171,7 +170,7 @@ export function AgentSkillsRose() {
               <span className="flex flex-col gap-0.5">
                 <span className="text-lg leading-[1.3] font-bold text-mist">{rose.title}</span>
                 <span className="sr-only">, </span>
-                <span className="text-sm leading-[1.4] text-mist/60">{rose.sub}</span>
+                <span className="text-sm leading-[1.4] whitespace-nowrap text-mist/60">{rose.sub}</span>
               </span>
             </div>
             <div
@@ -275,7 +274,7 @@ export function AgentSkillsInstall() {
             <article
               key={repository.id}
               aria-labelledby={`as-inst-${repository.id}`}
-              className="grid items-start gap-10 rounded-3xl border border-bitmap-highlight/40 bg-[#19321e] bg-[linear-gradient(rgba(1,30,12,0.42),rgba(1,30,12,0.78)),url('/images/texture-grain.png')] [background-repeat:no-repeat,repeat] [background-size:100%_100%,328px_140px] p-8 max-[1023px]:gap-6 max-[1023px]:p-6 min-[1024px]:grid-cols-[minmax(0,300px)_minmax(0,1fr)]"
+              className="as-lift grid items-start gap-10 rounded-3xl border border-bitmap-highlight/40 bg-[#19321e] bg-[linear-gradient(rgba(1,30,12,0.42),rgba(1,30,12,0.78)),url('/images/texture-grain.png')] [background-repeat:no-repeat,repeat] [background-size:100%_100%,328px_140px] p-8 max-[1023px]:gap-6 max-[1023px]:p-6 min-[1024px]:grid-cols-[minmax(0,300px)_minmax(0,1fr)]"
             >
               <div className="flex flex-col items-start gap-3.5">
                 <p className="text-[13px] leading-[1.3] font-bold tracking-[0.1em] text-bitmap-mid uppercase">

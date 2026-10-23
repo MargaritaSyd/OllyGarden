@@ -111,7 +111,7 @@ function FaqRow({
       >
         <h3 className={s.question}>{item.q}</h3>
         <svg
-          className="size-5 shrink-0 text-bitmap-mid transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
+          className="size-5 shrink-0 text-bitmap-mid transition-transform duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
           viewBox="0 0 20 20"
           fill="none"
           aria-hidden="true"

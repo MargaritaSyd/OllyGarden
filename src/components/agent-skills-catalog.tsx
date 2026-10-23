@@ -1,13 +1,13 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
+import { useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent } from "react";
 import { CtaArrow } from "@/components/cta-arrow";
 import { GitHubMark } from "@/components/company-opensource";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { skillCount, skillHref, skillRepositories, type SkillRepository } from "@/lib/agent-skills";
 
 const packageCard =
-  "flex h-full flex-col gap-4 rounded-3xl border border-bitmap-highlight/40 bg-[#19321e] bg-[url('/images/texture-grain.png')] bg-repeat [background-size:328px_140px] p-8 max-[767px]:p-6";
+  "as-lift flex h-full flex-col gap-4 rounded-3xl border border-bitmap-highlight/40 bg-[#19321e] bg-[url('/images/texture-grain.png')] bg-repeat [background-size:328px_140px] p-8 max-[767px]:p-6";
 
 function PrincipleText({ text }: { text: string }) {
   return text.split("`").map((part, index) =>
@@ -109,17 +109,23 @@ function SkillGroup({
   repository,
   title,
   skills,
+  index,
 }: {
   repository: SkillRepository;
   title: string;
   skills: SkillRepository["groups"][number]["skills"];
+  index: number;
 }) {
-  const nameWidth = repository.id === "opinions" ? "min-[768px]:max-[1023px]:[--as-name-w:280px]" : "min-[768px]:max-[1023px]:[--as-name-w:230px]";
+  const nameWidth =
+    repository.id === "opinions"
+      ? "[--as-name-w:450px] max-[1199px]:[--as-name-w:360px] max-[1023px]:[--as-name-w:280px]"
+      : "[--as-name-w:330px] max-[1199px]:[--as-name-w:300px] max-[1023px]:[--as-name-w:230px]";
 
   return (
     <section
       aria-labelledby={`${repository.id}-${title.toLowerCase().replaceAll(" ", "-")}`}
-      className={`overflow-hidden rounded-[20px] border border-bitmap-highlight/25 bg-[#19321e] bg-[linear-gradient(rgba(1,30,12,0.42),rgba(1,30,12,0.78)),url('/images/texture-grain.png')] [background-repeat:no-repeat,repeat] [background-size:100%_100%,328px_140px] ${nameWidth} min-[1024px]:[--as-name-w:320px]`}
+      style={{ "--g": index } as CSSProperties}
+      className={`as-skill-group overflow-hidden rounded-[20px] border border-bitmap-highlight/25 bg-[#19321e] bg-[linear-gradient(rgba(1,30,12,0.42),rgba(1,30,12,0.78)),url('/images/texture-grain.png')] [background-repeat:no-repeat,repeat] [background-size:100%_100%,328px_140px] ${nameWidth}`}
     >
       <h3
         id={`${repository.id}-${title.toLowerCase().replaceAll(" ", "-")}`}
@@ -273,12 +279,13 @@ export function AgentSkillsCatalog() {
                 tabIndex={selected ? 0 : undefined}
                 className="flex scroll-mt-28 flex-col gap-4 focus-visible:rounded-lg focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-bitmap-highlight"
               >
-                {repository.groups.map((group) => (
+                {repository.groups.map((group, index) => (
                   <SkillGroup
                     key={group.title}
                     repository={repository}
                     title={group.title}
                     skills={group.skills}
+                    index={index}
                   />
                 ))}
               </div>
