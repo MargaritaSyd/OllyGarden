@@ -375,10 +375,11 @@ export const roseCta = {
 
 /** Closing CTA reused by resource pages that hand off to Rose. */
 export const roseScanCta = {
-  title: "Start with a repository scan",
+  title: ["Start with a", "repository scan"],
   sub: "Connect Rose to your repository and see where your OpenTelemetry instrumentation can be improved. Get actionable findings, review the recommendations, and help your team fix telemetry issues at the source.",
   primary: { label: "Scan Your Repo for Free", href: siteConfig.appUrl },
   secondary: { label: "Book a Demo", href: "/contact" },
+  variant: "scan",
 } as const;
 
 export const roseMeta = {

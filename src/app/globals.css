@@ -246,6 +246,164 @@ body {
   }
 }
 
+/* Agent skills Rose diagram: a dot travels the stems into the brain, then across to the repos. */
+@keyframes as-flow-drop {
+  0% {
+    opacity: 0;
+    top: 0;
+  }
+  4% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 1;
+  }
+  36%,
+  100% {
+    opacity: 0;
+    top: calc(100% - 6px);
+  }
+}
+
+@keyframes as-flow-run {
+  0% {
+    opacity: 0;
+    left: 0;
+  }
+  4% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 1;
+  }
+  36%,
+  100% {
+    opacity: 0;
+    left: calc(100% - 6px);
+  }
+}
+
+@keyframes as-flow-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(217, 229, 51, 0);
+  }
+  50% {
+    box-shadow: 0 0 36px rgba(217, 229, 51, 0.18);
+  }
+}
+
+.as-flow-stem,
+.as-flow-run {
+  position: relative;
+  display: block;
+}
+
+.as-flow-stem {
+  width: 2px;
+  height: 100%;
+  background: repeating-linear-gradient(rgba(217, 229, 51, 0.55) 0 4px, transparent 4px 8px);
+}
+
+.as-flow-run {
+  width: 100%;
+  min-width: 120px;
+  height: 2px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(217, 229, 51, 0.55) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+.as-flow-stem::after,
+.as-flow-run::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #d9e533;
+  opacity: 0;
+  box-shadow: 0 0 10px rgba(217, 229, 51, 0.8);
+}
+
+.as-flow-stem::after {
+  top: 0;
+  left: -2px;
+}
+
+.as-flow-run::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  right: -1px;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid #d9e533;
+  border-right: 2px solid #d9e533;
+  rotate: 45deg;
+}
+
+.as-flow-run::after {
+  top: -2px;
+  left: 0;
+}
+
+.in-view .as-flow-stem::after {
+  animation: as-flow-drop 3.2s ease-in-out 0.6s infinite;
+}
+
+.in-view .as-flow-stem:nth-child(2)::after {
+  animation-delay: 0.8s;
+}
+
+.in-view .as-flow-stem:nth-child(3)::after {
+  animation-delay: 1s;
+}
+
+.in-view .as-flow-stem-one::after {
+  animation-delay: 1.6s;
+}
+
+.in-view .as-flow-run::after {
+  animation: as-flow-run 3.2s ease-in-out 2.2s infinite;
+}
+
+.in-view .as-flow-brain {
+  animation: as-flow-glow 3.2s ease-in-out 1.2s infinite;
+}
+
+@media (max-width: 767px) {
+  .as-flow-run {
+    width: 2px;
+    min-width: 0;
+    height: 36px;
+    background: repeating-linear-gradient(rgba(217, 229, 51, 0.55) 0 4px, transparent 4px 8px);
+  }
+
+  .as-flow-run::before {
+    inset: auto auto -1px -4px;
+    rotate: 135deg;
+  }
+
+  .as-flow-run::after {
+    top: 0;
+    left: -2px;
+  }
+
+  .in-view .as-flow-run::after {
+    animation-name: as-flow-drop;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .in-view .as-flow-stem::after,
+  .in-view .as-flow-run::after,
+  .in-view .as-flow-brain {
+    animation: none;
+  }
+}
+
 /* FAQ accordion. */
 .faq-accordion.js-anim .fq-head,
 .faq-accordion.js-anim .fq-item {

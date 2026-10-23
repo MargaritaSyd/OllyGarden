@@ -19,8 +19,8 @@ export type SiteCtaContent = {
   secondary?: SiteCtaAction;
   /** Product pages in Figma use the 57px buttons. */
   buttonSize?: "md" | "lg";
-  /** "product" follows the Rose page Figma (2371:32089): flush panel, 16/40 head rhythm, 24px button gap. */
-  variant?: "default" | "product";
+  /** "product" follows the Rose page Figma (2371:32089). "scan" is the agent-skills closing band. */
+  variant?: "default" | "product" | "scan";
   /** Drop the 48px gap above the panel; the home Figma (1:599) sits flush under the blog section. */
   flush?: boolean;
 };
@@ -30,6 +30,7 @@ export function SiteCta({ content = homeCta }: { content?: SiteCtaContent }) {
   const primary = content.primary ?? { label: "Get Started" };
   const secondary = content.secondary;
   const product = content.variant === "product";
+  const scan = content.variant === "scan";
   // Only a sub-line pulls the actions up into the head rhythm; a lone button row
   // keeps the 40px gap below the title (home Figma 2371:27246).
   const stacked = product ? Boolean(content.sub || secondary) : Boolean(content.sub);
@@ -48,7 +49,7 @@ export function SiteCta({ content = homeCta }: { content?: SiteCtaContent }) {
         />
         <div
           className={`relative flex flex-col items-center ${
-            stacked ? (product ? "gap-4" : "gap-[26px]") : ""
+            stacked ? (product ? "gap-4" : scan ? "gap-6" : "gap-[26px]") : ""
           }`}
         >
           <h2
@@ -66,7 +67,9 @@ export function SiteCta({ content = homeCta }: { content?: SiteCtaContent }) {
               className={`cta-sub ${
                 product
                   ? "max-w-[496px] text-base leading-[1.4] tracking-[0.02em] text-mist"
-                  : "max-w-[660px] text-base leading-[1.65] tracking-[0.01em] text-mist/80"
+                  : scan
+                    ? "max-w-[560px] text-base leading-[1.5] tracking-[0.01em] text-mist/80"
+                    : "max-w-[660px] text-base leading-[1.65] tracking-[0.01em] text-mist/80"
               }`}
             >
               {content.sub}
@@ -75,11 +78,12 @@ export function SiteCta({ content = homeCta }: { content?: SiteCtaContent }) {
           <div
             className={`cta-action flex w-full flex-col flex-wrap items-center justify-center sm:flex-row ${
               product || largeButtons ? "gap-6" : "gap-4"
-            } ${stacked && !product ? "" : product ? "mt-6" : "mt-10"}`}
+            } ${stacked && !product ? (scan ? "mt-2" : "") : product ? "mt-6" : "mt-10"}`}
           >
             <GetStartedLink
               href={primary.href}
-              size={content.buttonSize}
+              size={scan ? "og" : content.buttonSize}
+              tone={scan ? "paper" : "default"}
               className={primary.className}
               analytics={{ id: "closing_cta_primary", section: "closing_cta" }}
             >
@@ -90,7 +94,8 @@ export function SiteCta({ content = homeCta }: { content?: SiteCtaContent }) {
               <GetStartedLink
                 href={secondary.href ?? "/contact"}
                 variant="secondary"
-                size={content.buttonSize}
+                size={scan ? "og" : content.buttonSize}
+                tone={scan ? "paper" : "default"}
                 analytics={{ id: "closing_cta_secondary", section: "closing_cta" }}
               >
                 {secondary.label}

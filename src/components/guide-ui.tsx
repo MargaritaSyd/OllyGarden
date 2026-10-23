@@ -17,6 +17,7 @@ export function SectionHeader({
   eyebrow,
   title,
   lede,
+  ledeClassName,
   mark,
   children,
 }: {
@@ -24,6 +25,7 @@ export function SectionHeader({
   eyebrow: string;
   title: ReactNode;
   lede: string;
+  ledeClassName?: string;
   /** Path of the 32px section glyph shown above the eyebrow. */
   mark?: string;
   children?: ReactNode;
@@ -41,7 +43,7 @@ export function SectionHeader({
       >
         {title}
       </h2>
-      <p className="text-base leading-[1.4] tracking-[0.02em] text-mist">{lede}</p>
+      <p className={`text-base leading-[1.4] tracking-[0.02em] text-mist ${ledeClassName ?? ""}`}>{lede}</p>
       {children}
     </header>
   );

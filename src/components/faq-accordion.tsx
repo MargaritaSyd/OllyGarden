@@ -46,11 +46,14 @@ export function FaqAccordion({
   content,
   variant = "default",
   inset = "faq",
+  startClosed = false,
 }: {
   content: FaqContent;
   variant?: FaqVariant;
   /** `guide` uses the same horizontal inset as the resource-guide sections. */
   inset?: "faq" | "guide";
+  /** Leave every answer collapsed. The default variant otherwise opens the first item. */
+  startClosed?: boolean;
 }) {
   const s = styles[variant];
   const sectionClass =
@@ -70,7 +73,13 @@ export function FaqAccordion({
 
         <div className={s.list}>
           {content.items.map((item, index) => (
-            <FaqRow key={item.q} item={item} index={index} variant={variant} />
+            <FaqRow
+              key={item.q}
+              item={item}
+              index={index}
+              variant={variant}
+              startClosed={startClosed}
+            />
           ))}
         </div>
       </div>
@@ -82,16 +91,18 @@ function FaqRow({
   item,
   index,
   variant,
+  startClosed,
 }: {
   item: FaqItem;
   index: number;
   variant: FaqVariant;
+  startClosed: boolean;
 }) {
   const s = styles[variant];
 
   return (
     <details
-      open={variant !== "rose" && index === 0}
+      open={!startClosed && variant !== "rose" && index === 0}
       style={{ "--i": index } as CSSProperties}
       className={`faq-accordion-item fq-item overflow-hidden ${s.row} border border-sunflower/32 bg-[#002810] bg-[url('/images/texture-grain.png')] bg-repeat [background-size:328px_140px] transition-[border-color,box-shadow,opacity,transform] duration-200 ease-out hover:border-sunflower/55 hover:shadow-[0_14px_34px_rgba(0,0,0,0.26)]`}
     >

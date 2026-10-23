@@ -27,7 +27,12 @@ export default function AgentSkillsPage() {
       <AgentSkillsLayers />
       <AgentSkillsRose />
       <AgentSkillsInstall />
-      <FaqAccordion content={agentSkillsFaq} />
+      <div className="relative overflow-hidden">
+        <div className="tulip-grid" aria-hidden="true" />
+        <div className="relative z-[1]">
+          <FaqAccordion content={agentSkillsFaq} startClosed />
+        </div>
+      </div>
       <SiteCta content={roseScanCta} />
     </>
   );

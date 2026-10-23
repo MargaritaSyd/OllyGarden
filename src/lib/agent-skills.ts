@@ -11,6 +11,8 @@ export type SkillRepository = {
   layer: string;
   /** Second line of the repository's node in the Rose diagram. */
   origin: string;
+  /** Tab label. The prefix hides below 768px, matching the preview. */
+  tab: { prefix: string; label: string };
   title: string;
   summary: string;
   principles: readonly string[];
@@ -24,6 +26,7 @@ const otelFacts: SkillRepository = {
   href: "https://github.com/ollygarden/opentelemetry-agent-skills",
   layer: "Public OpenTelemetry facts",
   origin: "Open source, curated by us",
+  tab: { prefix: "OpenTelemetry", label: "facts" },
   title: "Agent Skills for OpenTelemetry",
   summary:
     "Vendor-neutral skills that point agents at upstream sources of truth: specifications, semantic conventions, SDK APIs, Collector components, and release data. Curated by us, non-opinionated by design.",
@@ -80,13 +83,14 @@ const ollygardenOpinions: SkillRepository = {
   href: "https://github.com/ollygarden/skills",
   layer: "Public OllyGarden opinions",
   origin: "Open source, authored by us",
+  tab: { prefix: "OllyGarden", label: "opinions" },
   title: "OllyGarden Skills",
   summary:
     "Our opinions on instrumentation patterns and telemetry shapes, layered on top of the facts. These skills reference the upstream skills, so install both packages together.",
   principles: [
     "Opinionated: how we would configure and fix it",
-    "Builds on otel-collector, otel-ottl, and the other fact skills",
-    "Prefixed ollygarden- to declare ownership in the skill namespace",
+    "Builds on `otel-collector`, `otel-ottl`, and the other fact skills",
+    "Prefixed `ollygarden-` to declare ownership in the skill namespace",
   ],
   groups: [
     {
@@ -118,6 +122,11 @@ export function skillCount(repository: SkillRepository) {
   return repository.groups.reduce((total, group) => total + group.skills.length, 0);
 }
 
+/** GitHub tree for one skill. Both repositories keep skills under `skills/<name>`. */
+export function skillHref(repository: Pick<SkillRepository, "href">, name: string) {
+  return `${repository.href}/tree/main/skills/${name}`;
+}
+
 const factCount = skillCount(otelFacts);
 const opinionCount = skillCount(ollygardenOpinions);
 
@@ -137,15 +146,17 @@ export const agentSkillsLayers = {
   eyebrow: "Two packages",
   title: "Facts and opinions, kept apart",
   lede: "There are many valid ways to use OpenTelemetry. One package states what is true upstream; the other says what we would do. Use the facts on their own, or add our opinions on top.",
+  mark: "/images/instrumentation-score/mark-dimensions.svg",
 } as const;
 
 export const agentSkillsRose = {
   eyebrow: "Inside Rose",
   title: "The same skills power Rose",
   lede: "Rose, our AI instrumentation agent, is built on the same packages you install. They are the public layers of the OllyGarden brain: Rose retrieves the skills a task needs, adds your organization's context, deterministic checks, and what we have learned in production, and opens pull requests with the fix.",
+  mark: "/images/solutions/financial/glyph.svg",
   brain: {
     title: "The OllyGarden brain",
-    sub: "Skills retrieval · deterministic checks · multi-agent orchestration",
+    chips: ["Skills retrieval", "Deterministic checks", "Multi-agent orchestration"],
   },
   rose: {
     title: "Rose",
@@ -167,7 +178,9 @@ export const agentSkillsInstall = {
   eyebrow: "Get started",
   title: "Install the skills",
   lede: "Both packages follow the Agent Skills specification and work with any agent that supports it. Install with skills.sh, or add each repository to Claude Code as a plugin marketplace.",
+  mark: "/images/instrumentation-score/mark-how.svg",
   specHref: "https://agentskills.io/specification",
+  specLink: "Agent Skills specification",
   blogHref: "/resources/blog/teach-your-coding-agent-opentelemetry",
   blogLink: "Read the announcement",
 } as const;
@@ -182,7 +195,7 @@ export const agentSkillsFaq = {
     },
     {
       q: "What is the difference between the two packages?",
-      a: "opentelemetry-agent-skills holds facts: anything you can verify against upstream specifications, source code, and releases. It is vendor neutral and non-opinionated by design. ollygarden/skills holds our opinions: what to instrument, which signal fits, and how we would configure the Collector. The opinion skills build on the fact skills, so install both.",
+      a: "`opentelemetry-agent-skills` holds facts: anything you can verify against upstream specifications, source code, and releases. It is vendor neutral and non-opinionated by design. `ollygarden/skills` holds our opinions: what to instrument, which signal fits, and how we would configure the Collector. The opinion skills build on the fact skills, so install both.",
     },
     {
       q: "Why does my coding agent need skills? Doesn't the model already know OpenTelemetry?",
@@ -194,7 +207,7 @@ export const agentSkillsFaq = {
     },
     {
       q: "How do I install the skills in Cursor, Codex, or GitHub Copilot?",
-      a: "Run npx skills add ollygarden/opentelemetry-agent-skills. The skills CLI installs into the coding agents it detects; pass -a to choose one, such as -a cursor, -a codex, or -a github-copilot. Install ollygarden/skills the same way. In Claude Code, you can also add either repository as a plugin marketplace.",
+      a: "Run `npx skills add ollygarden/opentelemetry-agent-skills`. The skills CLI installs into the coding agents it detects; pass `-a` to choose one, such as `-a cursor`, `-a codex`, or `-a github-copilot`. Install `ollygarden/skills` the same way. In Claude Code, you can also add either repository as a plugin marketplace.",
     },
     {
       q: "How do you keep the skills current?",
@@ -222,7 +235,7 @@ export const agentSkillsFaq = {
     },
     {
       q: "What data do the skills send to OllyGarden?",
-      a: "None. The skills are files your agent reads on your machine, and the fact skills fetch only public upstream sources. The one exception is the ollygarden-cli skill, which calls the OllyGarden API when you use it with your own account.",
+      a: "None. The skills are files your agent reads on your machine, and the fact skills fetch only public upstream sources. The one exception is the `ollygarden-cli` skill, which calls the OllyGarden API when you use it with your own account.",
     },
     {
       q: "How can I contribute?",
