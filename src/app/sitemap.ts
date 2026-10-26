@@ -153,6 +153,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    {
+      url: getAbsoluteUrl("/resources/trust-game"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     ...Object.entries(legalPages).map(([path, { updated }]) => ({
       url: getAbsoluteUrl(path),
       lastModified: new Date(updated),

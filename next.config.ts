@@ -25,6 +25,7 @@ const permanentRedirects = [
   ["/resources/webinars", "/resources/webinars-conferences"],
   ["/resources/community", "/resources/events"],
   ["/otel-quiz/result/:score(\\d{1,2})", "/otel-quiz"],
+  ["/resources/trust-game/result/:score(\\d{1,2})", "/resources/trust-game"],
   ["/careers/engineering-manager", "/careers"],
 ] as const;
 

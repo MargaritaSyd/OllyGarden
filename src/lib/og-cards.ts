@@ -7,6 +7,13 @@ import {
   quizScores,
   quizTier,
 } from "./quiz/score.ts";
+import {
+  trustCardPath,
+  trustPitch,
+  trustRoundSize,
+  trustScores,
+  trustTier,
+} from "./trust-game/score.ts";
 
 export type OgTheme = "olive" | "forest" | "cream" | "ink";
 
@@ -24,6 +31,13 @@ const quizResultCards: Record<string, OgCard> = Object.fromEntries(
   ]),
 );
 
+const trustResultCards: Record<string, OgCard> = Object.fromEntries(
+  trustScores.map((score) => [
+    trustCardPath(score),
+    { headline: `*${score}/${trustRoundSize}*\n${trustTier(score).name}`, body: trustPitch },
+  ]),
+);
+
 /** Open Graph card copy for every indexable page and quiz result, keyed by canonical path. */
 export const ogCards: Record<string, OgCard> = {
   "/": {
@@ -35,6 +49,11 @@ export const ogCards: Record<string, OgCard> = {
     body: "Take the quiz on semantic conventions, SDKs, signals, the Collector, OTTL, sampling, Weaver, and otelc.",
   },
   ...quizResultCards,
+  "/resources/trust-game": {
+    headline: "Would you trust *this telemetry*?",
+    body: "Ten anonymized OpenTelemetry cases. Decide whether each conclusion holds, then see the tell and the fix.",
+  },
+  ...trustResultCards,
   "/pricing": {
     headline: "Start free,\n*grow when ready*",
     body: "Plans for OllyGarden Insights and Rose, from free tiers with no credit card to custom Enterprise plans.",

@@ -68,6 +68,7 @@ import { roseFaq, roseMeta } from "@/lib/rose";
 import { solutionsMeta } from "@/lib/solutions";
 import type { Post } from "@/lib/posts";
 import { quizMeta } from "@/lib/quiz/topics";
+import { trustGameFaq, trustGameMeta } from "@/lib/trust-game/copy";
 import { getAbsoluteUrl, siteConfig } from "@/lib/site";
 
 export function organizationSchema(): Organization {
@@ -1221,6 +1222,40 @@ export function quizGraph(): Graph {
   return {
     "@context": "https://schema.org",
     "@graph": [organizationSchema(), websiteSchema(), quiz],
+  };
+}
+
+export function trustGameGraph(): Graph {
+  const quiz: Quiz = {
+    "@type": "Quiz",
+    "@id": getAbsoluteUrl(`${trustGameMeta.path}#game`),
+    name: trustGameMeta.title,
+    description: trustGameMeta.description,
+    url: getAbsoluteUrl(trustGameMeta.path),
+    about: { "@type": "Thing", name: "OpenTelemetry" },
+    educationalLevel: "Advanced",
+  };
+  const faq: FAQPage = {
+    "@type": "FAQPage",
+    "@id": getAbsoluteUrl(`${trustGameMeta.path}#faq`),
+    url: getAbsoluteUrl(trustGameMeta.path),
+    name: trustGameFaq.title,
+    description: trustGameFaq.sub,
+    inLanguage: siteConfig.language,
+    isPartOf: { "@id": getAbsoluteUrl("/#website") },
+    mainEntity: faqQuestions(trustGameFaq.items),
+  };
+  const crumbs: BreadcrumbList = {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: getAbsoluteUrl("/") },
+      { "@type": "ListItem", position: 2, name: "Resources", item: getAbsoluteUrl("/resources") },
+      { "@type": "ListItem", position: 3, name: "Trust Game", item: getAbsoluteUrl(trustGameMeta.path) },
+    ],
+  };
+  return {
+    "@context": "https://schema.org",
+    "@graph": [organizationSchema(), websiteSchema(), quiz, faq, crumbs],
   };
 }
 

@@ -108,6 +108,12 @@ export const resourceGroups: readonly ResourceGroup[] = [
         description: `${quizQuestionCount} questions, one per OpenTelemetry topic, that challenge even the project's maintainers.`,
         cta: "Take the quiz",
       },
+      {
+        href: "/resources/trust-game",
+        label: "Trust Game",
+        description: "Spot the telemetry conclusions the data doesn't back.",
+        cta: "Play the game",
+      },
     ],
   },
   {

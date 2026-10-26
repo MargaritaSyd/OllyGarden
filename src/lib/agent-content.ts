@@ -32,6 +32,10 @@ const agentPages: Record<string, AgentPage> = {
     title: quizMeta.title,
     description: "Test your OpenTelemetry knowledge with ten scored questions.",
   },
+  "/resources/trust-game": {
+    title: "Trust Game",
+    description: "Decide whether ten anonymized OpenTelemetry conclusions hold up.",
+  },
   "/pricing": {
     title: "OllyGarden Pricing",
     description: "Plans and prices for OllyGarden Insights and Rose.",

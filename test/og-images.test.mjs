@@ -26,7 +26,7 @@ test("every rendered card belongs to a card entry", () => {
   const urls = new Set(Object.keys(ogCards).map(ogImageUrl));
   const rendered = readdirSync(join(publicDir, "og"), { recursive: true })
     .filter((file) => file.endsWith(".png"))
-    .map((file) => `/og/${file}`);
+    .map((file) => `/og/${String(file).replaceAll("\\", "/")}`);
   for (const url of rendered) {
     assert.ok(urls.has(url), `public${url} has no entry in src/lib/og-cards.ts`);
   }
