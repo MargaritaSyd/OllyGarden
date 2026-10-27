@@ -306,7 +306,7 @@ function ResourceLinkIcon({ href }: { href: string }) {
       return <HelpCircleIcon />;
     case "/otel-quiz":
       return <ListChecksIcon />;
-    case "/trust-your-telemetry":
+    case "/resources/trust-your-telemetry":
       return <ScaleIcon />;
     default:
       return null;

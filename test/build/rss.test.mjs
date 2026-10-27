@@ -123,6 +123,10 @@ for (const [source, destination] of [
   ["/resources/webinars", "/resources/webinars-conferences"],
   ["/resources/community", "/resources/events"],
   ["/otel-quiz/result/7", "/otel-quiz"],
+  ["/trust-your-telemetry", "/resources/trust-your-telemetry"],
+  ["/trust-your-telemetry/booth", "/resources/trust-your-telemetry/booth"],
+  ["/resources/trust-game", "/resources/trust-your-telemetry"],
+  ["/resources/trust-game/booth", "/resources/trust-your-telemetry/booth"],
   ["/careers/engineering-manager", "/careers"],
   ["/careers/executive-assistant", "/careers/chief-of-staff"],
 ]) {
@@ -136,7 +140,7 @@ for (const [source, destination] of [
 
 for (const [page, heading] of [
   ["/otel-quiz", "How deep are your OpenTelemetry® roots?"],
-  ["/trust-your-telemetry", "Would you trust this telemetry?"],
+  ["/resources/trust-your-telemetry", "Would you trust this telemetry?"],
   [
     "/careers/founding-enterprise-account-executive",
     "Founding Enterprise Account Executive",
@@ -198,15 +202,15 @@ test("shared trust game results carry their tier card and stay out of search", a
   assert.match(html, /<meta name="robots" content="noindex, nofollow"/);
   assert.match(
     html,
-    /<meta property="og:image" content="https:\/\/ollygarden\.com\/og\/trust-your-telemetry\/tier\/skeptic\.png"/,
+    /<meta property="og:image" content="https:\/\/ollygarden\.com\/og\/resources\/trust-your-telemetry\/tier\/skeptic\.png"/,
   );
   assert.doesNotMatch(sitemap, /trust-your-telemetry\/(result|booth)/);
-  assert.equal((await fetch(`${origin}/trust-your-telemetry/result/NOT-A-TOKEN`)).status, 404);
+  assert.equal((await fetch(`${origin}/resources/trust-your-telemetry/result/NOT-A-TOKEN`)).status, 404);
 });
 
 test("the trust game page never server-renders a verdict", async () => {
-  const html = await (await fetch(`${origin}/trust-your-telemetry`)).text();
-  const markdown = await (await fetch(`${origin}/trust-your-telemetry.md`)).text();
+  const html = await (await fetch(`${origin}/resources/trust-your-telemetry`)).text();
+  const markdown = await (await fetch(`${origin}/resources/trust-your-telemetry.md`)).text();
   const { trustGameCases } = await import("../../src/lib/trust-game/cases.ts");
   for (const body of [html, markdown]) {
     for (const item of trustGameCases) {
@@ -217,7 +221,7 @@ test("the trust game page never server-renders a verdict", async () => {
 });
 
 test("the booth kiosk renders without site chrome or analytics", async () => {
-  const response = await fetch(`${origin}/trust-your-telemetry/booth`);
+  const response = await fetch(`${origin}/resources/trust-your-telemetry/booth`);
   const html = await response.text();
 
   assert.equal(response.status, 200);

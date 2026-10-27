@@ -8,6 +8,7 @@ import {
   trustGameResultToken,
   trustGameScoreFromToken,
   trustGameTier,
+  trustGameTierStops,
   trustGameTiers,
 } from "../src/lib/trust-game/score.ts";
 
@@ -63,6 +64,13 @@ test("mistakes split into lies trusted and truths doubted", () => {
   assert.deepEqual(trustGameMistakes(answers), { liesTrusted: 1, truthsDoubted: 1 });
 });
 
+test("the booth kiosk stays under the public game", async () => {
+  const { trustGameBoothPath } = await import("../src/lib/chrome.ts");
+  const { trustGamePath } = await import("../src/lib/trust-game/score.ts");
+  assert.equal(trustGamePath, "/resources/trust-your-telemetry");
+  assert.equal(trustGameBoothPath, `${trustGamePath}/booth`);
+});
+
 test("tiers scale with the deck, so 10- and 20-case games share them", () => {
   assert.equal(trustGameTier(10, 10).id, "sommelier");
   assert.equal(trustGameTier(9, 10).id, "seasoned");
@@ -70,6 +78,16 @@ test("tiers scale with the deck, so 10- and 20-case games share them", () => {
   assert.equal(trustGameTier(11, 20).id, "optimist");
   assert.equal(trustGameTier(0, 10).id, "paged");
   assert.equal(new Set(trustGameTiers.map((tier) => tier.id)).size, trustGameTiers.length);
+  assert.deepEqual(
+    trustGameTierStops(10).map((stop) => [stop.tier.id, stop.low, stop.high]),
+    [
+      ["paged", 0, 3],
+      ["optimist", 4, 5],
+      ["skeptic", 6, 7],
+      ["seasoned", 8, 9],
+      ["sommelier", 10, 10],
+    ],
+  );
 });
 
 test("result links hide the score in a token that maps back to it", () => {

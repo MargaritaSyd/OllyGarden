@@ -21,6 +21,7 @@ import { indexablePressReleases, pressReleaseHref } from "@/lib/press";
 import { rosePlans } from "@/lib/rose";
 import { getAbsoluteUrl, siteConfig } from "@/lib/site";
 import { telemetryQualityDefinition, telemetryQualityFaq, telemetryQualityMeta } from "@/lib/telemetry-quality";
+import { trustGameMeta } from "@/lib/trust-game/content";
 
 const link = (label: string, path: string, note?: string) =>
   `- [${label}](${path.startsWith("http") ? path : getAbsoluteUrl(path)})${note ? `: ${note}` : ""}`;
@@ -95,7 +96,7 @@ export function llmsIndex() {
       link("OpenTelemetry quiz", "/otel-quiz", "Ten questions, one per OpenTelemetry topic."),
       link(
         "Trust Your Telemetry? game",
-        "/trust-your-telemetry",
+        trustGameMeta.path,
         "Ten real, anonymized OpenTelemetry cases; decide which conclusions hold up.",
       ),
     ]),

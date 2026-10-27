@@ -2,7 +2,7 @@
 // import-free so no feature code rides along.
 
 /** The trust game's kiosk for event booths. */
-export const trustGameBoothPath = "/trust-your-telemetry/booth";
+export const trustGameBoothPath = "/resources/trust-your-telemetry/booth";
 
 /**
  * Pages that render without site chrome and never start analytics: shared conference displays.

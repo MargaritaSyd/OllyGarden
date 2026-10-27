@@ -3,7 +3,7 @@
 // extension.
 import { resultToken, scoreFromToken } from "../result-token.ts";
 
-export const trustGamePath = "/trust-your-telemetry";
+export const trustGamePath = "/resources/trust-your-telemetry";
 
 /** Cases in a web game, half trustworthy and half deceptive; shared results are scored out of it. */
 export const trustGameDeckSize = 10;
@@ -54,6 +54,17 @@ export type TrustGameTier = (typeof trustGameTiers)[number];
 
 export function trustGameTier(score: number, deckSize: number): TrustGameTier {
   return trustGameTiers.find((tier) => score >= tier.min * deckSize)!;
+}
+
+/** Inclusive score band for each tier on a round of `total` cases, lowest tier first. */
+export function trustGameTierStops(total: number) {
+  const ascending = [...trustGameTiers].reverse();
+  return ascending.map((tier, index) => {
+    const low = Math.ceil(tier.min * total);
+    const next = ascending[index + 1];
+    const high = next ? Math.ceil(next.min * total) - 1 : total;
+    return { tier, low, high: Math.max(low, high) };
+  });
 }
 
 /** Key of the tier's Open Graph card in og-cards.ts; not a route. */

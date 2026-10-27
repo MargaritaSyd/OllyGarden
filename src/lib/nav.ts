@@ -1,4 +1,5 @@
 import { siteConfig } from "@/lib/site";
+import { trustGamePath } from "@/lib/trust-game/score";
 
 export type MenuIconName =
   | "insights"
@@ -101,7 +102,7 @@ export const resourceLinks: NavLink[] = [
   { href: "/resources/agent-skills", label: "Agent Skills" },
   { href: "/resources/faq", label: "FAQ" },
   { href: "/otel-quiz", label: "OTel Quiz" },
-  { href: "/trust-your-telemetry", label: "Trust Your Telemetry?" },
+  { href: trustGamePath, label: "Trust Your Telemetry?" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -172,7 +173,7 @@ const headerResourceQuiz: NavLink = {
 };
 
 const headerResourceTrustGame: NavLink = {
-  href: "/trust-your-telemetry",
+  href: trustGamePath,
   label: "Trust Your Telemetry?",
   description: "Real telemetry and the conclusions drawn from it. Which hold up?",
 };

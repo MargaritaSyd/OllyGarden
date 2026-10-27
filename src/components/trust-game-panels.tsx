@@ -16,9 +16,7 @@ const line = "border-b border-white/8";
 
 /** Marks the element that holds the tell; it lights up once the case is revealed. */
 function hl(marked: boolean | undefined, revealed: boolean) {
-  return marked && revealed
-    ? "outline-2 -outline-offset-2 outline-sunflower bg-sunflower/10"
-    : "";
+  return marked && revealed ? "is-tell" : "";
 }
 
 /** The highlight's text equivalent for screen readers; goes first inside the marked element. */
@@ -38,7 +36,7 @@ export function TelemetryScreen({
   return (
     <section
       aria-label="Telemetry"
-      className={`min-w-0 rounded-2xl border border-white/10 bg-forest ${mono} text-[12.5px]`}
+      className={`tgp-window min-w-0 rounded-2xl border border-white/10 bg-forest ${mono} text-[12.5px]`}
     >
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 px-5 py-3 text-mist/55">
         <span className="flex gap-1.5" aria-hidden="true">
@@ -48,7 +46,7 @@ export function TelemetryScreen({
         </span>
         <span>{caption}</span>
       </div>
-      <div className="flex flex-col gap-6 overflow-x-auto p-5 [scrollbar-color:rgb(255_255_255/0.15)_transparent]">
+      <div className="tgp-scroll flex flex-col gap-6 overflow-x-auto p-5 [scrollbar-color:rgb(255_255_255/0.15)_transparent]">
         {panels.map((panel, index) => (
           <div key={index}>
             <PanelBody panel={panel} revealed={revealed} />

@@ -25,6 +25,12 @@ const permanentRedirects = [
   ["/resources/webinars", "/resources/webinars-conferences"],
   ["/resources/community", "/resources/events"],
   ["/otel-quiz/result/:score(\\d{1,2})", "/otel-quiz"],
+  ["/trust-your-telemetry", "/resources/trust-your-telemetry"],
+  ["/trust-your-telemetry/booth", "/resources/trust-your-telemetry/booth"],
+  ["/trust-your-telemetry/result/:token", "/resources/trust-your-telemetry/result/:token"],
+  ["/resources/trust-game", "/resources/trust-your-telemetry"],
+  ["/resources/trust-game/booth", "/resources/trust-your-telemetry/booth"],
+  ["/resources/trust-game/result/:token", "/resources/trust-your-telemetry/result/:token"],
   ["/careers/engineering-manager", "/careers"],
   ["/careers/executive-assistant", "/careers/chief-of-staff"],
 ] as const;

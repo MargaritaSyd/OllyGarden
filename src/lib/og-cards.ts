@@ -9,6 +9,7 @@ import {
 } from "./quiz/score.ts";
 import {
   trustGameCardPath,
+  trustGamePath,
   trustGameSharePitch,
   trustGameTiers,
 } from "./trust-game/score.ts";
@@ -47,7 +48,7 @@ export const ogCards: Record<string, OgCard> = {
     body: "Take the quiz on semantic conventions, SDKs, signals, the Collector, OTTL, sampling, Weaver, and otelc.",
   },
   ...quizResultCards,
-  "/trust-your-telemetry": {
+  [trustGamePath]: {
     headline: "Would you *trust* this telemetry?",
     body: "Ten real, anonymized OpenTelemetry cases. Decide which conclusions hold up, then see the fix.",
   },

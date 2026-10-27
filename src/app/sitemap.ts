@@ -11,6 +11,7 @@ import { telemetryQualityMeta } from "@/lib/telemetry-quality";
 import { indexablePressReleases, pressReleaseHref } from "@/lib/press";
 import { resourcesMeta } from "@/lib/resources";
 import { getAbsoluteUrl } from "@/lib/site";
+import { trustGamePath } from "@/lib/trust-game/score";
 
 // Static pages carry no lastmod: an always-current date tells crawlers nothing.
 // Legal pages carry the date they last changed.
@@ -154,7 +155,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
-      url: getAbsoluteUrl("/trust-your-telemetry"),
+      url: getAbsoluteUrl(trustGamePath),
       changeFrequency: "monthly",
       priority: 0.7,
     },
