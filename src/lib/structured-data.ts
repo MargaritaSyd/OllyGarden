@@ -68,7 +68,8 @@ import { roseFaq, roseMeta } from "@/lib/rose";
 import { solutionsMeta } from "@/lib/solutions";
 import type { Post } from "@/lib/posts";
 import { quizMeta } from "@/lib/quiz/topics";
-import { trustGameFaq, trustGameMeta } from "@/lib/trust-game/copy";
+import { trustGameFaq, trustGameMeta } from "@/lib/trust-game/content";
+import { trustGameDeckSize } from "@/lib/trust-game/score";
 import { getAbsoluteUrl, siteConfig } from "@/lib/site";
 
 export function organizationSchema(): Organization {
@@ -1225,37 +1226,33 @@ export function quizGraph(): Graph {
   };
 }
 
-export function trustGameGraph(): Graph {
-  const quiz: Quiz = {
+/** The trust game; its page also carries the FAQ, which shared result pages leave out. */
+export function trustGameGraph({ faq = true } = {}): Graph {
+  const url = getAbsoluteUrl(trustGameMeta.path);
+  const game: Quiz = {
     "@type": "Quiz",
-    "@id": getAbsoluteUrl(`${trustGameMeta.path}#game`),
+    "@id": `${url}#quiz`,
+    name: trustGameMeta.name,
+    description: `${trustGameDeckSize} real, anonymized OpenTelemetry cases across traces, logs, spans, and metrics. Decide whether each conclusion holds up, then see the tell and the fix.`,
+    about: { "@type": "Thing", name: "OpenTelemetry" },
+    educationalLevel: "Intermediate",
+    publisher: { "@id": getAbsoluteUrl("/#organization") },
+  };
+  const webPage: FAQPage = {
+    "@type": "FAQPage",
+    "@id": `${url}#webpage`,
+    url,
     name: trustGameMeta.title,
     description: trustGameMeta.description,
-    url: getAbsoluteUrl(trustGameMeta.path),
-    about: { "@type": "Thing", name: "OpenTelemetry" },
-    educationalLevel: "Advanced",
-  };
-  const faq: FAQPage = {
-    "@type": "FAQPage",
-    "@id": getAbsoluteUrl(`${trustGameMeta.path}#faq`),
-    url: getAbsoluteUrl(trustGameMeta.path),
-    name: trustGameFaq.title,
-    description: trustGameFaq.sub,
     inLanguage: siteConfig.language,
     isPartOf: { "@id": getAbsoluteUrl("/#website") },
+    about: { "@id": `${url}#quiz` },
+    publisher: { "@id": getAbsoluteUrl("/#organization") },
     mainEntity: faqQuestions(trustGameFaq.items),
-  };
-  const crumbs: BreadcrumbList = {
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: getAbsoluteUrl("/") },
-      { "@type": "ListItem", position: 2, name: "Resources", item: getAbsoluteUrl("/resources") },
-      { "@type": "ListItem", position: 3, name: "Trust Game", item: getAbsoluteUrl(trustGameMeta.path) },
-    ],
   };
   return {
     "@context": "https://schema.org",
-    "@graph": [organizationSchema(), websiteSchema(), quiz, faq, crumbs],
+    "@graph": [organizationSchema(), websiteSchema(), game, ...(faq ? [webPage] : [])],
   };
 }
 

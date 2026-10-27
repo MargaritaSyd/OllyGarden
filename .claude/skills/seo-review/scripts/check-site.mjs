@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Audits every sitemap URL of a running wicket deployment for the SEO/AEO rules in doc/seo.md.
 // Usage: node check-site.mjs <base-url> [path ...]
-//   base-url  e.g. http://localhost:3000, a Netlify deploy preview, or https://ollygarden.com
+//   base-url  e.g. http://localhost:3000, a local Worker preview, or https://ollygarden.com
 //   path      optional canonical paths to check instead of the whole sitemap
 // Canonical URLs must use NEXT_PUBLIC_SITE_URL (default https://ollygarden.com); when auditing a
 // local build made without it, localhost canonicals are accepted.

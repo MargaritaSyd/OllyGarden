@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { AnalyticsConsentBanner } from "@/components/analytics-consent-banner";
 import { AnnouncementBar } from "@/components/announcement-bar";
-import { PageMotif } from "@/components/page-motif";
+import { SiteChrome } from "@/components/site-chrome";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { WebsiteAnalytics } from "@/components/website-analytics";
@@ -15,7 +15,7 @@ const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
   subsets: ["latin"],
   display: "swap",
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400", "500", "700"],
 });
 
 // Code panels in the Rose MVI section (Figma uses JetBrains Mono there).
@@ -23,7 +23,7 @@ const jetBrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
   display: "swap",
-  weight: ["400", "500"],
+  weight: ["400"],
 });
 
 export const metadata: Metadata = rootMetadata;
@@ -61,16 +61,19 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="relative isolate flex min-h-full flex-col bg-forest font-sans text-mist">
-        <AnnouncementBar />
-        {/* The motif is absolute at the top of this wrapper. The header is fixed over the page. */}
-        <div className="relative flex flex-1 flex-col">
-          <PageMotif />
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-        </div>
-        <SiteFooter />
-        <AnalyticsConsentBanner />
-        <WebsiteAnalytics />
+        <SiteChrome
+          announcement={<AnnouncementBar />}
+          header={<SiteHeader />}
+          footer={<SiteFooter />}
+          analytics={
+            <>
+              <AnalyticsConsentBanner />
+              <WebsiteAnalytics />
+            </>
+          }
+        >
+          {children}
+        </SiteChrome>
       </body>
     </html>
   );

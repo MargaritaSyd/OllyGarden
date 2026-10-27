@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ChangeEvent } from "react";
 
 export const siteFormFieldClass =
-  "w-full rounded-lg border border-[#212c25] bg-[#05140a] px-4 py-3.5 text-base text-mist outline-none placeholder:text-mist/42 transition-[border-color,box-shadow] duration-[180ms] ease-out hover:border-[#3b4a3e] focus-visible:border-bitmap-highlight focus-visible:shadow-[0_0_0_3px_rgba(227,226,112,0.25)] aria-invalid:border-[#e98b7d]";
+  "w-full rounded-lg border border-[#212c25] bg-[#05140a] px-4 py-3.5 text-base text-mist outline-none placeholder:text-mist/42 transition-[border-color,box-shadow] duration-[180ms] ease-out hover:border-[#3b4a3e] focus-visible:border-bitmap-highlight focus-visible:shadow-[0_0_0_3px_rgba(227,226,112,0.25)] aria-invalid:border-wrong";
 
 export function SiteFormField({
   id,
@@ -59,7 +59,7 @@ export function SiteFormField({
         className={siteFormFieldClass}
       />
       {error ? (
-        <p className="text-[13px] leading-[1.4] text-[#f0a99e]" id={errorId}>
+        <p className="text-[13px] leading-[1.4] text-wrong-text" id={errorId}>
           {error}
         </p>
       ) : null}

@@ -306,8 +306,8 @@ function ResourceLinkIcon({ href }: { href: string }) {
       return <HelpCircleIcon />;
     case "/otel-quiz":
       return <ListChecksIcon />;
-    case "/resources/trust-game":
-      return <ScanSearchIcon />;
+    case "/trust-your-telemetry":
+      return <ScaleIcon />;
     default:
       return null;
   }
@@ -442,15 +442,14 @@ function ListChecksIcon() {
   );
 }
 
-function ScanSearchIcon() {
+function ScaleIcon() {
   return (
     <StrokeIcon>
-      <path d="M3 7V5a2 2 0 0 1 2-2h2" />
-      <path d="M17 3h2a2 2 0 0 1 2 2v2" />
-      <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
-      <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
-      <circle cx="12" cy="12" r="3" />
-      <path d="m16 16 2 2" />
+      <path d="M12 3v18" />
+      <path d="M7 21h10" />
+      <path d="M3 7h18" />
+      <path d="m6 7-3 7a3 3 0 0 0 6 0Z" />
+      <path d="m18 7-3 7a3 3 0 0 0 6 0Z" />
     </StrokeIcon>
   );
 }

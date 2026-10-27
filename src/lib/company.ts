@@ -149,7 +149,7 @@ export const companyTeamMembers = {
     name: "Jonathan Silva",
     role: "Founding Backend Engineer",
     img: "/images/company/team-jonathan.jpg",
-    bio: "Jonathan is a backend engineer focused on building robust, high-performance services. At OllyGarden, he develops the core systems that power telemetry analysis, helping teams deliver reliable observability at scale.",
+    bio: "Jojo started programming at 12 and developed his engineering mindset through scientific research and aerospace projects. He entered observability through the Linux Foundation mentorship program and now contributes to the OpenTelemetry and Prometheus communities. At OllyGarden, he helps expand the Insights Platform with new features and capabilities and maintains our OTel Collector enterprise distribution.",
     linkedin: "https://www.linkedin.com/in/jjneno/",
     github: "https://github.com/perebaj",
   },

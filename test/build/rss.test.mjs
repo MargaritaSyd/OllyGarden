@@ -124,6 +124,7 @@ for (const [source, destination] of [
   ["/resources/community", "/resources/events"],
   ["/otel-quiz/result/7", "/otel-quiz"],
   ["/careers/engineering-manager", "/careers"],
+  ["/careers/executive-assistant", "/careers/chief-of-staff"],
 ]) {
   test(`${source} redirects permanently to ${destination}`, async () => {
     const response = await fetch(`${origin}${source}`, { redirect: "manual" });
@@ -135,11 +136,12 @@ for (const [source, destination] of [
 
 for (const [page, heading] of [
   ["/otel-quiz", "How deep are your OpenTelemetry® roots?"],
+  ["/trust-your-telemetry", "Would you trust this telemetry?"],
   [
     "/careers/founding-enterprise-account-executive",
     "Founding Enterprise Account Executive",
   ],
-  ["/careers/executive-assistant", "Executive Assistant"],
+  ["/careers/chief-of-staff", "Chief of Staff"],
   ["/careers/ai-software-engineer", "AI Software Engineer"],
   ["/privacy-policy", "Your rights"],
   ["/data-protection-policy", "Data Protection Policy"],
@@ -182,6 +184,45 @@ test("shared quiz results carry their score card and stay out of search", async 
   );
   assert.doesNotMatch(sitemap, /otel-quiz\/result/);
   assert.equal((await fetch(`${origin}/otel-quiz/result/NOT-A-TOKEN`)).status, 404);
+});
+
+test("shared trust game results carry their tier card and stay out of search", async () => {
+  const { trustGameResultPath, trustGameResultToken } = await import(
+    "../../src/lib/trust-game/score.ts"
+  );
+  const response = await fetch(`${origin}${trustGameResultPath(trustGameResultToken(7))}`);
+  const html = await response.text();
+  const sitemap = await (await fetch(`${origin}/sitemap.xml`)).text();
+
+  assert.equal(response.status, 200);
+  assert.match(html, /<meta name="robots" content="noindex, nofollow"/);
+  assert.match(
+    html,
+    /<meta property="og:image" content="https:\/\/ollygarden\.com\/og\/trust-your-telemetry\/tier\/skeptic\.png"/,
+  );
+  assert.doesNotMatch(sitemap, /trust-your-telemetry\/(result|booth)/);
+  assert.equal((await fetch(`${origin}/trust-your-telemetry/result/NOT-A-TOKEN`)).status, 404);
+});
+
+test("the trust game page never server-renders a verdict", async () => {
+  const html = await (await fetch(`${origin}/trust-your-telemetry`)).text();
+  const markdown = await (await fetch(`${origin}/trust-your-telemetry.md`)).text();
+  const { trustGameCases } = await import("../../src/lib/trust-game/cases.ts");
+  for (const body of [html, markdown]) {
+    for (const item of trustGameCases) {
+      for (const reveal of [item.headline, item.tell]) assert.ok(!body.includes(reveal), `${item.id} reveal leaked`);
+    }
+  }
+  assert.match(markdown, /What you.ll practice/);
+});
+
+test("the booth kiosk renders without site chrome or analytics", async () => {
+  const response = await fetch(`${origin}/trust-your-telemetry/booth`);
+  const html = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.match(html, /<meta name="robots" content="noindex, nofollow"/);
+  assert.doesNotMatch(html, /<header|<footer|Cookie settings/);
 });
 
 for (const page of [

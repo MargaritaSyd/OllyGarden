@@ -1,40 +1,48 @@
 // Imported by src/lib/og-cards.ts, which scripts/render-og-images.mjs loads outside the
-// tsconfig path aliases. Keep this file free of imports.
+// tsconfig path aliases. Import only other import-free modules, by relative path with the .ts
+// extension.
+import { resultToken, scoreFromToken } from "../result-token.ts";
 
-/** Cases dealt in one game. The bank is larger; each round is half that hold and half that don't. */
-export const trustRoundSize = 10;
+export const trustGamePath = "/trust-your-telemetry";
 
-export const trustScores = Array.from({ length: trustRoundSize + 1 }, (_, score) => score);
+/** Cases in a web game, half trustworthy and half deceptive; shared results are scored out of it. */
+export const trustGameDeckSize = 10;
 
-export const trustPitch = "Ten telemetry conclusions. Does the data back them up?";
+export const trustGameSharePitch =
+  "Ten real OpenTelemetry cases and the conclusions people drew from them. Which would you trust?";
 
-/** Score tiers, highest first. Result screens, shared pages, and their cards share them. */
-export const trustTiers = [
+/** Score tiers, highest first; `min` is the share of the deck answered correctly. */
+export const trustGameTiers = [
   {
-    min: 10,
+    id: "sommelier",
+    min: 1,
     name: "Telemetry sommelier",
     emoji: "🍷",
     message: "A perfect read. No bad conclusion gets past you.",
   },
   {
-    min: 8,
+    id: "seasoned",
+    min: 0.8,
     name: "Seasoned on-call",
     emoji: "📟",
     message: "Sharp instincts. Very few bad calls fool you.",
   },
   {
-    min: 6,
+    id: "skeptic",
+    min: 0.6,
     name: "Healthy skeptic",
     emoji: "🧐",
     message: "You question conclusions, which is the right habit. The tells are worth a second look.",
   },
   {
-    min: 4,
+    id: "optimist",
+    min: 0.4,
     name: "Dashboard optimist",
     emoji: "📈",
     message: "You accept conclusions a little too readily. The tells show where they fooled you.",
   },
   {
+    id: "paged",
     min: 0,
     name: "Paged at 3 a.m.",
     emoji: "🌙",
@@ -42,48 +50,27 @@ export const trustTiers = [
   },
 ] as const;
 
-export function trustTier(score: number) {
-  return trustTiers.find((tier) => score >= tier.min)!;
+export type TrustGameTier = (typeof trustGameTiers)[number];
+
+export function trustGameTier(score: number, deckSize: number): TrustGameTier {
+  return trustGameTiers.find((tier) => score >= tier.min * deckSize)!;
 }
 
-/** Inclusive score band for a tier, highest tier first. */
-export function trustTierRange(index: number, total = trustRoundSize) {
-  const low = trustTiers[index].min;
-  const high = index === 0 ? total : trustTiers[index - 1].min - 1;
-  return low === high ? `${low}` : `${low}–${high}`;
+/** Key of the tier's Open Graph card in og-cards.ts; not a route. */
+export function trustGameCardPath(tier: TrustGameTier) {
+  return `${trustGamePath}/tier/${tier.id}`;
 }
 
-/** Key of the score's Open Graph card in og-cards.ts; not a route. */
-export function trustCardPath(score: number) {
-  return `/resources/trust-game/score/${score}`;
+/** The score a shared result token stands for, or null when the token is malformed. */
+export function trustGameScoreFromToken(token: string): number | null {
+  return scoreFromToken(token, trustGameDeckSize);
 }
 
-const tokenAlphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
-const tokenPattern = /^[0-9a-z]{8}$/;
-
-/**
- * Result links carry a random-looking token whose FNV-1a hash mod 11 is the score, so editing the
- * URL doesn't pick a score. It is obfuscation, not a signature: anyone can mint a token.
- */
-export function trustScoreFromToken(token: string): number | null {
-  if (!tokenPattern.test(token)) return null;
-  let hash = 0x811c9dc5;
-  for (const char of token) hash = Math.imul(hash ^ char.charCodeAt(0), 0x01000193);
-  return (hash >>> 0) % (trustRoundSize + 1);
+/** A fresh result token for `score`; each call returns a different one. */
+export function trustGameResultToken(score: number) {
+  return resultToken(score, trustGameDeckSize);
 }
 
-/** A fresh random token that maps back to `score`; each call returns a different one. */
-export function trustResultToken(score: number) {
-  let token;
-  do {
-    token = Array.from(
-      { length: 8 },
-      () => tokenAlphabet[Math.floor(Math.random() * tokenAlphabet.length)],
-    ).join("");
-  } while (trustScoreFromToken(token) !== score);
-  return token;
-}
-
-export function trustResultPath(token: string) {
-  return `/resources/trust-game/result/${token}`;
+export function trustGameResultPath(token: string) {
+  return `${trustGamePath}/result/${token}`;
 }

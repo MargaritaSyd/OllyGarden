@@ -2,15 +2,13 @@ name: Deploy production
 run-name: ${{ inputs.skip_supabase && 'Deploy production (publish only, Supabase skipped)' || github.event.head_commit.message || 'Deploy production' }}
 
 # Production deploys run here, in order: Supabase migrations, then Edge Functions, then the
-# Netlify build. Netlify skips the production builds a merge would start (`ignore` in
-# netlify.toml) and builds only from the build hook this workflow calls, so new code never goes
-# live before the schema it needs. The hook body is the commit this run migrated for; the
-# production prebuild refuses to build any other commit.
+# Cloudflare Worker (wrangler.jsonc) that serves ollygarden.com, so new code never goes live before
+# the schema it needs. Each deploy is stamped `wicket@<commit>` in the Worker's deployment message.
 
 on:
   push:
     branches: [main]
-  # Redeploy without a merge, for example after changing a Netlify environment variable.
+  # Redeploy without a merge, for example after changing a repository variable.
   workflow_dispatch:
     inputs:
       skip_supabase:
@@ -35,7 +33,7 @@ env:
 
 jobs:
   deploy:
-    name: Migrate, deploy functions, publish
+    name: Migrate and deploy functions
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -44,7 +42,6 @@ jobs:
       # Optional. The CLI reads it from the environment and, when it is empty, connects through a
       # temporary login role. Never pass it as --password: CLI 2.120 rejects an empty value.
       SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-      NETLIFY_BUILD_HOOK_URL: ${{ secrets.NETLIFY_BUILD_HOOK_URL }}
       SKIP_SUPABASE: ${{ inputs.skip_supabase && 'true' || 'false' }}
       GH_TOKEN: ${{ github.token }}
     steps:
@@ -72,7 +69,6 @@ jobs:
       - name: Check deploy secrets
         run: |
           missing=""
-          [ -n "$NETLIFY_BUILD_HOOK_URL" ] || missing="$missing NETLIFY_BUILD_HOOK_URL"
           if [ "$SKIP_SUPABASE" != "true" ] && [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
             missing="$missing SUPABASE_ACCESS_TOKEN"
           fi
@@ -148,13 +144,67 @@ jobs:
           echo "::error::supabase functions deploy failed after 3 attempts"
           exit 1
 
-      - name: Publish on Netlify
+  # A separate job, so the dependency tree the build runs never shares an environment with the
+  # Supabase token.
+  cloudflare:
+    name: Build and deploy the Cloudflare Worker
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      # write only to cancel this run when a newer commit supersedes it.
+      actions: write
+    env:
+      NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+      NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN: ${{ vars.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN }}
+      NEXT_PUBLIC_POSTHOG_HOST: ${{ vars.NEXT_PUBLIC_POSTHOG_HOST }}
+      NEXT_PUBLIC_APOLLO_APP_ID: ${{ vars.NEXT_PUBLIC_APOLLO_APP_ID }}
+      NEXT_PUBLIC_HUBSPOT_PORTAL_ID: ${{ vars.NEXT_PUBLIC_HUBSPOT_PORTAL_ID }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+      SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY }}
+      SUPABASE_SEND_EMAIL: ${{ vars.SUPABASE_SEND_EMAIL }}
+      WRANGLER_SEND_METRICS: "false"
+    steps:
+      # The newer commit's run, queued behind this one, deploys it.
+      - name: Stop if a newer commit is on main
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           head=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)
           if [ "$head" != "$GITHUB_SHA" ]; then
-            echo "main moved to $head while this run deployed Supabase; the run for that commit publishes it."
-            exit 0
+            echo "main is at $head; the run for that commit deploys it."
+            gh run cancel "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY"
+            sleep 60
+            exit 1
           fi
-          curl --fail --silent --show-error --retry 3 --retry-all-errors -X POST \
-            -H "Content-Type: text/plain" --data "$GITHUB_SHA" "$NETLIFY_BUILD_HOOK_URL"
-          echo "Netlify production build requested for $GITHUB_SHA."
+
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+
+      - name: Build
+        run: |
+          scripts/check-cloudflare-vars.sh
+          bun install --frozen-lockfile
+          bunx opennextjs-cloudflare build
+
+      # The message stamps the commit, so `wrangler deployments list` shows what is live.
+      # opennextjs-cloudflare re-splits the arguments it forwards on spaces, so none may contain one.
+      - name: Deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          bunx opennextjs-cloudflare deploy -- --message "wicket@$GITHUB_SHA" \
+            --var "SUPABASE_URL:$SUPABASE_URL" \
+            --var "SUPABASE_PUBLISHABLE_KEY:$SUPABASE_PUBLISHABLE_KEY" \
+            --var "SUPABASE_SEND_EMAIL:$SUPABASE_SEND_EMAIL"

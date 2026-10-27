@@ -93,7 +93,11 @@ export function llmsIndex() {
       link("Webinars and conference talks", "/resources/webinars-conferences"),
       link("Events", "/resources/events"),
       link("OpenTelemetry quiz", "/otel-quiz", "Ten questions, one per OpenTelemetry topic."),
-      link("Trust Game", "/resources/trust-game", "Ten telemetry conclusions. Does the data back them up?"),
+      link(
+        "Trust Your Telemetry? game",
+        "/trust-your-telemetry",
+        "Ten real, anonymized OpenTelemetry cases; decide which conclusions hold up.",
+      ),
     ]),
     section("Developer tools", [
       link(

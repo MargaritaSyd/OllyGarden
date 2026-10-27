@@ -137,8 +137,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
-      url: getAbsoluteUrl("/careers/executive-assistant"),
-      lastModified: new Date("2026-10-05"),
+      url: getAbsoluteUrl("/careers/chief-of-staff"),
+      lastModified: new Date("2026-10-27"),
       changeFrequency: "monthly",
       priority: 0.8,
     },
@@ -154,7 +154,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
-      url: getAbsoluteUrl("/resources/trust-game"),
+      url: getAbsoluteUrl("/trust-your-telemetry"),
       changeFrequency: "monthly",
       priority: 0.7,
     },

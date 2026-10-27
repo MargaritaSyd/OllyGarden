@@ -1,5 +1,7 @@
 // Imported by src/lib/og-cards.ts, which scripts/render-og-images.mjs loads outside the
-// tsconfig path aliases. Keep this file free of imports.
+// tsconfig path aliases. Import only other import-free modules, by relative path with the .ts
+// extension.
+import { resultToken, scoreFromToken } from "../result-token.ts";
 
 /** One question per topic; a test keeps this in step with the question bank. */
 export const quizQuestionCount = 10;
@@ -62,30 +64,14 @@ export function quizCardPath(score: number) {
   return `/otel-quiz/score/${score}`;
 }
 
-const tokenAlphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
-const tokenPattern = /^[0-9a-z]{8}$/;
-
-/**
- * Result links carry a random-looking token whose FNV-1a hash mod 11 is the score, so editing the
- * URL doesn't pick a score. It is obfuscation, not a signature: anyone can mint a token.
- */
+/** The score a shared result token stands for, or null when the token is malformed. */
 export function quizScoreFromToken(token: string): number | null {
-  if (!tokenPattern.test(token)) return null;
-  let hash = 0x811c9dc5;
-  for (const char of token) hash = Math.imul(hash ^ char.charCodeAt(0), 0x01000193);
-  return (hash >>> 0) % (quizQuestionCount + 1);
+  return scoreFromToken(token, quizQuestionCount);
 }
 
-/** A fresh random token that maps back to `score`; each call returns a different one. */
+/** A fresh result token for `score`; each call returns a different one. */
 export function quizResultToken(score: number) {
-  let token;
-  do {
-    token = Array.from(
-      { length: 8 },
-      () => tokenAlphabet[Math.floor(Math.random() * tokenAlphabet.length)],
-    ).join("");
-  } while (quizScoreFromToken(token) !== score);
-  return token;
+  return resultToken(score, quizQuestionCount);
 }
 
 export function quizResultPath(token: string) {

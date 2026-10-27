@@ -25,8 +25,8 @@ const permanentRedirects = [
   ["/resources/webinars", "/resources/webinars-conferences"],
   ["/resources/community", "/resources/events"],
   ["/otel-quiz/result/:score(\\d{1,2})", "/otel-quiz"],
-  ["/resources/trust-game/result/:score(\\d{1,2})", "/resources/trust-game"],
   ["/careers/engineering-manager", "/careers"],
+  ["/careers/executive-assistant", "/careers/chief-of-staff"],
 ] as const;
 
 const nextConfig: NextConfig = {
@@ -40,8 +40,11 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return [
-      { source: "/api-docs", destination: "/api-docs.md" },
-      { source: "/api-versioning", destination: "/api-versioning.md" },
+      { source: "/api-docs", destination: "/agent-content/api-docs.md" },
+      {
+        source: "/api-versioning",
+        destination: "/agent-content/api-versioning.md",
+      },
       // Public .md files take precedence; any other page.md is its Markdown version.
       {
         source: "/:path((?!agent-content/).+)\\.md",
@@ -86,7 +89,7 @@ const nextConfig: NextConfig = {
           {
             key: "Content-Security-Policy",
             value:
-              "default-src 'self'; script-src 'self' 'unsafe-inline' https://*.posthog.com https://*.i.posthog.com https://eu-assets.i.posthog.com https://assets.apollo.io; connect-src 'self' https://*.posthog.com https://*.i.posthog.com https://eu.posthog.com https://eu.i.posthog.com wss://*.posthog.com https://*.supabase.co https://*.supabase.com https://aplo-evnt.com; img-src 'self' data: blob: https:; media-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; worker-src 'self' blob:",
+              "default-src 'self'; script-src 'self' 'unsafe-inline' https://*.posthog.com https://*.i.posthog.com https://eu-assets.i.posthog.com https://assets.apollo.io https://js.hs-scripts.com https://js.hs-analytics.net https://js.hs-banner.com; connect-src 'self' https://*.posthog.com https://*.i.posthog.com https://eu.posthog.com https://eu.i.posthog.com wss://*.posthog.com https://*.supabase.co https://*.supabase.com https://aplo-evnt.com https://track.hubspot.com https://*.hs-banner.com; img-src 'self' data: blob: https:; media-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; worker-src 'self' blob:",
           },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           {

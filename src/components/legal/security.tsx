@@ -32,7 +32,7 @@ const Security = () => {
               under NDA.
             </li>
             <li>
-              • The core platform runs in Google Cloud in the EU (Netherlands) by default. The
+              • The core platform runs on Amazon Web Services in the EU (Frankfurt, Germany) by default. The
               managed Rose service uses the locations described below.
             </li>
             <li>

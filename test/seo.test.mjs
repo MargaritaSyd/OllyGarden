@@ -401,7 +401,7 @@ describe("page metadata", () => {
       assert.equal(getAbsoluteUrl("/pricing"), "https://ollygarden.com/pricing");
       assert.equal(getAbsoluteUrl("/"), "https://ollygarden.com/");
       delete process.env.NEXT_PUBLIC_SITE_URL;
-      assert.equal(getSiteUrl().href, "http://localhost:3000/", "an unset origin must fall back to localhost, which the prebuild validator rejects on Netlify");
+      assert.equal(getSiteUrl().href, "http://localhost:3000/", "an unset origin must fall back to localhost, which scripts/check-cloudflare-vars.sh rejects for deploys");
     } finally {
       process.env.NEXT_PUBLIC_SITE_URL = configured;
     }

@@ -5,7 +5,7 @@ The Website project is [PostHog 57287](https://eu.posthog.com/project/57287).
 contains production traffic, referrer and UTM acquisition, popular pages, CTA intent,
 persisted submissions, submission attempts, contact/careers conversion funnels, quiz completion,
 engaged visits by page/device, browser failures, and P90 Web Vitals.
-Every report filters `$host=ollygarden.com`; localhost and deploy previews are excluded.
+Every report filters `$host=ollygarden.com`; localhost and local previews are excluded.
 The 30-day window spans the website migration. Historical paths and event semantics must be
 considered when comparing releases.
 
@@ -20,6 +20,9 @@ Automatic and custom URL properties strip queries, fragments, and credentials. M
 links are excluded. UTM dimensions remain available separately: campaign authors must use
 campaign identifiers, never names or email addresses. Do not put personal information in URL paths.
 
+The trust game's booth kiosk (`/trust-your-telemetry/booth`) never initializes PostHog or Apollo and
+shows no consent banner: one shared screen on conference wifi would only produce junk records.
+
 Apollo's website visitor tracker identifies visiting companies from their network, for sales
 prioritization in Apollo's Website Visitors view. It follows the same consent record: the script loads
 only after analytics consent and when `NEXT_PUBLIC_APOLLO_APP_ID` is set, and declining or withdrawing
@@ -27,10 +30,33 @@ consent clears its local storage (a loaded script stops at the next page load). 
 full page URL, referrer, and UTM parameters with an anonymous ID. Contact-level identification is not
 used: the CSP blocks the LiveIntent resolver it depends on.
 
+HubSpot's tracking code records page views and clicks on HubSpot's visitor and contact timelines, so
+sales can see which organizations and known contacts are engaging. It loads only after analytics
+consent and when `NEXT_PUBLIC_HUBSPOT_PORTAL_ID` is set. HubSpot receives the full page URL, referrer,
+page title, click targets, and the `hubspotutk` visitor cookie. A visitor who is already a HubSpot
+contact, for example after clicking a tracked email link, has these visits added to their record.
+
+The tracking code records only full page loads, so `WebsiteAnalytics` reports App Router navigations
+through `trackHubSpotPageView` when the pathname changes, sending the path with its current query
+string. Query-only changes are not separate page views. Navigations before the script finishes loading
+are covered by its own initial page view.
+
+Our banner is the only consent source: the loader runs with `disableHubSpotCookieBanner` and
+`setHubSpotConsent` (analytics and functionality, no advertising). Declining before HubSpot loads
+means it never loads. Withdrawing consent after it loaded pushes `revokeCookieConsent`: HubSpot sends
+one cookie-less revocation request and stops tracking page views and clicks at once. Either way, every
+`__hs*` and `hubspotutk` cookie is deleted, including any set while the script was still loading.
+The script itself stays in memory until the next page load, and granting consent again in the same
+page restores HubSpot's consent. Withdrawing consent does not delete visits already recorded in
+HubSpot; those follow our CRM retention practices.
+
+The CSP allows the loader, analytics, and banner scripts and `track.hubspot.com`, and blocks
+`js.hscollectedforms.net`, so HubSpot cannot capture our form submissions.
+
 The implementation uses the [PostHog JavaScript configuration](https://posthog.com/docs/libraries/js/config)
 and [event sanitization hook](https://posthog.com/docs/libraries/js/usage#amending-or-sampling-events).
 Custom events include `page_path`, a cleaned `current_url`, and `analytics_version=2`.
-The version identifies this event contract, not the Netlify commit.
+The version identifies this event contract, not the deployed commit.
 Confirmed app handoffs and outbound/download clicks use beacon transport, which stays synchronous
 when the SDK enables gzip compression and the current document is about to unload.
 
@@ -85,7 +111,7 @@ consenting browsers, not all site visitors. Missing events are not evidence of z
 
 ## Release verification and additional reports
 
-1. Match the Netlify deploy commit to the reviewed commit. SDK bot filtering can suppress automated
+1. Match the Worker deployment commit (`wicket@<commit>`) to the reviewed commit. SDK bot filtering can suppress automated
    browsers; use native browser input for the live checks without changing production bot filtering.
 2. Run the isolated browser regression script described below. It uses a fake token, serves SDK
    extensions locally, intercepts ingestion, and mocks form Server Actions; it performs no database writes.

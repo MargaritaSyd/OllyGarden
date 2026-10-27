@@ -11,7 +11,7 @@ against this document.
 - `src/app/robots.ts` allows everything except `/api/` and `/agent-content/`. The Markdown route
   stays disallowed so its URLs are not indexed as duplicates; agents reach Markdown through
   `<path>.md` or `Accept: text/markdown` on the page URL.
-- Cloudflare sits in front of Netlify. Its AI Crawl Control decides which crawlers get through, and
+- Cloudflare serves the site. Its AI Crawl Control decides which crawlers get through, and
   Bot Preference Sync prepends those choices to `robots.txt`. GPTBot, ClaudeBot, OAI-SearchBot,
   Claude-SearchBot, PerplexityBot, and the user-triggered agents are allowed. A 403 for any of them
   is a Cloudflare setting, not something `robots.txt` can fix.
@@ -77,7 +77,7 @@ Markup describes only what the page shows. Prices come from `insightsPlans` and 
 - `src/app/sitemap.ts` lists every indexable page. Blog posts and press releases come from their
   data; pages without a real content date carry no `lastmod`, because an always-current date tells
   crawlers nothing.
-- `noindex` pages stay out of the sitemap and `llms.txt`: coming-soon stubs, shared quiz results,
+- `noindex` pages stay out of the sitemap and `llms.txt`: coming-soon stubs, shared quiz and trust game results, the trust game booth,
   the not-found page, and press releases with `noIndex: true` (use `indexablePressReleases`).
   Retired product pages redirect instead: `/products/tulip` goes to `/products/insights`.
 - Renamed or moved pages keep a permanent redirect in `next.config.ts`. Internal links point at the
@@ -110,7 +110,7 @@ Markup describes only what the page shows. Prices come from `insightsPlans` and 
 ## Verification
 
 - `node .claude/skills/seo-review/scripts/check-site.mjs <base-url> [path ...]` audits a local
-  build, a deploy preview, or production against these rules.
+  build, a local Worker preview, or production against these rules.
 - `bun run test` enforces Open Graph cards, redirects, the sitemap, RSS, `llms.txt`, and Markdown
   versions.
 - AI referrals appear in PostHog project 57287 as `$referring_domain` values such as `chatgpt.com`

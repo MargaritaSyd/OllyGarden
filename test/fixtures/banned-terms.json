@@ -1,0 +1,32 @@
+{
+  "sourceCompanies": ["Adobe", "IG Group", "Nike", "WeMoney"],
+  "vendors": [
+    "Amazon",
+    "AWS",
+    "CloudWatch",
+    "Azure",
+    "Chronosphere",
+    "Dash0",
+    "Datadog",
+    "Dynatrace",
+    "Elastic",
+    "Grafana",
+    "Honeycomb",
+    "Lightstep",
+    "New Relic",
+    "Splunk"
+  ],
+  "industries": [
+    "bank",
+    "banking",
+    "bureau",
+    "credit",
+    "ecommerce",
+    "e-commerce",
+    "fintech",
+    "lending",
+    "loan",
+    "retail",
+    "trading"
+  ]
+}

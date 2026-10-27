@@ -45,6 +45,9 @@ the visual language. For historical URL migrations only, compare the sitemap in 
 - The telemetry quality guide (`/resources/telemetry-quality`) takes its definition, dimensions,
   and FAQ from `src/lib/telemetry-quality.ts`. Its numbers come only from the published case
   studies; bump `updated` there when the copy changes, since it feeds the sitemap and JSON-LD.
+- The Trust Your Telemetry? game (`/trust-your-telemetry`, plus a `/booth` kiosk) takes its cases
+  from `src/lib/trust-game/cases.ts` and its copy from `src/lib/trust-game/content.ts`; how to add
+  a case, the content rules, and the booth checklist are in `doc/trust-your-telemetry.md`.
 - Press-release data lives in `src/lib/press.ts`. Static assets live under `public/`; reuse the
   existing brand and layout assets instead of redrawing them.
 - Global colors, typography, surfaces, and utility classes live in `src/app/globals.css`; reusable
@@ -56,8 +59,9 @@ the visual language. For historical URL migrations only, compare the sitemap in 
   never run JavaScript), unique metadata from `createPageMetadata`, a canonical path, and
   appropriate JSON-LD from `src/lib/structured-data.ts`.
 - Titles lead with the OllyGarden brand or product and use "OpenTelemetry" only referentially
-  (Linux Foundation trademark rules). After changing public pages, copy, pricing, content,
-  metadata, or routes, run the `seo-review` skill; conventions live in `doc/seo.md`.
+  (Linux Foundation trademark rules). After changing public pages (including legal pages),
+  copy, pricing, content, metadata, or routes, run the `seo-review` skill; conventions live in
+  `doc/seo.md`.
 - Keep `src/app/sitemap.ts`, `src/app/robots.ts`, navigation data in `src/lib/nav.ts`, and the
   redirects in the root `next.config.ts` consistent when routes change.
 - `/resources/blog` is canonical. `/blog`, old product paths, old legal paths, and other migrated
@@ -96,11 +100,14 @@ the visual language. For historical URL migrations only, compare the sitemap in 
   and the build fails when an indexable page has no card. `noindex` pages without a card, including
   coming-soon stubs and the not-found page, use the site-wide card for `/`.
 - Shared quiz results live at `/otel-quiz/result/<token>`: server-rendered `noindex` pages outside
-  the sitemap. The eight-character token's FNV-1a hash mod 11 is the score, which keeps casual URL
-  edits from choosing one; it is not tamper-proof. Each page passes `ogCard: quizCardPath(score)`
-  to `createPageMetadata`, so the 11 cards are keyed `/otel-quiz/score/<score>` and generated from
-  the tiers in `src/lib/quiz/score.ts`. That module and `og-cards.ts` stay free of path-alias
-  imports; `og-cards.ts` imports it as `./quiz/score.ts`. Numeric `/otel-quiz/result/<score>` links
+  the sitemap. The eight-character token's FNV-1a hash mod 11 is the score (`src/lib/result-token.ts`),
+  which keeps casual URL edits from choosing one; it is not tamper-proof. Each page passes
+  `ogCard: quizCardPath(score)` to `createPageMetadata`, so the 11 cards are keyed
+  `/otel-quiz/score/<score>` and generated from the tiers in `src/lib/quiz/score.ts`. Shared trust
+  game results at `/trust-your-telemetry/result/<token>` work the same way, with one card per tier
+  keyed `/trust-your-telemetry/tier/<id>` from `src/lib/trust-game/score.ts`. Those modules,
+  `result-token.ts`, and `og-cards.ts` import only each other, by relative `.ts` paths, because the
+  render script loads them outside the path aliases. Numeric `/otel-quiz/result/<score>` links
   redirect to `/otel-quiz`.
 - Render cards with the `og-image` skill through `node scripts/render-og-images.mjs [path ...]`
   (it finds the skill in `~/.claude/skills/og-image` or as the `og-image@growlight` plugin, which
@@ -123,18 +130,19 @@ the visual language. For historical URL migrations only, compare the sitemap in 
   or changed column ships its migration in the same PR, and the migration must be additive so the
   live code keeps working once it applies. On every merge to `main`,
   `.github/workflows/deploy-production.yml` applies pending migrations, redeploys the Edge
-  Functions when any changed, and only then starts the Netlify production build through a build hook; production
-  never builds from a plain push. A `[skip ci]` commit skips that workflow, so it is not deployed
+  Functions when any changed, and only then builds and deploys the Cloudflare Worker that serves
+  ollygarden.com, so code never goes live before its migrations. A `[skip ci]` commit skips that workflow, so it is not deployed
   until the workflow runs by hand or the next merge. See `doc/supabase.md` before changing form payloads, tables,
   policies, or functions.
 
-## Analytics and Netlify
+## Analytics and build configuration
 
 - Browser analytics initializes from `src/instrumentation-client.ts` and is implemented in
   `src/lib/posthog.ts`. Consent state uses the backward-compatible
   `ollygarden-cookie-consent` local-storage record in `src/lib/analytics-consent.ts`.
-- Apollo's company-level visitor tracker (`src/lib/apollo.ts`) shares the analytics consent; see
-  `doc/analytics.md`. Never allow LiveIntent (`liadm.com`) in the CSP.
+- Apollo's company-level visitor tracker (`src/lib/apollo.ts`) and HubSpot's tracking code
+  (`src/lib/hubspot.ts`) share the analytics consent; see `doc/analytics.md`. Never allow LiveIntent
+  (`liadm.com`) or `js.hscollectedforms.net` in the CSP.
 - Capture and persistence start opted out. Session recording stays disabled. Visitors can reopen
   consent through **Cookie settings** in the footer. The not-found page emits `page_not_found` only
   after analytics consent.
@@ -142,14 +150,13 @@ the visual language. For historical URL migrations only, compare the sitemap in 
   `section`, `page_path`, and `current_url`. Instrument hero, pricing, and closing CTAs through the
   shared `GetStartedLink`; keep the header sign-in event in `src/components/site-header.tsx`.
 - The token variable is exactly `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN`.
-  `NEXT_PUBLIC_POSTHOG_TOKEN` is not read. `VITE_POSTHOG_API_KEY` remains a temporary fallback for
-  the previous deployment configuration.
-- Netlify must provide `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` and
-  `NEXT_PUBLIC_POSTHOG_HOST=https://eu.i.posthog.com` with Build scope for every deploy context.
-  Those values live in Netlify, not in `netlify.toml`; `.env.example` documents their names.
-- `netlify.toml` makes `bun run build` explicit and excludes intentionally public client variables
-  from secret scanning. That allowlist does not supply their values. The `prebuild` validator must
-  remain enabled so a Netlify deploy cannot silently omit PostHog.
+  `NEXT_PUBLIC_POSTHOG_TOKEN` is not read. `next.config.ts` still falls back to
+  `VITE_POSTHOG_API_KEY` for local builds; deploys require `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN`.
+- The deploy build reads `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN`,
+  `NEXT_PUBLIC_POSTHOG_HOST=https://eu.i.posthog.com` and the other public values from GitHub
+  repository variables; `.env.example` documents their names and `doc/supabase.md` lists them all.
+  `scripts/check-cloudflare-vars.sh` must keep running before the deploy build so a deploy cannot
+  silently omit PostHog, the canonical origin, or the Supabase values.
 - Production events live in PostHog Website project 57287. After analytics changes, confirm the
   published commit, reopen consent, accept analytics, navigate client-side, request one uniquely
   named missing path, click an instrumented CTA, and verify `$pageview`, `page_not_found`, and
@@ -158,12 +165,12 @@ the visual language. For historical URL migrations only, compare the sitemap in 
 ## Verification
 
 - GitHub Actions (`.github/workflows/ci.yml`) runs `bun run typecheck`, `bun run lint`,
-  `bun run test:unit`, and `bun run test:rss` on every pull request and push to `main`. Netlify
-  only runs `bun run build`, so these gates do not run there. Run the same four commands locally
-  before opening a pull request.
+  `bun run test:unit`, and `bun run test:rss` on every pull request and push to `main`, then builds the Cloudflare Worker
+  with a `wrangler deploy --dry-run`. Run the same four commands locally before opening a pull
+  request.
 - `bun run test:unit` runs every `test/*.test.mjs` with Node's test runner (new files are picked up
   without registration) and prints a coverage table for the `src/` and `scripts/` modules the
-  tests load. It covers consent, PostHog configuration, Netlify environment validation, Open Graph
+  tests load. It covers consent, PostHog configuration, Worker request handling, Open Graph
   cards, JSON-LD and metadata invariants, sitemap/nav/redirect consistency, and the form Server
   Actions against an in-process Supabase stand-in. Coverage is reported, not enforced: there is no
   minimum threshold.
@@ -172,14 +179,20 @@ the visual language. For historical URL migrations only, compare the sitemap in 
   description limits. `bun run test` runs both suites.
 - `bun run typecheck` runs `next typegen` before `tsc --noEmit` because the route `PageProps` and
   `LayoutProps` types are generated into `.next/types/`. A local build may omit the PostHog token;
-  Netlify builds may not.
-- CI installs with `bun install --frozen-lockfile` using the Bun in `.bun-version` (the same
-  version as `BUN_VERSION` in `netlify.toml`). An older local Bun rewrites `bun.lock` to an older
+  deploy builds may not.
+- CI installs with `bun install --frozen-lockfile` using the Bun in `.bun-version`, which the
+  deploy workflow uses too. An older local Bun rewrites `bun.lock` to an older
   format; do not commit that diff, or regenerate the lockfile with the pinned version.
+- The Cloudflare Worker (`wrangler.jsonc`, `worker.ts`, `src/edge/`) runs the OpenNext build, not
+  the Node server `test:rss` uses. After changing it, a route handler that reads files, or the
+  rewrites and headers in `next.config.ts`, run `bunx opennextjs-cloudflare build` and
+  `bunx opennextjs-cloudflare preview`, then probe the affected routes. A file a route handler reads
+  at runtime must match a module rule in `wrangler.jsonc`.
 - For layout changes, verify desktop and mobile behavior, keyboard navigation, focus states, and
   reduced motion. Keep the shared header/footer behavior described in `doc/layout.md`.
-- After merging deployment or analytics changes, verify the exact commit is published on Netlify
-  and perform the live checks in `operations.md` before closing the issue.
+- After merging deployment or analytics changes, verify the exact commit is deployed to the
+  Worker (`wicket@<commit>` in `wrangler deployments list` or the **Deploy production** log) and
+  perform the live checks in `operations.md` before closing the issue.
 
 ## Delivering a change
 
@@ -189,17 +202,21 @@ the visual language. For historical URL migrations only, compare the sitemap in 
    verification), and whether merging and production checks are authorized. Permission for one
    stage does not cover the next.
 2. Fetch `origin/main` and work in an isolated worktree. Check open pull requests and Linear for
-   overlapping work; open a Linear issue for substantial or user-visible changes and use its
-   suggested branch name.
+   overlapping work. Substantial or user-visible changes need a Linear issue with background,
+   acceptance criteria, and rollout; fill in an empty existing issue, and use its suggested branch
+   name. Never `git stash` in a worktree; the stash is shared by all worktrees.
 3. Keep the diff minimal. Add a focused test that fails without the fix, then run the gates under
-   Verification.
-4. Before opening the pull request, update `operations.md` and the `doc/` pages the change
-   affects with what it proved. Do not record checks you did not run.
+   Verification and the **Before commit** skills.
+4. Before opening the pull request, update the `doc/` pages the change affects and `operations.md`
+   (a new external service, signal, or failure mode adds rows to Failure scenarios and Telemetry
+   inventory). Record only what the change proved.
 5. Open the pull request with a Conventional Commits title and a body covering motivation,
-   evidence, validation results, risk, and the live checks it needs. Own the review loop: wait for
-   CI on the exact head, answer every review thread, and have a fresh sub-agent try to break the
-   change before asking for human review.
-6. After merge, prove the exact merge commit is published on Netlify and run the live checks in
+   evidence, validation results, risk, rollback (for configuration-gated features, the variable to
+   remove), and the live checks it needs. Own the review loop: wait for CI on the exact head,
+   answer every review thread, and have a fresh sub-agent try to break the change. Then request
+   human review; merge only if step 1 authorized it and a person approved (bots and the sub-agent
+   do not count).
+6. After merge, prove the exact merge commit is deployed to the Worker and run the live checks in
    `operations.md`. Close the issue only with that evidence.
 
 ## Agent skills

@@ -80,15 +80,30 @@ export function PageHero({
   );
 }
 
-/** Body container that shares `PageHero`'s inset and column width. */
+/**
+ * Body container that shares `PageHero`'s inset and column width.
+ *
+ * `wide` uses the site's full content width instead, for interactive content such as the trust
+ * game; the motif frame ends with the hero, so the body no longer needs to clear its side columns.
+ * `width="wide"` stays inside the motif inset and only widens the column, for the quiz topic grid.
+ */
 export function PageBody({
   children,
+  wide = false,
   width = "default",
 }: {
   children: ReactNode;
-  /** "wide" fills the motif inset. The quiz topic grid needs the extra room. */
+  wide?: boolean;
   width?: "default" | "wide";
 }) {
+  if (wide) {
+    return (
+      <div className="px-5 pt-12 pb-24 sm:px-8 lg:px-12">
+        <div className="mx-auto max-w-[1232px]">{children}</div>
+      </div>
+    );
+  }
+
   return (
     <div className={`${inset} pt-12 pb-24`}>
       <div className={width === "wide" ? "mx-auto max-w-6xl" : "mx-auto max-w-5xl"}>

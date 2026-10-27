@@ -1,3 +1,4 @@
+import { shuffle } from "../shuffle.ts";
 import type { QuizQuestion, QuizTopic } from "./types";
 
 const allQuestions: QuizQuestion[] = [
@@ -1550,15 +1551,6 @@ function shuffleOptions(
     options: indices.map((i) => question.options[i]),
     correctIndex: indices.indexOf(question.correctIndex),
   };
-}
-
-function shuffle<T>(array: T[], random: () => number): T[] {
-  const arr = [...array];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
 }
 
 export { allQuestions };

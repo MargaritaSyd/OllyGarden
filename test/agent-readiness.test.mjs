@@ -28,56 +28,8 @@ test("agent discovery resources and live OpenAPI proxy are present", () => {
   assert.match(read("src/app/layout.tsx"), /service-desc/);
 });
 
-test("Markdown negotiation preserves explicit opt-out, cache variation, and GET/HEAD scope", async () => {
-  const edge = read("netlify/edge-functions/markdown-negotiation.ts");
-  assert.match(edge, /Number\.parseFloat\(quality\) > 0/);
-  assert.match(edge, /request\.method !== "GET" && request\.method !== "HEAD"/);
-  assert.match(edge, /headers\.set\("Vary"[\s\S]+Accept/);
-  assert.match(edge, /context\.next\(\{ sendConditionalRequest: true \}\)/);
-  assert.match(read("netlify.toml"), /excludedPath = "\/agent-content\/\*"/);
+test("Markdown representations convert technical content faithfully", async () => {
   assert.ok(existsSync(join(root, "src/app/agent-content/[...slug]/route.ts")));
-
-  const negotiation =
-    await import("../netlify/edge-functions/markdown-negotiation.ts");
-  const downstream = {
-    next: async () =>
-      new Response("html", { headers: { Vary: "RSC, Accept-Encoding" } }),
-  };
-  const html = await negotiation.default(
-    new Request("https://ollygarden.com/", {
-      headers: { Accept: "text/html" },
-    }),
-    downstream,
-  );
-  assert.match(html.headers.get("Vary"), /Accept/);
-  const optedOut = await negotiation.default(
-    new Request("https://ollygarden.com/", {
-      headers: { Accept: "text/markdown;q=0" },
-    }),
-    downstream,
-  );
-  assert.ok(optedOut instanceof Response);
-  const markdown = await negotiation.default(
-    new Request("https://ollygarden.com/", {
-      headers: { Accept: "text/markdown" },
-    }),
-    downstream,
-  );
-  assert.equal(markdown.pathname, "/agent-content/index.md");
-  assert.equal(
-    negotiation.markdownRepresentationUrl("https://ollygarden.com/api-docs")
-      .pathname,
-    "/agent-content/api-docs.md",
-  );
-  assert.equal(
-    await negotiation.default(
-      new Request("https://ollygarden.com/images/logo.svg", {
-        headers: { Accept: "text/markdown" },
-      }),
-      downstream,
-    ),
-    undefined,
-  );
 
   assert.match(
     read("src/lib/agent-content.ts"),
@@ -98,6 +50,14 @@ test("Markdown negotiation preserves explicit opt-out, cache variation, and GET/
   );
   assert.match(headline, /^# Clean, compliant telemetry for$/m);
   assert.match(headline, /^## Find and fix$/m);
+  const emphasis = htmlToMarkdown(`<button>Start</button><p><b>Note.</b> Text with <i>stress</i>.</p>`);
+  assert.doesNotMatch(emphasis, /\*\*Start/, "<button> is not <b>");
+  assert.match(emphasis, /\*\*Note\.\*\* Text with \*stress\*\./);
+  assert.match(htmlToMarkdown("<dl><div><dt>Logs</dt><dd>The data model.</dd></div></dl>"), /^Logs: The data model\.$/m);
+  const bare = htmlToMarkdown("<dl><dt>Purpose</dt><dd>Analytics</dd><dt>Retention</dt><dd>2 years</dd></dl><p>after</p>");
+  assert.match(bare, /^Purpose: Analytics$/m);
+  assert.match(bare, /^Retention: 2 years$/m);
+  assert.match(bare, /^after$/m);
 });
 
 test("security headers cover every route", () => {
@@ -125,8 +85,9 @@ test("legal, quiz, and role routes are canonical content rather than redirects",
     "/security",
     "/imprint",
     "/otel-quiz",
+    "/trust-your-telemetry",
     "/careers/founding-enterprise-account-executive",
-    "/careers/executive-assistant",
+    "/careers/chief-of-staff",
     "/careers/ai-software-engineer",
   ]) {
     assert.ok(
@@ -143,8 +104,10 @@ test("legal, quiz, and role routes are canonical content rather than redirects",
     "security",
     "imprint",
     "otel-quiz",
+    "trust-your-telemetry",
+    "trust-your-telemetry/booth",
     "careers/founding-enterprise-account-executive",
-    "careers/executive-assistant",
+    "careers/chief-of-staff",
     "careers/ai-software-engineer",
   ]) {
     assert.ok(existsSync(join(root, `src/app/${route}/page.tsx`)));

@@ -9,7 +9,8 @@ import { siteConfig } from "@/lib/site";
 type GetStartedLinkProps = {
   href?: string;
   children?: ReactNode;
-  variant?: "primary" | "secondary";
+  /** "inverse" is the forest button for light (mist) panels. */
+  variant?: "primary" | "secondary" | "inverse";
   /** "lg" matches the 57px hero buttons in the Figma product pages. "og" matches the preview's 51px pills. */
   size?: "md" | "lg" | "og";
   /** "paper" is the white and glass pair used on the agent-skills closing band. */
@@ -25,6 +26,7 @@ const variants = {
     "bg-mist text-forest motion-safe:hover:scale-[1.04] hover:shadow-[0_0_28px_rgba(227,226,112,0.4)]",
   secondary:
     "border border-mist/50 bg-white/20 text-mist hover:bg-white/30 motion-safe:hover:scale-[1.03]",
+  inverse: "bg-forest text-mist hover:bg-olive motion-safe:hover:scale-[1.03]",
 } as const;
 
 const sizes = {
@@ -51,9 +53,11 @@ export function GetStartedLink({
   analytics,
   "aria-label": ariaLabel,
 }: GetStartedLinkProps) {
+  const appearance =
+    tone === "paper" && variant !== "inverse" ? paper[variant] : variants[variant];
   const classes = `group inline-flex items-center justify-center gap-2.5 rounded-2xl ${sizes[size]} transition-[color,background-color,border-color,transform,box-shadow] duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
     fullWidth ? "w-full max-w-none" : "w-full max-w-[340px] sm:w-auto"
-  } ${(tone === "paper" ? paper : variants)[variant]} ${className}`;
+  } ${appearance} ${className}`;
 
   function onClick(event: MouseEvent<HTMLAnchorElement>) {
     if (!analytics) {

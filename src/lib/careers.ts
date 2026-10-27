@@ -117,58 +117,61 @@ export const enterpriseAccountExecutive = {
   closingTitle: "Ready to build the motion?",
 } satisfies CareersRole;
 
-export const executiveAssistant = {
-  id: "executive-assistant",
+export const chiefOfStaff = {
+  id: "chief-of-staff",
   active: true,
-  title: "Executive Assistant",
+  title: "Chief of Staff",
   location: "Remote, CET hours",
   time: "Full-time",
   description:
-    "Keep OllyGarden’s operations running: scheduling, finance operations, company events, and paperwork, working closely with our CEO and alongside AI agents.",
+    "Run OllyGarden’s operating cadence, board and investor operations, and finance, and get the company ready for its Series A, working directly with our CEO.",
   lookingFor: [
-    "Experience as an executive assistant or in operations at a startup or small company, without a large admin team behind you",
+    "Experience in a chief of staff, business operations, strategy, or finance role at a venture-backed startup, ideally through a fundraise",
     "Fluent English and Brazilian Portuguese, required for regular communication with Portuguese-speaking customers, partners, and team members in Brazil",
-    "Availability during agreed Central European working hours, with some regular afternoon overlap with the Americas",
-    "Hands-on use of startup finance tools (Mercury, Brex, Expensify, Remote.com, or similar) and corporate travel tools (Navan or similar)",
-    "Comfort working inside an AI-assisted workflow: you act on the drafts and queues agents prepare instead of redoing them by hand",
-    "Discretion with confidential information, including compensation, investor, and legal matters",
+    "Availability during Central European working hours, with some regular afternoon overlap with the Americas",
+    "Clear, async-first writing: board updates, planning documents, and decisions people can act on without a meeting",
+    "Comfort with spreadsheets and financial models, from a monthly close to a burn and runway forecast",
+    "Discretion with board, investor, and personnel information",
+    "Hands-on use of AI agents to get work done faster instead of redoing their output by hand",
   ],
   youWillDo: [
-    "Coordinate scheduling across time zones for company meetings, customer calls, and the CEO’s calendar, resolving conflicts and protecting focus time",
-    "Organize team offsites, conferences, and community events, including travel, sponsor and speaker paperwork, attendee lists, venues, and restaurant bookings",
-    "Run finance operations: match receipts to expenses, schedule contractor payments, chase failed vendor payments, and prepare document handoffs to our accountants",
-    "Coordinate legal, board, and investor logistics: collect signatures and documents, track deadlines with counsel, and prepare materials for investor updates",
-    "Send and follow up on what the team and our AI agents have prepared, and keep HubSpot and Linear current",
-    "Answer or route administrative email and requests, closing the long tail of small tasks that keep a company running",
+    "Run our operating cadence: facilitate quarterly planning and OKRs, weekly leadership priorities, and mid-quarter check-ins, and close the loop when commitments slip",
+    "Own board and investor operations: draft board decks and monthly investor updates, prepare board meetings and minutes with counsel, and keep our investor reporting on schedule",
+    "Build Series A readiness: maintain the company metrics model, keep a current data room, and run the logistics of the raise, from the investor pipeline to diligence requests",
+    "Own finance operations and budget tracking with our accountants: the monthly close, spend against budget, vendor and contractor payments, and the annual budget and business plan",
+    "Run company-wide programs that have no other owner, including hiring logistics, onboarding coordination, compliance evidence cycles, and legal and administrative work for our entities",
+    "Lead special projects for the CEO, from pricing analysis to new tooling to process design, and document the results in our handbook",
+    "Organize team offsites and coordinate our attendance at conferences and community events",
+    "Manage the CEO’s calendar, inbox triage, and follow-ups with help from our AI agents",
   ],
   bonusPoints: [
     "German language skills",
-    "Experience with HubSpot and Linear",
-    "Experience working closely with a founder or a small leadership team",
-    "A background in event or conference logistics",
+    "Experience preparing a company for a Series A or later round",
+    "Experience with Linear, HubSpot, and startup finance tools such as Mercury or Brex",
+    "A background in developer tools, infrastructure, or observability companies",
   ],
-  href: "/careers/executive-assistant",
-  datePosted: "2026-10-05",
+  href: "/careers/chief-of-staff",
+  datePosted: "2026-10-27",
   employmentType: ["FULL_TIME"],
   locationLine: "Remote · CET hours · Full-time",
   intro:
-    "OllyGarden runs lean, with AI agents doing much of our information work. This role owns what still needs a person: the execution and follow-through that keep the company running, from scheduling and finance operations to company events and paperwork. You will work closely with our CEO, Juraci Paixão Kröhling, and support the whole team.",
+    "OllyGarden runs lean, with AI agents doing much of our information work. As our Chief of Staff, you will run the company’s operating system: planning, board and investor operations, finance, and the programs that keep a growing team aligned. You will report to our CEO, Juraci Paixão Kröhling, give the CEO more time for customers, product, and fundraising, and help get OllyGarden ready for its Series A. As we grow, this role can grow into leading operations and hiring that team.",
   outcomes: [
-    "No admin task sits overdue, and admin email gets an answer or a clear owner within one business day",
-    "Company events and offsites run smoothly, from the first booking to the last receipt",
-    "Meetings land on the right days, so the team’s deep-work time stays protected",
-    "Drafts, follow-ups, and invoices go out on time, and our CRM and task tracker reflect reality",
+    "Every quarter starts with clear priorities and OKRs, and slipped commitments surface early with an owner and a plan",
+    "Board meetings and investor updates go out on time, with numbers the team and our investors trust",
+    "When the Series A process starts, the metrics, data room, and materials are already in place",
+    "Finance runs on a predictable monthly close, and spend against budget is always visible",
   ],
-  interviewTitle: "Show us how you work",
+  interviewTitle: "Show us how you operate",
   interviewLede:
-    "The process is short and practical. We want to see how you prioritize, communicate, and follow through when many small things compete for attention.",
+    "The process is short and practical. We want to see how you structure ambiguous work, write for a busy audience, and keep a team moving on what matters.",
   interview: [
-    "A conversation about the teams and people you have supported, the tools you use, and why OllyGarden interests you",
-    "A practical exercise with a realistic week of requests: scheduling conflicts across time zones, a team offsite to organize, receipts to match, and drafts waiting to go out",
-    "A working session with Juraci Paixão Kröhling on written communication, in English and Portuguese",
-    "Reference conversations focused on reliability, discretion, and follow-through",
+    "A conversation about the companies and leaders you have worked with, the operating rhythms you have run, and why OllyGarden interests you",
+    "A practical exercise with realistic material: turn a month of company metrics and notes into a short board update and a list of decisions for the CEO",
+    "A working session with Juraci Paixão Kröhling on planning and written communication, in English and Portuguese",
+    "Reference conversations focused on judgment, discretion, and follow-through",
   ],
-  closingTitle: "Ready to keep things moving?",
+  closingTitle: "Ready to run the operating system?",
 } satisfies CareersRole;
 
 export const aiSoftwareEngineer = {
@@ -230,7 +233,7 @@ export const aiSoftwareEngineer = {
 export const careersOpenPositions: CareersPosition[] = [
   aiSoftwareEngineer,
   enterpriseAccountExecutive,
-  executiveAssistant,
+  chiefOfStaff,
 ];
 
 export function getActiveCareersPositions() {

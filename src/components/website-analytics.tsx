@@ -3,12 +3,17 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import { getAnalyticsConsent, subscribeAnalyticsConsent } from "@/lib/analytics-consent";
+import { trackHubSpotPageView } from "@/lib/hubspot";
 import { classifyLink, createPageEngagement } from "@/lib/page-engagement";
 import { capturePostHogEvent, isPostHogConfigured } from "@/lib/posthog";
 
 export function WebsiteAnalytics() {
   const pathname = usePathname();
   const consent = useSyncExternalStore(subscribeAnalyticsConsent, getAnalyticsConsent, () => null);
+
+  useEffect(() => {
+    if (consent) trackHubSpotPageView(pathname);
+  }, [pathname, consent]);
 
   useEffect(() => {
     if (!consent || !isPostHogConfigured()) return;

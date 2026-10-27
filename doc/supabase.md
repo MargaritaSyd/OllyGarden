@@ -14,7 +14,7 @@ Copy [`.env.example`](../.env.example) and set:
 | `SUPABASE_PUBLISHABLE_KEY` | Publishable / anon key — stays on the server |
 | `SUPABASE_SEND_EMAIL` | `true` to invoke Edge Functions after insert. Anything else (`false`, unset) **inserts only** — no mail |
 
-On Netlify, add these as regular (or secret) env vars. Do not use the `NEXT_PUBLIC_` prefix.
+In production they are Worker variables that **Deploy production** sets from GitHub repository variables. Do not use the `NEXT_PUBLIC_` prefix.
 
 Restart `next dev` after changing these.
 
@@ -102,15 +102,13 @@ run at a time:
 2. If anything under `supabase/functions/` or `config.toml` changed since the last run that
    deployed Supabase, every function is redeployed with its `verify_jwt`. Until one run has
    succeeded, every run deploys all functions.
-3. A Netlify build hook starts the production build, with the commit as the hook body.
+3. The Cloudflare Worker `wicket` that serves ollygarden.com is built with OpenNext and deployed,
+   stamped `wicket@<commit>`. This runs as a separate job, without the Supabase secrets, and only
+   after the first job succeeded.
 
-Netlify skips the production build a merge would start (`ignore` in `netlify.toml`), and the
-production `prebuild` refuses to build without that hook body or for a different commit
-(`validateProductionDeploy` in `scripts/validate-netlify-env.mjs`). So a failed migration leaves
-the previous deploy live instead of publishing code against the old schema. Deploy previews still
-build on every pull request. To redeploy without a merge, for example after changing a Netlify
-variable, run **Deploy production** from the Actions tab; Netlify's own **Trigger deploy** is
-skipped or fails in `prebuild` by design. A run for a commit that is no longer `main` HEAD cancels
+Because the Worker deploys only after that job succeeds, a failed migration leaves the previous
+deploy live instead of publishing code against the old schema. To redeploy without a merge, for example after changing a repository variable, run
+**Deploy production** from the Actions tab. A run for a commit that is no longer `main` HEAD cancels
 itself before touching Supabase, so re-running an old run never deploys old functions. Re-running a
 failed run is otherwise safe: applied migrations are skipped. A commit message with `[skip ci]`
 skips the deploy too; run the workflow by hand afterwards.
@@ -132,10 +130,17 @@ order, so re-run it after other migrations land. A failed `db push` is not retri
 schema, and when the change is present but unrecorded, run
 `bun run supabase migration repair <version> --status applied` instead of re-running the SQL.
 
-The workflows need repository secrets `SUPABASE_ACCESS_TOKEN` (a Supabase access token whose owner
-can change the Website project) and `NETLIFY_BUILD_HOOK_URL` (a build hook on `main` for
-`ollygarden-wicket`). `SUPABASE_DB_PASSWORD` is optional; without it the CLI uses a temporary
-login role. Values live in GitHub and the services, never in this repository.
+The workflows need the repository secret `SUPABASE_ACCESS_TOKEN` (a Supabase access token whose
+owner can change the Website project). `SUPABASE_DB_PASSWORD` is optional; without it the CLI uses a temporary
+login role. Worker Previews, built by Workers Builds for every non-production branch, share the production
+`Website` project but set `SUPABASE_SEND_EMAIL=false` in the `previews` block of
+`wrangler.jsonc`, so their submissions are real rows that send no email. The Cloudflare deploy needs the secret
+`CLOUDFLARE_API_TOKEN` (Workers Scripts and Workers Routes write) and the repository variables
+`CLOUDFLARE_ACCOUNT_ID`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN`,
+`NEXT_PUBLIC_POSTHOG_HOST`, `NEXT_PUBLIC_APOLLO_APP_ID`, `NEXT_PUBLIC_HUBSPOT_PORTAL_ID`,
+`SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SEND_EMAIL`, all public values;
+`scripts/check-cloudflare-vars.sh` stops the build when a required one is unset. Values live in
+GitHub and the services, never in this repository.
 
 The manual commands above still work for local checks and emergencies. A hand-applied migration
 is recorded in the remote history, so the next deploy skips it. Deploy one function by hand with

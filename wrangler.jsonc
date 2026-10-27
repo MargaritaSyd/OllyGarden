@@ -1,0 +1,45 @@
+// ollygarden.com on Cloudflare Workers, built by OpenNext. The Deploy
+// production workflow deploys it. The route covers the apex only: the zone
+// redirects www and plain HTTP (seedbed infrastructure/cloudflare/ollygarden-com).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "wicket",
+  "main": "worker.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  // Production is reached only through its hostname. Preview URLs stay on for
+  // Worker Previews; they answer with X-Robots-Tag: noindex.
+  "workers_dev": false,
+  "preview_urls": true,
+  // zone_id rather than zone_name, so the deploy token needs no Zone:Read.
+  "routes": [
+    { "pattern": "ollygarden.com/*", "zone_id": "1530d11fb608f49d13135b2eea000a1b" },
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  // Route handlers read these at runtime (src/lib/agent-content.ts,
+  // src/lib/case-study-markdown.ts). Attached as modules, they appear under
+  // the Worker's working directory, /bundle. Without fallthrough, wrangler's
+  // default rules, which would attach every .html, .txt and .wasm in the
+  // repository, stay off.
+  "find_additional_modules": true,
+  "rules": [
+    {
+      "type": "Text",
+      "globs": ["content/**/*.html", "content/**/*.txt", "public/*.md"],
+      "fallthrough": false,
+    },
+    { "type": "CompiledWasm", "globs": [], "fallthrough": false },
+  ],
+  "observability": { "enabled": true },
+  // Worker Previews, built by Workers Builds for every non-production branch.
+  // Previews inherit none of production's settings: the preview command passes
+  // SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY with --var, and previews write to
+  // the production Website project but never send notification email.
+  "previews": {
+    "vars": { "SUPABASE_SEND_EMAIL": "false" },
+    "observability": { "enabled": true },
+  },
+}

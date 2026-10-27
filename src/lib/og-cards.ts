@@ -8,11 +8,9 @@ import {
   quizTier,
 } from "./quiz/score.ts";
 import {
-  trustCardPath,
-  trustPitch,
-  trustRoundSize,
-  trustScores,
-  trustTier,
+  trustGameCardPath,
+  trustGameSharePitch,
+  trustGameTiers,
 } from "./trust-game/score.ts";
 
 export type OgTheme = "olive" | "forest" | "cream" | "ink";
@@ -31,14 +29,14 @@ const quizResultCards: Record<string, OgCard> = Object.fromEntries(
   ]),
 );
 
-const trustResultCards: Record<string, OgCard> = Object.fromEntries(
-  trustScores.map((score) => [
-    trustCardPath(score),
-    { headline: `*${score}/${trustRoundSize}*\n${trustTier(score).name}`, body: trustPitch },
+const trustGameTierCards: Record<string, OgCard> = Object.fromEntries(
+  trustGameTiers.map((tier) => [
+    trustGameCardPath(tier),
+    { headline: `Trust game result\n*${tier.name}*`, body: trustGameSharePitch },
   ]),
 );
 
-/** Open Graph card copy for every indexable page and quiz result, keyed by canonical path. */
+/** Open Graph card copy for every indexable page and game result, keyed by canonical path. */
 export const ogCards: Record<string, OgCard> = {
   "/": {
     headline: "Observability starts with *good telemetry*",
@@ -49,11 +47,11 @@ export const ogCards: Record<string, OgCard> = {
     body: "Take the quiz on semantic conventions, SDKs, signals, the Collector, OTTL, sampling, Weaver, and otelc.",
   },
   ...quizResultCards,
-  "/resources/trust-game": {
-    headline: "Would you trust *this telemetry*?",
-    body: "Ten anonymized OpenTelemetry cases. Decide whether each conclusion holds, then see the tell and the fix.",
+  "/trust-your-telemetry": {
+    headline: "Would you *trust* this telemetry?",
+    body: "Ten real, anonymized OpenTelemetry cases. Decide which conclusions hold up, then see the fix.",
   },
-  ...trustResultCards,
+  ...trustGameTierCards,
   "/pricing": {
     headline: "Start free,\n*grow when ready*",
     body: "Plans for OllyGarden Insights and Rose, from free tiers with no credit card to custom Enterprise plans.",
@@ -94,9 +92,9 @@ export const ogCards: Record<string, OgCard> = {
     headline: "Founding Enterprise *Account Executive*",
     body: "United States, remote, full-time. Build OllyGarden's first enterprise sales motion and turn what works into a repeatable playbook.",
   },
-  "/careers/executive-assistant": {
-    headline: "Executive *Assistant*",
-    body: "Remote, CET hours, full-time. Own the scheduling, finance operations, company events, and paperwork that keep OllyGarden moving.",
+  "/careers/chief-of-staff": {
+    headline: "Chief of *Staff*",
+    body: "Remote, CET hours, full-time. Run OllyGarden's operating cadence, board and investor operations, and finance on the way to our Series A.",
   },
   "/careers/ai-software-engineer": {
     headline: "AI Software *Engineer*",

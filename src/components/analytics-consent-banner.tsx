@@ -31,9 +31,10 @@ export function AnalyticsConsentBanner() {
     >
       <div className="mx-auto flex max-w-[1080px] flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <p className="max-w-2xl text-sm leading-6 text-mist/80">
-          We use analytics cookies to understand how the website is used (PostHog) and which
-          companies visit (Apollo.io), so we can improve it. You can accept analytics or continue
-          with essential cookies only. Details are in our{" "}
+          We use analytics cookies to understand how the website is used (PostHog), which companies
+          visit (Apollo.io), and which companies and contacts engage (HubSpot), so we can improve
+          it. You can accept analytics or continue with essential cookies only. Details are in
+          our{" "}
           <Link href="/privacy-policy" className="underline hover:no-underline">
             Privacy Policy
           </Link>

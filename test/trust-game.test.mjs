@@ -1,106 +1,101 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { boothTotals, parseBoothStats, recordBoothGame } from "../src/lib/trust-game/booth-stats.ts";
+import { trustGameCases } from "../src/lib/trust-game/cases.ts";
+import { dealTrustGame, trustGameFullDeckSize, trustGameMistakes } from "../src/lib/trust-game/deck.ts";
+import {
+  trustGameDeckSize,
+  trustGameResultToken,
+  trustGameScoreFromToken,
+  trustGameTier,
+  trustGameTiers,
+} from "../src/lib/trust-game/score.ts";
 
-test("each trust game deals five conclusions that hold and five that do not", async () => {
-  const { trustCases } = await import("../src/lib/trust-game/cases.ts");
-  const { dealAllTrustCases, dealTrustCases } = await import("../src/lib/trust-game/deal.ts");
+/** Whether anything in the panel carries the `hl` mark the reveal lights up. */
+function hasHighlight(value) {
+  if (Array.isArray(value)) return value.some(hasHighlight);
+  if (value && typeof value === "object") return value.hl === true || Object.values(value).some(hasHighlight);
+  return false;
+}
 
-  assert.equal(trustCases.length, 20);
-  assert.equal(trustCases.filter((item) => item.truth).length, 10);
-  assert.equal(trustCases.filter((item) => !item.truth).length, 10);
-  for (const item of trustCases) {
-    assert.ok(item.panels.length > 0, item.id);
-    if (!item.truth) {
-      assert.ok(item.fix.length > 0, item.id);
-      assert.ok(item.flaw === "data" || item.flaw === "reading", item.id);
+test("the case set is balanced, uniquely named, and consistent with its ids", () => {
+  const trustworthy = trustGameCases.filter((item) => item.truth);
+  assert.equal(trustworthy.length * 2, trustGameCases.length);
+  assert.equal(trustGameFullDeckSize, trustGameCases.length);
+  assert.equal(new Set(trustGameCases.map((item) => item.id)).size, trustGameCases.length);
+  const flaws = new Set(trustGameCases.map((item) => item.flaw).filter(Boolean));
+  assert.deepEqual([...flaws].sort(), ["data", "reading"], "both ways a conclusion fails are covered");
+  for (const item of trustGameCases) {
+    assert.match(item.id, item.truth ? /^T\d+$/ : /^D\d+$/, `${item.id} prefix must match truth`);
+    assert.doesNotMatch(item.headline, /^(Trustworthy|Deceptive)\b/, `${item.id}: the reveal adds the verdict`);
+    assert.ok(hasHighlight(item.panels), `${item.id} needs at least one highlighted element`);
+  }
+});
+
+// The types in cases.ts check panel shapes; these are the rules tsc can't see.
+test("tables fill every column and trace bars stay on the axis", () => {
+  for (const item of trustGameCases) {
+    for (const panel of item.panels) {
+      if (panel.type === "table")
+        for (const row of panel.rows) assert.equal(row.cells.length, panel.cols.length, `${item.id} table row width`);
+      if (panel.type === "trace")
+        for (const row of panel.rows) assert.ok(row.start + row.dur <= panel.total * 1.01, `${item.id} bar past the axis`);
     }
   }
-
-  let index = 0;
-  const random = () => {
-    index += 1;
-    return (index % 7) / 7;
-  };
-  const dealt = dealTrustCases(trustCases, random);
-  assert.equal(dealt.length, 10);
-  assert.equal(dealt.filter((item) => item.truth).length, 5);
-  assert.equal(new Set(dealt.map((item) => item.id)).size, 10);
-
-  const all = dealAllTrustCases(trustCases, random);
-  assert.equal(all.length, 20);
-  assert.equal(all.filter((item) => item.truth).length, 10);
-  assert.equal(new Set(all.map((item) => item.id)).size, 20);
 });
 
-test("trust game ladder covers every score once", async () => {
-  const { trustRoundSize, trustScoreFromToken, trustResultToken, trustTier, trustTierRange, trustTiers } =
-    await import("../src/lib/trust-game/score.ts");
+test("a dealt deck is shuffled, balanced, and never repeats a case", () => {
+  for (const size of [trustGameDeckSize, trustGameFullDeckSize]) {
+    const deck = dealTrustGame(size);
+    assert.equal(deck.length, size);
+    assert.equal(deck.filter((item) => item.truth).length, size / 2);
+    assert.equal(new Set(deck.map((item) => item.id)).size, size);
+  }
+});
 
-  const covered = trustTiers.flatMap((_, index) => {
-    const range = trustTierRange(index);
-    const [low, high = low] = range.split("–").map(Number);
-    return Array.from({ length: high - low + 1 }, (__, offset) => low + offset);
+test("mistakes split into lies trusted and truths doubted", () => {
+  const answers = [
+    { id: "T1", trusted: true, correct: true },
+    { id: "D1", trusted: true, correct: false },
+    { id: "T2", trusted: false, correct: false },
+    { id: "D2", trusted: false, correct: true },
+  ];
+  assert.deepEqual(trustGameMistakes(answers), { liesTrusted: 1, truthsDoubted: 1 });
+});
+
+test("tiers scale with the deck, so 10- and 20-case games share them", () => {
+  assert.equal(trustGameTier(10, 10).id, "sommelier");
+  assert.equal(trustGameTier(9, 10).id, "seasoned");
+  assert.equal(trustGameTier(16, 20).id, "seasoned");
+  assert.equal(trustGameTier(11, 20).id, "optimist");
+  assert.equal(trustGameTier(0, 10).id, "paged");
+  assert.equal(new Set(trustGameTiers.map((tier) => tier.id)).size, trustGameTiers.length);
+});
+
+test("result links hide the score in a token that maps back to it", () => {
+  for (let score = 0; score <= trustGameDeckSize; score++) {
+    const token = trustGameResultToken(score);
+    assert.match(token, /^[0-9a-z]{8}$/);
+    assert.equal(trustGameScoreFromToken(token), score);
+  }
+  assert.equal(trustGameScoreFromToken("7"), null);
+});
+
+test("booth counters add up games and per-case accuracy and survive bad storage", () => {
+  const once = recordBoothGame(parseBoothStats(null), [
+    { id: "T1", correct: true },
+    { id: "D1", correct: false },
+  ]);
+  const twice = recordBoothGame(parseBoothStats(JSON.stringify(once)), [{ id: "T1", correct: false }]);
+  assert.deepEqual(twice, {
+    games: 2,
+    cases: { T1: { correct: 1, total: 2 }, D1: { correct: 0, total: 1 } },
   });
-  assert.deepEqual(
-    covered.sort((a, b) => a - b),
-    Array.from({ length: trustRoundSize + 1 }, (_, score) => score),
-  );
-  for (const score of covered) {
-    assert.equal(trustTier(score).min <= score, true);
-  }
-  for (let score = 0; score <= trustRoundSize; score += 1) {
-    assert.equal(trustScoreFromToken(trustResultToken(score)), score);
-  }
-  assert.equal(trustScoreFromToken("not-a-token"), null);
-  assert.equal(trustScoreFromToken("7"), null);
-});
-
-test("booth totals scale to a 10- or 20-case round and stay on the device", async () => {
-  const { readFileSync } = await import("node:fs");
-  const { trustTiers } = await import("../src/lib/trust-game/score.ts");
-  const {
-    boothBeatPercent,
-    boothCrowdPercent,
-    boothStage,
-    boothTier,
-    boothTierRange,
-    emptyBoothStats,
-    recordBoothGame,
-  } = await import("../src/lib/trust-game/booth.ts");
-
-  assert.equal(boothTier(10, 10).name, trustTiers[0].name);
-  assert.equal(boothTier(8, 10).name, trustTiers[1].name);
-  assert.equal(boothTier(16, 20).name, trustTiers[1].name);
-  assert.equal(boothTier(12, 20).name, trustTiers[2].name);
-  assert.equal(boothTierRange(0, 10), "10");
-  assert.equal(boothTierRange(1, 10), "8–9");
-  assert.equal(boothTierRange(1, 20), "16–19");
-  assert.equal(boothTierRange(4, 20), "0–7");
-
-  assert.deepEqual(boothStage(1920, 1080), { zoom: 1, width: 1920, height: 1080 });
-  assert.deepEqual(boothStage(2560, 1080), { zoom: 1, width: 2560, height: 1080 });
-  const smaller = boothStage(1280, 720);
-  assert.ok(Math.abs(smaller.zoom - 2 / 3) < 1e-9);
-  assert.ok(Math.abs(smaller.width - 1920) < 1e-6);
-
-  const cases = [{ id: "T1" }, { id: "T2" }];
-  const once = recordBoothGame(emptyBoothStats(), cases, [{ correct: true }, { correct: false }]);
-  assert.equal(once.games, 1);
-  assert.equal(once.correct, 1);
-  assert.equal(once.total, 2);
-  assert.deepEqual(once.results, [0.5]);
-  assert.equal(boothCrowdPercent(once.cases.T1), null);
-  const repeated = [0, 1, 2, 3].reduce(
-    (stats) => recordBoothGame(stats, cases, [{ correct: true }, { correct: true }]),
-    once,
-  );
-  assert.equal(repeated.cases.T1.total, 5);
-  assert.equal(boothCrowdPercent(repeated.cases.T1), 100);
-  assert.equal(boothBeatPercent([], 1), 0);
-  assert.equal(boothBeatPercent([0.2, 0.4, 0.9], 0.5), 67);
-
-  const page = readFileSync(new URL("../src/app/resources/trust-game/booth/page.tsx", import.meta.url), "utf8");
-  assert.match(page, /noIndex:\s*true/);
-  const sitemap = readFileSync(new URL("../src/app/sitemap.ts", import.meta.url), "utf8");
-  assert.equal(sitemap.includes("/resources/trust-game/booth"), false);
+  assert.deepEqual(boothTotals(twice), { correct: 1, total: 3 });
+  assert.deepEqual(parseBoothStats("{not json"), { games: 0, cases: {} });
+  assert.deepEqual(parseBoothStats("null"), { games: 0, cases: {} });
+  assert.deepEqual(parseBoothStats('{"games":1,"cases":{"T1":{"correct":"x"}}}'), {
+    games: 1,
+    cases: { T1: { correct: 0, total: 0 } },
+  });
 });

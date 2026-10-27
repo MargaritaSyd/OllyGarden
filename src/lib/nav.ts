@@ -101,7 +101,7 @@ export const resourceLinks: NavLink[] = [
   { href: "/resources/agent-skills", label: "Agent Skills" },
   { href: "/resources/faq", label: "FAQ" },
   { href: "/otel-quiz", label: "OTel Quiz" },
-  { href: "/resources/trust-game", label: "Trust Game" },
+  { href: "/trust-your-telemetry", label: "Trust Your Telemetry?" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -171,10 +171,10 @@ const headerResourceQuiz: NavLink = {
   description: "Ten questions that challenge even OpenTelemetry maintainers.",
 };
 
-const headerResourceTrust: NavLink = {
-  href: "/resources/trust-game",
-  label: "Trust Game",
-  description: "Spot the telemetry conclusions the data doesn't back.",
+const headerResourceTrustGame: NavLink = {
+  href: "/trust-your-telemetry",
+  label: "Trust Your Telemetry?",
+  description: "Real telemetry and the conclusions drawn from it. Which hold up?",
 };
 
 export const headerResourceLinks: NavLink[] = [
@@ -189,7 +189,7 @@ export const headerResourceLinks: NavLink[] = [
   headerResourceSkills,
   headerResourceFaq,
   headerResourceQuiz,
-  headerResourceTrust,
+  headerResourceTrustGame,
 ];
 
 export type FeaturedResource = {

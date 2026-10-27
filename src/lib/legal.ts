@@ -50,13 +50,13 @@ export const legalPages = {
     title: "Privacy Policy",
     description:
       "What personal data OllyGarden collects on its website and platform, why, which providers process it, how long we keep it, and your rights under the GDPR.",
-    updated: "2026-10-07",
+    updated: "2026-10-24",
   },
   "/data-protection-policy": {
     title: "Data Protection Policy",
     description:
       "The technical and organizational controls OllyGarden uses to protect customer data: encryption, access control, tenant isolation, monitoring, and deletion.",
-    updated: "2026-06-03",
+    updated: "2026-10-21",
   },
   "/rose-terms-of-service": {
     title: "Rose Terms of Service",
@@ -68,13 +68,13 @@ export const legalPages = {
     title: "Subprocessors",
     description:
       "Every third party that processes OllyGarden customer data for Insights and Rose, what each one does, and where it processes the data.",
-    updated: "2026-10-06",
+    updated: "2026-10-21",
   },
   "/security": {
     title: "Security",
     description:
       "How OllyGarden protects customer data with SOC 2 Type II controls, Rose execution safeguards, and encryption, and how to report a vulnerability.",
-    updated: "2026-09-30",
+    updated: "2026-10-21",
   },
   "/imprint": {
     title: "Imprint",
@@ -102,7 +102,7 @@ export const websiteProcessors: [string, string][] = [
   ["Resend", "Delivery of form submissions to our team by email"],
   ["PostHog (EU)", "Website analytics"],
   ["Apollo.io", "Identification of visiting organizations, business contact data, sales outreach"],
-  ["HubSpot", "Customer relationship management"],
+  ["HubSpot", "Customer relationship management, website activity of visiting organizations and contacts"],
   ["Google Workspace", "Email and documents"],
 ];
 
@@ -113,14 +113,15 @@ export const subprocessorGroups: SubprocessorGroup[] = [
     description: "Used by Insights and Rose to host and operate the OllyGarden platform.",
     entries: [
       {
-        name: "Google Cloud Platform",
+        name: "Amazon Web Services",
         purpose: "Hosting, storage, and encryption keys for the platform and telemetry analysis",
-        location: "Netherlands (europe-west4)",
+        location: "Germany (eu-central-1)",
       },
       {
-        name: "Amazon Web Services",
-        purpose: "Cloud infrastructure",
-        location: "Germany (eu-central-1)",
+        name: "Google Cloud Platform",
+        purpose:
+          "Previous hosting environment, being decommissioned after the platform moved to Amazon Web Services in October 2026",
+        location: "Netherlands (europe-west4)",
       },
       {
         name: "Supabase",
@@ -130,7 +131,7 @@ export const subprocessorGroups: SubprocessorGroup[] = [
       {
         name: "ClickHouse",
         purpose: "Telemetry analysis database",
-        location: "Netherlands (Google Cloud europe-west4)",
+        location: "Germany (Amazon Web Services eu-central-1)",
       },
       {
         name: "Cloudflare",

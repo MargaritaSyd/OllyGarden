@@ -19,8 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      # Canonical origin for the production build that test:rss serves. Do not set NETLIFY
-      # here: the prebuild validator only requires the PostHog token on Netlify deploys.
+      # Canonical origin for the production build that test:rss serves.
       NEXT_PUBLIC_SITE_URL: https://ollygarden.com
     steps:
       - uses: actions/checkout@v7
@@ -28,8 +27,7 @@ jobs:
           # Nothing in this job pushes, so do not keep the token around for later steps.
           persist-credentials: false
 
-      # .bun-version is the single pin for the Bun that writes bun.lock; keep it equal to
-      # BUN_VERSION in netlify.toml.
+      # .bun-version is the single pin for the Bun that writes bun.lock.
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: .bun-version
@@ -52,3 +50,12 @@ jobs:
 
       - name: Production build and RSS/redirect suite
         run: bun run test:rss
+
+      # The Worker build (wrangler.jsonc) runs OpenNext on top of `next build`; the dry run bundles
+      # it without uploading, so an upgrade that breaks it fails here rather than on main.
+      - name: Cloudflare Worker build
+        env:
+          WRANGLER_SEND_METRICS: "false"
+        run: |
+          bunx opennextjs-cloudflare build
+          bunx wrangler deploy --dry-run

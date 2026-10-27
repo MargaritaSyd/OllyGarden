@@ -142,7 +142,7 @@ export const faqSections: readonly FaqSection[] = [
       },
       {
         q: "Where is my data processed?",
-        a: "The OllyGarden platform runs in Google Cloud in the Netherlands by default, and its databases are in the EU. Rose analyzes repositories in isolated sandboxes and with AI models hosted in the United States. Every provider that processes customer data, with its location, is listed at ollygarden.com/subprocessors.",
+        a: "The OllyGarden platform runs on Amazon Web Services in Frankfurt, Germany, by default, and its databases are in the EU. Rose analyzes repositories in isolated sandboxes and with AI models hosted in the United States. Every provider that processes customer data, with its location, is listed at ollygarden.com/subprocessors.",
       },
       {
         q: "Is OllyGarden SOC 2 compliant?",

@@ -23,7 +23,7 @@ bun run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-Set `NEXT_PUBLIC_SITE_URL` to the production origin in every deployed environment (any host). There is no Vercel/Netlify auto-detect — without it, canonicals and the sitemap fall back to `http://localhost:3000`. That value drives canonical URLs, Open Graph tags, the sitemap, robots.txt, JSON-LD, and the RSS feed.
+Set `NEXT_PUBLIC_SITE_URL` to the production origin in every deployed environment (any host). There is no host auto-detect — without it, canonicals and the sitemap fall back to `http://localhost:3000`. That value drives canonical URLs, Open Graph tags, the sitemap, robots.txt, JSON-LD, and the RSS feed.
 
 Form submits need `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` (server-only). Leave `SUPABASE_SEND_EMAIL` as `false` until you want Edge Function emails. Details: [`doc/supabase.md`](doc/supabase.md).
 
@@ -44,9 +44,9 @@ bun run test       # test:unit + test:rss
 ```
 
 GitHub Actions runs typecheck, lint, test:unit, and test:rss on every pull request and push to
-`main` (`.github/workflows/ci.yml`). Netlify only runs the build. Production deploys go through
+`main` (`.github/workflows/ci.yml`), and builds the Cloudflare Worker. Production deploys go through
 `.github/workflows/deploy-production.yml`: Supabase migrations and Edge Functions first, then the
-Netlify production build. Details: [`doc/supabase.md`](doc/supabase.md#schema-and-edge-functions).
+Cloudflare Worker that serves ollygarden.com (`wrangler.jsonc`). Details: [`doc/supabase.md`](doc/supabase.md#schema-and-edge-functions).
 
 ## SEO
 

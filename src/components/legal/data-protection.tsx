@@ -119,9 +119,8 @@ const DataProtection = () => {
               Customer Data Protection
             </h3>
             <p>
-              OllyGarden, Inc. hosts on "Google Cloud Platform (GCP)" in the
-              europe-west4 region by default. Data is replicated across multiple
-              regions for redundancy and disaster recovery.
+              OllyGarden, Inc. hosts on Amazon Web Services (AWS) in the
+              eu-central-1 region (Frankfurt, Germany) by default.
             </p>
             <p>
               All OllyGarden, Inc. employees adhere to the following processes
@@ -213,7 +212,7 @@ const DataProtection = () => {
           </CardHeader>
           <CardContent className="space-y-4 text-muted-foreground">
             <p>
-              OllyGarden, Inc. uses Google Cloud Platform, and Grafana Cloud to
+              OllyGarden, Inc. uses Grafana Cloud and Datadog to
               monitor the entire cloud service operation (monitoring and
               internal reporting capabilities are used to report on
               cryptographic operations, encryption, and key management policies,
@@ -596,6 +595,25 @@ const DataProtection = () => {
                     <td className="border border-border px-3 py-2 text-sm">
                       Added Data Deletion Request submission and logging
                       procedure
+                    </td>
+                    <td className="border border-border px-3 py-2 text-sm"></td>
+                  </tr>
+                  <tr>
+                    <td className="border border-border px-3 py-2 text-sm">
+                      1.2
+                    </td>
+                    <td className="border border-border px-3 py-2 text-sm">
+                      21.10.2026
+                    </td>
+                    <td className="border border-border px-3 py-2 text-sm">
+                      Lanay Marques
+                    </td>
+                    <td className="border border-border px-3 py-2 text-sm">
+                      Juraci Paixão
+                    </td>
+                    <td className="border border-border px-3 py-2 text-sm">
+                      Updated hosting to AWS eu-central-1 and monitoring
+                      providers after the October 2026 infrastructure migration
                     </td>
                     <td className="border border-border px-3 py-2 text-sm"></td>
                   </tr>

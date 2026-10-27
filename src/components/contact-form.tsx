@@ -139,7 +139,7 @@ export function ContactForm() {
         >
           {status === "error" ? (
             <p
-              className="rounded-lg border border-[#e98b7d]/40 bg-[#e98b7d]/12 px-4 py-3.5 text-sm leading-[1.45] text-[#f0a99e]"
+              className="rounded-lg border border-wrong/40 bg-wrong/12 px-4 py-3.5 text-sm leading-[1.45] text-wrong-text"
               role="alert"
             >
               {contactForm.error}

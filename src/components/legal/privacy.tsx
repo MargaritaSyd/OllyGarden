@@ -61,6 +61,13 @@ const websiteActivities: Activity[] = [
     retention: "Until you withdraw consent, or until the organization-level record is no longer relevant to sales.",
   },
   {
+    title: "Website activity in our CRM (only with your consent)",
+    data: "Pages you view and their titles, links and buttons you click, the full page URL including campaign parameters, the referring site, visit times, your IP address, and an identifier stored in a cookie. If you are already a contact in our CRM, for example because you clicked a link in an email from us, these visits are added to your contact record.",
+    purpose: "Understanding which organizations and contacts are interested in OllyGarden, so our sales team can follow up on relevant interest.",
+    basis: "Your consent (Art. 6(1)(a) GDPR).",
+    retention: "Collection stops when you withdraw consent. Visits already recorded stay in our CRM and are kept or deleted under our CRM retention practices, like the rest of your contact record.",
+  },
+  {
     title: "Contact, product inquiry, and open source application forms",
     data: "Name, email address, and, depending on the form, company, message, support tier, or GitHub repository URL.",
     purpose: "Responding to your request and evaluating your inquiry or application.",
@@ -214,11 +221,11 @@ const Privacy = () => {
             necessary and needs no consent.
           </p>
           <p>
-            Analytics and company identification use cookies and browser local storage, and start
-            only after you select <strong>Accept analytics</strong>. If you choose essential cookies
-            only, neither runs. You can change your choice at any time through{" "}
-            <strong>Cookie settings</strong> in the website footer. Withdrawing consent stops
-            collection from your next page view and clears the related local storage; it does not
+            Analytics, company identification, and CRM website activity use cookies and browser
+            local storage, and start only after you select <strong>Accept analytics</strong>. If you
+            choose essential cookies only, none of them runs. You can change your choice at any time
+            through <strong>Cookie settings</strong> in the website footer. Withdrawing consent stops
+            collection from your next page view and clears the related cookies and local storage; it does not
             affect processing that took place before.
           </p>
           <p>

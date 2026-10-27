@@ -6,6 +6,7 @@ import { CtaArrow } from "@/components/cta-arrow";
 import { onQuizStart } from "@/components/quiz-hero-cta";
 import { QuizMark } from "@/components/quiz-mark";
 import { QuizCount } from "@/components/quiz-score-cards";
+import { ResultShare } from "@/components/result-share";
 import { capturePostHogEvent } from "@/lib/posthog";
 import { quizTopics, selectQuizQuestions } from "@/lib/quiz/questions";
 import {
@@ -24,9 +25,6 @@ const primaryButton =
 
 const secondaryButton =
   "group inline-flex h-12 items-center justify-center gap-2.5 rounded-2xl border border-mist/50 bg-white/20 px-6 text-base font-medium text-mist transition-[color,background-color,transform] duration-300 hover:bg-white/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bitmap-highlight";
-
-const chipButton =
-  "rounded-xl border border-mist/30 px-5 py-2.5 font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bitmap-highlight";
 
 function tierLabel(name: string) {
   return name.charAt(0).toUpperCase() + name.slice(1);
@@ -476,84 +474,26 @@ function QuizShare({
   score: number;
   results: Partial<Record<QuizTopic, boolean>>;
 }) {
-  const [copied, setCopied] = useState(false);
   const [url] = useState(() => getAbsoluteUrl(quizResultPath(quizResultToken(score))));
   const tier = quizTier(score);
   const text = [
     `I scored ${score}/${quizQuestionCount} on the OpenTelemetry quiz: ${tier.name} ${tier.emoji}`,
     quizTopics.map((topic) => (results[topic] ? "🟩" : "🟥")).join(""),
   ].join("\n");
-  const withUrl = `${text}\n${url}`;
-
-  function shared(channel: string) {
-    capturePostHogEvent("quiz_shared", {
-      channel,
-      score,
-      page_path: "/otel-quiz",
-    });
-  }
-
-  async function copy() {
-    await navigator.clipboard.writeText(withUrl);
-    setCopied(true);
-    shared("copy");
-  }
-
-  async function shareNatively() {
-    try {
-      await navigator.share({ text, url });
-      shared("native");
-    } catch {
-      // The visitor closed the share sheet.
-    }
-  }
-
-  const links = [
-    {
-      channel: "linkedin",
-      label: "LinkedIn",
-      href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
-    },
-    {
-      channel: "x",
-      label: "X",
-      href: `https://x.com/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
-    },
-    {
-      channel: "bluesky",
-      label: "Bluesky",
-      href: `https://bsky.app/intent/compose?text=${encodeURIComponent(withUrl)}`,
-    },
-  ];
 
   return (
-    <div className="mt-8">
-      <p className="text-xs font-bold tracking-[.15em] text-bitmap-mid uppercase">
-        Share your result
-      </p>
-      <div className="mt-4 flex flex-wrap gap-3">
-        {links.map((link) => (
-          <a
-            key={link.channel}
-            href={link.href}
-            target="_blank"
-            rel="noreferrer"
-            onClick={() => shared(link.channel)}
-            className={chipButton}
-          >
-            {link.label}
-          </a>
-        ))}
-        <button type="button" onClick={copy} className={chipButton}>
-          {copied ? "Copied" : "Copy result"}
-        </button>
-        {"share" in navigator ? (
-          <button type="button" onClick={shareNatively} className={chipButton}>
-            More…
-          </button>
-        ) : null}
-      </div>
-    </div>
+    <ResultShare
+      text={text}
+      url={url}
+      align="start"
+      onShared={(channel) =>
+        capturePostHogEvent("quiz_shared", {
+          channel,
+          score,
+          page_path: "/otel-quiz",
+        })
+      }
+    />
   );
 }
 

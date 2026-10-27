@@ -7,6 +7,9 @@
   --color-sprout: #0ead47;
   --color-forest: #011e0c;
   --color-olive: #697d07;
+  /* Errors and wrong answers; `wrong-text` is the lighter shade for error copy. */
+  --color-wrong: #e98b7d;
+  --color-wrong-text: #f0a99e;
 
   --color-bitmap-highlight: #e3e270;
   --color-bitmap-sunflower: #d1d100;
@@ -5286,6 +5289,18 @@ section[id] {
   }
 }
 
+/* Trust game reveal panel; the component applies it only under motion-safe. */
+@keyframes trust-rise {
+  from {
+    opacity: 0.3;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* Rose MVI waterfall. The child arrow is an SVG because U+21B3 is outside JetBrains Mono. */
 .rz-term {
   display: flex;
@@ -6218,147 +6233,6 @@ section[id] {
 
 @media (prefers-reduced-motion: reduce) {
   .quiz-hero-deco {
-    display: none;
-  }
-}
-
-.tg-hero-pos-bottom {
-  z-index: 2;
-}
-
-.tg-hero-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 1.1em;
-  overflow: hidden;
-  padding: 1.75em 2em 2em;
-  border: 1px solid rgb(227 226 112 / 40%);
-  border-radius: 1.5em;
-  background-color: #19321e;
-  background-image: url("/images/texture-grain.png");
-  background-size: 328px 140px;
-  box-shadow:
-    rgb(255 255 255 / 6%) 0 1px 0 inset,
-    rgb(0 0 0 / 35%) 0 24px 60px;
-}
-
-.tg-hero-kicker {
-  color: #9ca703;
-  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
-  font-size: 0.75em;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  line-height: 1.2;
-  text-transform: uppercase;
-}
-
-.tg-hero-claim {
-  color: #faf9f0;
-  font-size: 1.2em;
-  font-weight: 700;
-  line-height: 1.3;
-}
-
-.tg-hero-rows {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35em;
-  padding: 0.75em;
-  border: 1px solid rgb(250 249 240 / 8%);
-  border-radius: 0.75em;
-  background: rgb(1 30 12 / 72%);
-  color: rgb(250 249 240 / 78%);
-  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
-  font-size: 0.75em;
-  line-height: 1.5;
-}
-
-.tg-hero-rows p {
-  display: grid;
-  grid-template-columns: 4.6em minmax(0, 1fr);
-  gap: 0.6em;
-  overflow: hidden;
-  padding: 0.2em 0.4em;
-  border-radius: 0.35em;
-  white-space: nowrap;
-}
-
-.tg-hero-rows p span:last-child {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tg-hero-rows .is-hl {
-  background: rgb(227 226 112 / 8%);
-  box-shadow: inset 0 0 0 1px rgb(227 226 112 / 55%);
-}
-
-.tg-hero-rows .is-ok {
-  color: #b4c22b;
-  font-weight: 700;
-}
-
-.tg-hero-rows .is-error {
-  color: #e98b7d;
-  font-weight: 700;
-}
-
-.tg-hero-rows .is-muted {
-  color: rgb(250 249 240 / 45%);
-  font-weight: 700;
-}
-
-.tg-hero-stamp {
-  align-self: flex-start;
-  border: 2px solid;
-  border-radius: 4px;
-  padding: 4px 10px;
-  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  line-height: 1.3;
-  text-transform: uppercase;
-  rotate: -3deg;
-}
-
-.tg-hero-stamp.is-holds {
-  color: #b4c22b;
-}
-
-.tg-hero-stamp.is-fails {
-  color: #e3e270;
-}
-
-@media (max-width: 640px) {
-  .tg-table thead {
-    display: none;
-  }
-
-  .tg-table tr {
-    display: block;
-    padding: 0.35rem 0;
-  }
-
-  .tg-table td {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    padding-top: 0.15rem;
-    padding-bottom: 0.15rem;
-  }
-
-  .tg-table td::before {
-    content: attr(data-label);
-    color: rgb(250 249 240 / 45%);
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .tg-table td.tg-bar {
     display: none;
   }
 }

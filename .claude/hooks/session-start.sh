@@ -50,10 +50,10 @@ install_plugins() {
 
 cd "$CLAUDE_PROJECT_DIR"
 
-# Use the Bun version Netlify builds with; an older Bun rewrites bun.lock in an older format.
-bun_version=$(sed -n 's/^ *BUN_VERSION *= *"\(.*\)"/\1/p' netlify.toml | head -1)
+# Use the Bun version CI builds with; an older Bun rewrites bun.lock in an older format.
+bun_version=$(tr -d '[:space:]' < .bun-version)
 if [ -z "$bun_version" ]; then
-  echo "session-start: BUN_VERSION not found in netlify.toml" >&2
+  echo "session-start: .bun-version is empty" >&2
   exit 1
 fi
 bun_prefix="$HOME/.local/bun-$bun_version"

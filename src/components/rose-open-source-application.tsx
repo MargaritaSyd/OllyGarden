@@ -124,7 +124,7 @@ export function RoseOpenSourceApplication({ label }: { label: string }) {
             {status === "error" ? (
               <p
                 role="alert"
-                className="rounded-lg border border-[#e98b7d]/40 bg-[#e98b7d]/12 p-3 text-sm text-[#f0a99e]"
+                className="rounded-lg border border-wrong/40 bg-wrong/12 p-3 text-sm text-wrong-text"
               >
                 We couldn’t save your application. Please try again.
               </p>

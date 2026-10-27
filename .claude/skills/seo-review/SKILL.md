@@ -30,7 +30,7 @@ changes):
 node .claude/skills/seo-review/scripts/check-site.mjs http://localhost:3100 /products/rose /resources/blog/new-post
 ```
 
-A Netlify deploy preview URL works the same way, and so does `https://ollygarden.com` for a
+A local Worker preview (`bunx opennextjs-cloudflare preview`) works the same way, and so does `https://ollygarden.com` for a
 baseline. Errors break an invariant; warnings are judgment calls you resolve in step 3. When a
 finding also shows up on production, it predates the change — report it separately so it doesn't
 block this one. Stop the server when you're done.

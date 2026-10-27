@@ -8,6 +8,8 @@ import { pressMeta } from "@/lib/press";
 import { quizQuestionCount } from "@/lib/quiz/score";
 import { quizMeta } from "@/lib/quiz/topics";
 import { siteConfig } from "@/lib/site";
+import { trustGameMeta } from "@/lib/trust-game/content";
+import { trustGameDeckSize } from "@/lib/trust-game/score";
 import { telemetryQualityMeta } from "@/lib/telemetry-quality";
 import { webinarsMeta } from "@/lib/webinars";
 
@@ -109,9 +111,9 @@ export const resourceGroups: readonly ResourceGroup[] = [
         cta: "Take the quiz",
       },
       {
-        href: "/resources/trust-game",
-        label: "Trust Game",
-        description: "Spot the telemetry conclusions the data doesn't back.",
+        href: trustGameMeta.path,
+        label: trustGameMeta.name,
+        description: `${trustGameDeckSize} real, anonymized OpenTelemetry cases and the conclusions drawn from them. Which hold up?`,
         cta: "Play the game",
       },
     ],

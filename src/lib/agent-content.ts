@@ -8,6 +8,7 @@ import { instrumentationScoreMeta } from "@/lib/instrumentation-score";
 import { legalPages } from "@/lib/legal";
 import { telemetryQualityMeta } from "@/lib/telemetry-quality";
 import { quizMeta } from "@/lib/quiz/topics";
+import { trustGameMeta } from "@/lib/trust-game/content";
 import { resourcesHero, resourcesMeta } from "@/lib/resources";
 import { getAbsoluteUrl, siteConfig } from "@/lib/site";
 
@@ -32,9 +33,9 @@ const agentPages: Record<string, AgentPage> = {
     title: quizMeta.title,
     description: "Test your OpenTelemetry knowledge with ten scored questions.",
   },
-  "/resources/trust-game": {
-    title: "Trust Game",
-    description: "Decide whether ten anonymized OpenTelemetry conclusions hold up.",
+  [trustGameMeta.path]: {
+    title: trustGameMeta.name,
+    description: trustGameMeta.description,
   },
   "/pricing": {
     title: "OllyGarden Pricing",
@@ -111,10 +112,10 @@ const agentPages: Record<string, AgentPage> = {
     description:
       "Build OllyGarden's first enterprise sales motion in the United States.",
   },
-  "/careers/executive-assistant": {
-    title: "Executive Assistant",
+  "/careers/chief-of-staff": {
+    title: "Chief of Staff",
     description:
-      "Keep OllyGarden's operations running, working closely with the CEO. Remote, CET hours, full-time.",
+      "Run OllyGarden's operating cadence, board and investor operations, and finance, reporting to the CEO. Remote, CET hours, full-time.",
   },
   "/careers/ai-software-engineer": {
     title: "AI Software Engineer",

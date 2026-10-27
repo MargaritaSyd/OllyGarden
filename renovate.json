@@ -2,15 +2,5 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended"
-  ],
-  "customManagers": [
-    {
-      "customType": "regex",
-      "description": "Bun version Netlify builds with",
-      "managerFilePatterns": ["/^netlify\\.toml$/"],
-      "matchStrings": ["BUN_VERSION = \"(?<currentValue>[^\"]+)\""],
-      "depNameTemplate": "bun",
-      "datasourceTemplate": "npm"
-    }
   ]
 }
