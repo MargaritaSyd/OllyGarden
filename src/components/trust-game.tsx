@@ -152,9 +152,10 @@ export function TrustGame({ mode }: { mode: "web" | "booth" }) {
   const round = useRef<HTMLDivElement>(null);
   const claim = useRef<HTMLQuoteElement>(null);
   useEffect(() => {
+    if (booth) return;
     if ((round.current?.getBoundingClientRect().top ?? 0) < 0) round.current?.scrollIntoView();
     claim.current?.focus({ preventScroll: true });
-  }, [deck, index]);
+  }, [booth, deck, index]);
 
   const onPageHide = useEffectEvent(() => {
     if (active && !complete) capturePostHogEvent("trust_game_abandoned", { case_number: index + 1 });
@@ -171,13 +172,24 @@ export function TrustGame({ mode }: { mode: "web" | "booth" }) {
     if (key === "escape") {
       home();
       setStaff(false);
-    } else if (!active && key === "s") setStaff((open) => !open);
-    else if (active && key === trustGameRule.keys.holds.toLowerCase()) choose(true);
-    else if (active && key === trustGameRule.keys.fails.toLowerCase()) choose(false);
-    else if (answer && (key === "enter" || key === " ")) {
-      if (document.activeElement instanceof HTMLButtonElement) return;
+      return;
+    }
+    if (!active) {
+      if (key === "s") setStaff((open) => !open);
+      else if (key === "f") toggleFullscreen();
+      else if (key === "a") start(trustGameFullDeckSize);
+      else if (key === "enter" || key === " ") {
+        event.preventDefault();
+        start(trustGameDeckSize);
+      }
+      return;
+    }
+    if (key === trustGameRule.keys.holds.toLowerCase()) choose(true);
+    else if (key === trustGameRule.keys.fails.toLowerCase()) choose(false);
+    else if ((key === "enter" || key === " ") && (complete || answer)) {
       event.preventDefault();
-      next();
+      if (complete) retake();
+      else next();
     }
   });
   useEffect(() => {
@@ -207,6 +219,7 @@ export function TrustGame({ mode }: { mode: "web" | "booth" }) {
       <BoothFrame
         screen={!active ? "attract" : complete ? "result" : "case"}
         exitLabel={active ? "Exit" : "Full screen"}
+        exitKey={active ? "Esc" : "F"}
         onExit={() => (active ? home() : toggleFullscreen())}
         progress={
           active && !complete ? (
@@ -464,7 +477,8 @@ function Reveal({
           onClick={onNext}
           className={booth ? "tb-btn tb-btn--primary" : "tg-next"}
         >
-          {last ? "See my score" : "Next case"} →
+          {last ? "See my score" : "Next case"}
+          {booth ? <BoothKey>Enter</BoothKey> : " →"}
         </button>
         {booth && crowd != null ? (
           <p className="tb-crowd">
@@ -740,12 +754,14 @@ function toggleFullscreen() {
 function BoothFrame({
   screen,
   exitLabel,
+  exitKey,
   onExit,
   progress,
   children,
 }: {
   screen: "attract" | "case" | "result";
   exitLabel: string;
+  exitKey?: string;
   onExit: () => void;
   progress?: ReactNode;
   children: ReactNode;
@@ -768,6 +784,7 @@ function BoothFrame({
           {progress}
           <button type="button" className="tb-exit" onClick={onExit}>
             {exitLabel}
+            {exitKey ? <BoothKey>{exitKey}</BoothKey> : null}
           </button>
         </div>
         <BoothStageContext.Provider value={stage}>{children}</BoothStageContext.Provider>
@@ -831,16 +848,17 @@ function BoothAttract({
           Would you <em>trust</em> this telemetry?
         </h1>
         <p className="tb-start-sub">
-          {registerOpenTelemetry(
-            "Each case is real OpenTelemetry data from production systems, anonymized, and a conclusion someone drew from it. Some hold up. Some don't. You make the call.",
-          )}
+          Real production telemetry, and the conclusion someone drew from it. Some hold up. Some don’t. You make
+          the call.
         </p>
         <div className="tb-start-actions">
           <button type="button" className="tb-btn tb-btn--primary" onClick={() => onStart(trustGameDeckSize)}>
             Play {trustGameDeckSize} cases
+            <BoothKey>Enter</BoothKey>
           </button>
           <button type="button" className="tb-btn tb-btn--ghost" onClick={() => onStart(trustGameFullDeckSize)}>
             All {trustGameFullDeckSize}
+            <BoothKey>A</BoothKey>
           </button>
         </div>
       </div>
@@ -859,6 +877,10 @@ function BoothAttract({
             </div>
           </div>
         )}
+        <p className="tb-provenance">
+          <b>Anonymized, but real.</b> Every service, host, endpoint and ID name is invented. Status codes, span
+          structure and ratios are as measured.
+        </p>
       </div>
       <div className="tb-start-foot">
         {stats.games ? (
@@ -875,11 +897,16 @@ function BoothAttract({
         ) : (
           <p className="tb-booth-first">Be the first to play at this booth.</p>
         )}
-        <p className="tb-provenance">
-          <b>{trustGameNotice.label}.</b> {trustGameNotice.text}
-        </p>
       </div>
     </section>
+  );
+}
+
+function BoothKey({ children }: { children: string }) {
+  return (
+    <kbd className="tb-key" aria-hidden="true">
+      {children}
+    </kbd>
   );
 }
 
@@ -1020,10 +1047,8 @@ function BoothResults({
   const score = answers.filter((answer) => answer.correct).length;
   const total = answers.length;
   const tier = trustGameTier(score, total);
-  const heading = useRef<HTMLParagraphElement>(null);
   const [left, setLeft] = useState(BOOTH_RESULT_MS / 1000);
   const finish = useEffectEvent(onHome);
-  useEffect(() => heading.current?.focus(), []);
   useEffect(() => {
     const started = Date.now();
     const timer = window.setInterval(() => {
@@ -1043,7 +1068,7 @@ function BoothResults({
         <p className="tb-kicker" id="tb-result-title">
           Your result
         </p>
-        <p className="tb-score" ref={heading} tabIndex={-1}>
+        <p className="tb-score">
           <span className="tb-score-num">{score}</span>
           <span className="tb-score-of">/{total}</span>
         </p>
@@ -1054,9 +1079,11 @@ function BoothResults({
         <div className="tb-result-actions">
           <button type="button" className="tb-btn tb-btn--primary" onClick={onRetake}>
             Play again
+            <BoothKey>Enter</BoothKey>
           </button>
           <button type="button" className="tb-btn tb-btn--ghost" onClick={onHome}>
             Home
+            <BoothKey>Esc</BoothKey>
           </button>
         </div>
       </div>
