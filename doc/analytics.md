@@ -20,7 +20,7 @@ Automatic and custom URL properties strip queries, fragments, and credentials. M
 links are excluded. UTM dimensions remain available separately: campaign authors must use
 campaign identifiers, never names or email addresses. Do not put personal information in URL paths.
 
-The trust game's booth kiosk (`/trust-your-telemetry/booth`) never initializes PostHog or Apollo and
+The trust game's booth kiosk (`/resources/trust-your-telemetry/booth`) never initializes PostHog or Apollo and
 shows no consent banner: one shared screen on conference wifi would only produce junk records.
 
 Apollo's website visitor tracker identifies visiting companies from their network, for sales

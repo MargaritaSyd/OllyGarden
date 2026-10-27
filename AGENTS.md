@@ -45,7 +45,7 @@ the visual language. For historical URL migrations only, compare the sitemap in 
 - The telemetry quality guide (`/resources/telemetry-quality`) takes its definition, dimensions,
   and FAQ from `src/lib/telemetry-quality.ts`. Its numbers come only from the published case
   studies; bump `updated` there when the copy changes, since it feeds the sitemap and JSON-LD.
-- The Trust Your Telemetry? game (`/trust-your-telemetry`, plus a `/booth` kiosk) takes its cases
+- The Trust Your Telemetry? game (`/resources/trust-your-telemetry`, plus a `/booth` kiosk) takes its cases
   from `src/lib/trust-game/cases.ts` and its copy from `src/lib/trust-game/content.ts`; how to add
   a case, the content rules, and the booth checklist are in `doc/trust-your-telemetry.md`.
 - Press-release data lives in `src/lib/press.ts`. Static assets live under `public/`; reuse the
@@ -104,8 +104,8 @@ the visual language. For historical URL migrations only, compare the sitemap in 
   which keeps casual URL edits from choosing one; it is not tamper-proof. Each page passes
   `ogCard: quizCardPath(score)` to `createPageMetadata`, so the 11 cards are keyed
   `/otel-quiz/score/<score>` and generated from the tiers in `src/lib/quiz/score.ts`. Shared trust
-  game results at `/trust-your-telemetry/result/<token>` work the same way, with one card per tier
-  keyed `/trust-your-telemetry/tier/<id>` from `src/lib/trust-game/score.ts`. Those modules,
+  game results at `/resources/trust-your-telemetry/result/<token>` work the same way, with one card per tier
+  keyed `/resources/trust-your-telemetry/tier/<id>` from `src/lib/trust-game/score.ts`. Those modules,
   `result-token.ts`, and `og-cards.ts` import only each other, by relative `.ts` paths, because the
   render script loads them outside the path aliases. Numeric `/otel-quiz/result/<score>` links
   redirect to `/otel-quiz`.

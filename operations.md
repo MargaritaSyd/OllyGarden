@@ -130,7 +130,7 @@ monitoring.
   the Cloudflare dashboard) serves an earlier version immediately. Nothing pins it: the next
   **Deploy production** run deploys `main` again, so follow a rollback with a revert pull request.
   A rollback never reverts a database migration; keep migrations additive.
-- **Trust game booth:** `/trust-your-telemetry/booth` sends no analytics. Its play counts live only
+- **Trust game booth:** `/resources/trust-your-telemetry/booth` sends no analytics. Its play counts live only
   in the booth browser's local storage; staff read them with `S` on the attract screen and copy
   them each day. Setup and keys are in
   [doc/trust-your-telemetry.md](doc/trust-your-telemetry.md#booth-checklist).

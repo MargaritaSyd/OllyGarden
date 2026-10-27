@@ -17,9 +17,11 @@ outage).
 
 | Route | Indexed | Purpose |
 | --- | --- | --- |
-| `/trust-your-telemetry` | yes | The game inside the site shell (`PageHero` + `PageBody`), plus crawlable copy and the FAQ |
-| `/trust-your-telemetry/result/<token>` | no | Shared-result landing page; the token works like the quiz's (`src/lib/result-token.ts`) |
-| `/trust-your-telemetry/booth` | no | Full-screen kiosk for event booths; not in the sitemap or navigation |
+| `/resources/trust-your-telemetry` | yes | The game inside the site shell (`PageHero` + `PageBody`), plus crawlable copy and the FAQ |
+| `/resources/trust-your-telemetry/result/<token>` | no | Shared-result landing page; the token works like the quiz's (`src/lib/result-token.ts`) |
+| `/resources/trust-your-telemetry/booth` | no | Full-screen kiosk for event booths; not in the sitemap or navigation |
+
+`/trust-your-telemetry` and `/resources/trust-game` redirect to these paths, including the booth and shared results.
 
 ## Where things live
 
@@ -38,7 +40,7 @@ outage).
 - A game deals equal numbers of trustworthy and deceptive cases, shuffled: 10 on the web, 10 or the
   full balanced set (`trustGameFullDeckSize`) in the booth. One point per correct verdict; no timer.
 - Tiers are fractions of the deck, so 10- and 20-case games share them. Shared results are always
-  scored out of 10, and each tier has its own Open Graph card (`/trust-your-telemetry/tier/<id>`).
+  scored out of 10, and each tier has its own Open Graph card (`/resources/trust-your-telemetry/tier/<id>`).
 - Verdicts never appear in server-rendered HTML, Markdown, `llms.txt`, or JSON-LD; the cases ship
   only in the client bundle.
 
@@ -80,7 +82,7 @@ consent banner and never starts PostHog or Apollo, and the game itself only repo
 
 ## Booth checklist
 
-1. Open `/trust-your-telemetry/booth` in a fresh browser profile on the booth machine, full screen.
+1. Open `/resources/trust-your-telemetry/booth` in a fresh browser profile on the booth machine, full screen.
    The page loads its fonts from the site, so it needs a network connection.
 2. Keys: `Y` it holds, `N` something's off, `Enter` or `Space` next, `Esc` back to the attract
    screen. On a touchscreen the verdict buttons are the main control. After 120 seconds without

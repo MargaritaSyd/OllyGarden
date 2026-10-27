@@ -28,7 +28,7 @@ Header chrome uses **two splits**.
 
 ## Site chrome
 
-`SiteChrome` (`src/components/site-chrome.tsx`) wraps every page in the root layout with the announcement bar, `PageMotif`, header, footer, consent banner, and analytics. Pages that `isChromeless` in `src/lib/chrome.ts` lists render alone, and `src/instrumentation-client.ts` never starts PostHog or Apollo on them. Today that is only the trust game's booth kiosk (`/trust-your-telemetry/booth`), which runs full screen on a shared conference display.
+`SiteChrome` (`src/components/site-chrome.tsx`) wraps every page in the root layout with the announcement bar, `PageMotif`, header, footer, consent banner, and analytics. Pages that `isChromeless` in `src/lib/chrome.ts` lists render alone, and `src/instrumentation-client.ts` never starts PostHog or Apollo on them. Today that is only the trust game's booth kiosk (`/resources/trust-your-telemetry/booth`), which runs full screen on a shared conference display.
 
 ## Announcement bar
 
