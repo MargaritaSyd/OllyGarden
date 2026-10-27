@@ -15,7 +15,7 @@ const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
   subsets: ["latin"],
   display: "swap",
-  weight: ["300", "400", "500", "700"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 // Code panels in the Rose MVI section (Figma uses JetBrains Mono there).
@@ -23,7 +23,7 @@ const jetBrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
   display: "swap",
-  weight: ["400"],
+  weight: ["400", "500"],
 });
 
 export const metadata: Metadata = rootMetadata;

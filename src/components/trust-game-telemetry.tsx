@@ -269,7 +269,7 @@ function ChartView({ panel, revealed }: { panel: ChartPanel; revealed: boolean }
   const summary = `${panel.title}: between ${Math.min(...panel.series)}${panel.unit} and ${Math.max(...panel.series)}${panel.unit} across ${panel.xlabels[0]} to ${panel.xlabels[labelCount]}`;
 
   return (
-    <div className={tellClass(panel.hl, revealed)}>
+    <div className={`tgp-chart ${tellClass(panel.hl, revealed)}`}>
       <TellMark highlight={panel.hl} revealed={revealed} />
       <p className="mb-3 text-sm font-semibold text-mist">{panel.title}</p>
       <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={summary} className="w-full text-mist/40">
@@ -364,7 +364,7 @@ export function TelemetryView({
   revealed: boolean;
 }) {
   return (
-    <section className="overflow-hidden rounded-2xl border border-mist/15 bg-[#011407]" aria-label="Telemetry">
+    <section className="tgp-window overflow-hidden rounded-2xl border border-mist/15 bg-[#011407]" aria-label="Telemetry">
       <div className="flex items-center gap-3 border-b border-mist/10 px-4 py-2.5">
         <span className="flex gap-1.5" aria-hidden="true">
           <i className="size-2.5 rounded-full bg-[#e98b7d]" />
@@ -373,7 +373,7 @@ export function TelemetryView({
         </span>
         <span className="truncate font-mono text-xs text-mist/65">{caption}</span>
       </div>
-      <div className="overflow-x-auto p-4">
+      <div className="tgp-scroll overflow-x-auto p-4">
         {panels.map((panel, index) => (
           <div key={`${panel.type}-${index}`} className={index > 0 ? "mt-6 border-t border-mist/10 pt-6" : undefined}>
             <PanelBody panel={panel} revealed={revealed} />
