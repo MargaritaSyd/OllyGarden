@@ -169,9 +169,8 @@ export function TrustGame({ mode }: { mode: "web" | "booth" }) {
   const onKey = useEffectEvent((event: KeyboardEvent) => {
     if (event.metaKey || event.ctrlKey || event.altKey) return;
     const key = event.key.toLowerCase();
-    if (key === "escape") {
+    if (key === "h") {
       home();
-      setStaff(false);
       return;
     }
     if (!active) {
@@ -219,7 +218,7 @@ export function TrustGame({ mode }: { mode: "web" | "booth" }) {
       <BoothFrame
         screen={!active ? "attract" : complete ? "result" : "case"}
         exitLabel={active ? "Exit" : "Full screen"}
-        exitKey={active ? "Esc" : "F"}
+        exitKey={active ? "H" : "F"}
         onExit={() => (active ? home() : toggleFullscreen())}
         progress={
           active && !complete ? (
@@ -1083,7 +1082,7 @@ function BoothResults({
           </button>
           <button type="button" className="tb-btn tb-btn--ghost" onClick={onHome}>
             Home
-            <BoothKey>Esc</BoothKey>
+            <BoothKey>H</BoothKey>
           </button>
         </div>
       </div>

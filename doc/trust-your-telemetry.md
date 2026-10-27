@@ -84,7 +84,7 @@ consent banner and never starts PostHog or Apollo, and the game itself only repo
 
 1. Open `/resources/trust-your-telemetry/booth` in a fresh browser profile on the booth machine, full screen.
    The page loads its fonts from the site, so it needs a network connection.
-2. Keys: `Y` it holds, `N` something's off, `Enter` or `Space` next, `Esc` back to the attract
+2. Keys: `Y` it holds, `N` something's off, `Enter` or `Space` next, `H` back to the attract. `Esc` is left to the browser so it only leaves fullscreen.
    screen. On a touchscreen the verdict buttons are the main control. After 120 seconds without
    input the game returns to the attract screen.
 3. The attract screen shows games played and average accuracy on this device. Press `S` there for
