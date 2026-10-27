@@ -1,19 +1,27 @@
 import { FaqAccordion } from "@/components/faq-accordion";
 import { JsonLd } from "@/components/json-ld";
 import { PageBody, PageHero } from "@/components/page-hero";
+import { QuizHeroDeco } from "@/components/quiz-hero-deco";
+import { SiteCta } from "@/components/site-cta";
 import { TrustGame, TrustNotice } from "@/components/trust-game";
+import { TrustGameCards } from "@/components/trust-game-cards";
 import { createPageMetadata } from "@/lib/metadata";
 import { trustGameGraph } from "@/lib/structured-data";
 import { registerOpenTelemetry } from "@/lib/trademarks";
-import {
-  trustGameFaq,
-  trustGameHero,
-  trustGameHowItWorks,
-  trustGameMeta,
-  trustGamePractice,
-} from "@/lib/trust-game/content";
+import { trustGameFaq, trustGameHero, trustGameMeta, trustGamePractice } from "@/lib/trust-game/content";
 import { trustGameDeckSize, trustGameTierStops } from "@/lib/trust-game/score";
 import "@/components/trust-game.css";
+
+const trustGameCta = {
+  title: ["Turn OpenTelemetry knowledge", "into better instrumentation"],
+  sub: "OllyGarden Insights scores the telemetry you already send, and Rose fixes it at the source.",
+  primary: {
+    label: "Explore OllyGarden Insights",
+    href: "/products/insights",
+    className: "hover:!bg-mist",
+  },
+  secondary: { label: "Meet OllyGarden Rose", href: "/products/rose" },
+} as const;
 
 export const metadata = createPageMetadata({
   title: trustGameMeta.title,
@@ -28,40 +36,37 @@ export default function TrustGamePage() {
     <>
       <JsonLd data={trustGameGraph()} />
       <PageHero
+        className="quiz-hero"
+        decoration={<QuizHeroDeco />}
+        aside={<TrustGameCards />}
         eyebrow={<TrustEyebrow />}
         titleId="trust-title"
-        title={<TrustTitle title={trustGameHero.title} />}
+        title={trustGameHero.title}
         lede={registerOpenTelemetry(trustGameHero.lede)}
       >
         <a
           href="#trust-game"
-          className="inline-flex h-12 items-center rounded-xl bg-sunflower px-6 font-semibold text-forest"
+          className="group inline-flex h-12 items-center justify-center gap-2.5 rounded-2xl bg-mist px-8 text-base font-medium text-forest transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] motion-safe:hover:scale-[1.04] motion-safe:hover:shadow-[0_0_28px_rgba(227,226,112,0.4)]"
         >
-          Start the game
+          Play Now
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" className="motion-safe:group-hover:translate-y-0.5">
+            <path
+              d="M8 2v11M3.5 8.5 8 13l4.5-4.5"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         </a>
       </PageHero>
       <PageBody wide>
         <div id="trust-game">
           <TrustGame mode="web" />
         </div>
-        <section className="mx-auto mt-[clamp(3rem,6vw,5rem)] max-w-3xl" aria-labelledby="trust-how">
-          <h2 id="trust-how" className="text-3xl font-bold text-mist">
-            {trustGameHowItWorks.title}
-          </h2>
-          <ol className="tg-how">
-            {trustGameHowItWorks.steps.map((step, index) => (
-              <li key={step.title} className="tg-how-step">
-                <span className="tg-how-num">0{index + 1}</span>
-                <div>
-                  <p className="tg-how-title">{step.title}</p>
-                  <p className="tg-how-desc">{step.body}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
         <section className="mt-[clamp(3rem,6vw,5rem)]" aria-labelledby="trust-practice">
-          <h2 id="trust-practice" className="text-3xl font-bold text-mist">
+          <p className="text-xs font-bold tracking-[.15em] text-sunflower uppercase">{trustGamePractice.eyebrow}</p>
+          <h2 id="trust-practice" className="mt-3 text-3xl font-bold text-mist">
             {trustGamePractice.title}
           </h2>
           <p className="mt-4 max-w-3xl text-lg leading-8 text-mist/70">{trustGamePractice.lede}</p>
@@ -74,10 +79,11 @@ export default function TrustGamePage() {
               </li>
             ))}
           </ul>
+          <TrustNotice className="tg-provenance" />
           <div className="tg-tiers">
-            <p className="text-xs font-bold tracking-[.15em] text-bitmap-mid uppercase">Where will you land?</p>
+            <p className="text-xs font-bold tracking-[.15em] text-sunflower uppercase">Where will you land?</p>
             <ul className="tg-tier-list">
-              {stops.map((stop) => (
+              {[...stops].reverse().map((stop) => (
                 <li key={stop.tier.id}>
                   <span className="tg-tier-emoji" aria-hidden="true">
                     {stop.tier.emoji}
@@ -91,27 +97,10 @@ export default function TrustGamePage() {
               ))}
             </ul>
           </div>
-          <TrustNotice className="tg-provenance" />
         </section>
       </PageBody>
       <FaqAccordion content={trustGameFaq} />
-    </>
-  );
-}
-
-function TrustTitle({ title }: { title: string }) {
-  const parts = title.split(/(trust)/i);
-  return (
-    <>
-      {parts.map((part, index) =>
-        part.toLowerCase() === "trust" ? (
-          <span key={index} className="text-sunflower">
-            {part}
-          </span>
-        ) : (
-          part
-        ),
-      )}
+      <SiteCta content={trustGameCta} />
     </>
   );
 }
@@ -119,6 +108,15 @@ function TrustTitle({ title }: { title: string }) {
 function TrustEyebrow() {
   return (
     <span className="inline-flex items-center gap-2 rounded-full border border-sunflower/35 bg-[#082312]/80 px-3 py-1 text-xs font-bold tracking-[0.14em] text-bitmap-highlight normal-case">
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none" aria-hidden="true">
+        <path
+          d="M1 1l3 5-3 5M5.5 1l3 5-3 5M10 1l3 5-3 5"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
       {trustGameHero.eyebrow}
     </span>
   );

@@ -12,7 +12,7 @@ export const trustGameMeta = {
 } as const;
 
 export const trustGameHero = {
-  eyebrow: `${trustGameDeckSize} cases · real telemetry`,
+  eyebrow: "Trust Game",
   title: "Would you trust this telemetry?",
   lede: "Each case shows real, anonymized OpenTelemetry data and a conclusion someone drew from it. Some conclusions hold up, some don't. Make the call, then see the tell and the fix.",
 } as const;
@@ -69,6 +69,7 @@ export const trustGameHowItWorks = {
 
 /** What the cases exercise, without saying which case is which. */
 export const trustGamePractice = {
+  eyebrow: `${trustGameCases.length} cases`,
   title: "What you'll practice",
   lede: `${trustGameCases.length} cases across traces, logs, spans, and metrics. Each game deals ${trustGameDeckSize} of them, half that hold up and half that don't.`,
   skills: [

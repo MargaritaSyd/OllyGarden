@@ -30,7 +30,7 @@ import {
   saveBoothStats,
 } from "@/lib/trust-game/booth-stats";
 import { type TrustCase, trustGameCases } from "@/lib/trust-game/cases";
-import { trustGameNotice, trustGamePitch, trustGameRule } from "@/lib/trust-game/content";
+import { trustGameHowItWorks, trustGameNotice, trustGamePitch, trustGameRule } from "@/lib/trust-game/content";
 import {
   type TrustAnswer,
   dealTrustGame,
@@ -197,6 +197,25 @@ export function TrustGame({ mode }: { mode: "web" | "booth" }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [booth]);
 
+  const onWebKey = useEffectEvent((event: KeyboardEvent) => {
+    if (event.metaKey || event.ctrlKey || event.altKey) return;
+    const target = event.target;
+    if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) return;
+    if (!active || complete) return;
+    const key = event.key.toLowerCase();
+    if (key === trustGameRule.keys.holds.toLowerCase()) choose(true);
+    else if (key === trustGameRule.keys.fails.toLowerCase()) choose(false);
+    else if (answer && (key === "enter" || key === " ")) {
+      event.preventDefault();
+      next();
+    }
+  });
+  useEffect(() => {
+    if (booth) return;
+    window.addEventListener("keydown", onWebKey);
+    return () => window.removeEventListener("keydown", onWebKey);
+  }, [booth]);
+
   useEffect(() => {
     if (!booth || !active || complete) return;
     let timer = window.setTimeout(home, BOOTH_IDLE_MS);
@@ -249,18 +268,35 @@ export function TrustGame({ mode }: { mode: "web" | "booth" }) {
 
   if (!active) {
     return (
-      <section className="tg-page" aria-labelledby="trust-start">
-        <div className="tg-pitch">
+      <section className="tg-page tg-stage" aria-labelledby="trust-start">
+        <div className="tg-stage-copy">
           <p className="tg-label">Ready when you are</p>
-          <h2 id="trust-start" className="tg-tier-name">
+          <h2 id="trust-start" className="tg-stage-title">
             {trustGameDeckSize} conclusions. Does the telemetry back them up?
           </h2>
           <p className="tg-pitch-lede">
             {trustGameRule.explainer} Half the conclusions hold. No timer and no sign-up.
           </p>
-          <button type="button" className="tg-next" onClick={() => start(trustGameDeckSize)}>
-            Start the game
+          <button type="button" className="tg-stage-start" onClick={() => start(trustGameDeckSize)}>
+            Start the game <span aria-hidden="true">→</span>
           </button>
+          <p className="tg-stage-hint">Make the call with Y or N, then Enter for the next case.</p>
+        </div>
+        <div className="tg-stage-how">
+          <h2 className="tg-label" id="trust-how">
+            {trustGameHowItWorks.title}
+          </h2>
+          <ol className="tg-how">
+            {trustGameHowItWorks.steps.map((step, index) => (
+              <li key={step.title} className="tg-how-step">
+                <span className="tg-how-num">0{index + 1}</span>
+                <div>
+                  <p className="tg-how-title">{step.title}</p>
+                  <p className="tg-how-desc">{step.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
     );
