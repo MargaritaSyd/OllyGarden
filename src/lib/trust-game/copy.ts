@@ -111,6 +111,13 @@ export const trustGameCta = {
   secondary: { label: "Meet OllyGarden Rose", href: "/products/rose" },
 } as const;
 
+export const trustGameBoothMeta = {
+  title: "Trust Game booth",
+  description:
+    "A fullscreen Trust Game for an OllyGarden booth. Ten or twenty anonymized telemetry cases. No timer and no sign-up.",
+  path: "/resources/trust-game/booth",
+} as const;
+
 export const trustGamePitch = {
   title: "Your telemetry can lie to you. OllyGarden catches it before your on-call does.",
   lede: "OllyGarden reads the OpenTelemetry data you already send and flags what makes it untrustworthy:",

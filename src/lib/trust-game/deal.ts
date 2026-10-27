@@ -21,3 +21,8 @@ export function dealTrustCases(cases: readonly TrustCase[], random: () => number
   ).slice(0, 5);
   return shuffle([...holds, ...misses], random);
 }
+
+/** Every case, shuffled. The booth's "All 20" round uses this. */
+export function dealAllTrustCases(cases: readonly TrustCase[], random: () => number = Math.random) {
+  return shuffle(cases, random);
+}
