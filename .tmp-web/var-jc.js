@@ -1,1 +1,0 @@
-jc=[{id:`logo`,label:`Logo`,icon:`target`},{id:`colour`,label:`Colour`,icon:`petals`},{id:`type`,label:`Typography`,icon:`list-bars`},{id:`pattern`,label:`Pixel pattern`,icon:`processor`},{id:`icons`,label:`Icons`,icon:`flower`},{id:`imagery`,label:`Imagery`,icon:`sun`}]

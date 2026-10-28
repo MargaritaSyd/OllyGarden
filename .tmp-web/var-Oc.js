@@ -1,1 +1,0 @@
-Oc=e=>Dc.find(t=>t.name===e)?.body??``

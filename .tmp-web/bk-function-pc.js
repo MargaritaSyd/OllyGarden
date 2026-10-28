@@ -1,1 +1,0 @@
-function Pc(){let[e,t]=(0,_.useState)(null),n=(0,_.useRef)(null);return(0,_.useEffect)(()=>()=>clearTimeout(n.current),[]),[e,(0,_.useCallback)(async e=>{try{await navigator.clipboard.writeText(e),t(e),clearTimeout(n.current),n.current=setTimeout(()=>t(null),1600)}catch{}},[])]}

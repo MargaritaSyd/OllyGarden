@@ -1,1 +1,0 @@
-fc=`/images/brand-kit/logos/`
