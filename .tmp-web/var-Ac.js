@@ -1,0 +1,1 @@
+Ac=({name:e})=>(0,z.jsx)(kc,{name:e,size:32,className:`rz-mark bk-mark`})

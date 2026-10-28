@@ -1,0 +1,1 @@
+Mc=[{id:`downloads`,label:`Downloads`,icon:`layers`},...jc];

@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { blogPostHref, blogPosts } from "@/lib/blog";
+import { brandKitMeta } from "@/lib/brand-kit/content";
 import { expandBlogCta } from "@/lib/blog-cta";
 import { caseStudiesMeta } from "@/lib/case-studies";
 import { caseStudyMarkdown } from "@/lib/case-study-markdown";
@@ -65,6 +66,10 @@ const agentPages: Record<string, AgentPage> = {
     title: "OllyGarden Agent Skills",
     description:
       "Open source OpenTelemetry skills for coding agents, and how Rose uses them.",
+  },
+  [brandKitMeta.path]: {
+    title: "OllyGarden Brand Kit",
+    description: brandKitMeta.description,
   },
   [caseStudiesMeta.path]: {
     title: caseStudiesMeta.title,

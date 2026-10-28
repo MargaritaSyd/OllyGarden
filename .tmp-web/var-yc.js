@@ -1,0 +1,1 @@
+yc=[{bg:`#FAF9F0`,fg:`#00280E`,mark:`#D1D100`,markFg:`#00280E`},{bg:`#34520B`,fg:`#FAF9F0`,mark:`#0EAD47`,markFg:`#FAF9F0`},{bg:`#00280E`,fg:`#FAF9F0`,mark:`#9DA704`,markFg:`#FAF9F0`},{bg:`#FAF9F0`,fg:`#697D07`,mark:`#E3E270`,markFg:`#697D07`}]

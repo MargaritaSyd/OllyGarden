@@ -1,4 +1,5 @@
 import { agentSkillsMeta } from "@/lib/agent-skills";
+import { brandKitMeta } from "@/lib/brand-kit/content";
 import { blogMeta, blogPosts } from "@/lib/blog";
 import { caseStudies, caseStudiesMeta } from "@/lib/case-studies";
 import { communityMeta } from "@/lib/community";
@@ -128,6 +129,12 @@ export const resourceGroups: readonly ResourceGroup[] = [
         description:
           "Answers about OllyGarden products, data privacy, rate limits, and pricing.",
         cta: "Read the FAQ",
+      },
+      {
+        href: brandKitMeta.path,
+        label: "Brand Kit",
+        description: brandKitMeta.description,
+        cta: "Open the kit",
       },
       {
         href: siteConfig.docsUrl,

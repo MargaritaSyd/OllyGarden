@@ -1,3 +1,4 @@
+import { brandKitMeta } from "@/lib/brand-kit/content";
 import { siteConfig } from "@/lib/site";
 import { trustGamePath } from "@/lib/trust-game/score";
 
@@ -103,6 +104,7 @@ export const resourceLinks: NavLink[] = [
   { href: "/resources/faq", label: "FAQ" },
   { href: "/otel-quiz", label: "OTel Quiz" },
   { href: trustGamePath, label: "Trust Your Telemetry?" },
+  { href: brandKitMeta.path, label: "Brand Kit" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -178,6 +180,12 @@ const headerResourceTrustGame: NavLink = {
   description: "Real telemetry and the conclusions drawn from it. Which hold up?",
 };
 
+const headerResourceBrand: NavLink = {
+  href: brandKitMeta.path,
+  label: "Brand Kit",
+  description: "Logos, colours, type, icons, and photography.",
+};
+
 export const headerResourceLinks: NavLink[] = [
   headerResourceDocs,
   headerResourceBlog,
@@ -191,6 +199,7 @@ export const headerResourceLinks: NavLink[] = [
   headerResourceFaq,
   headerResourceQuiz,
   headerResourceTrustGame,
+  headerResourceBrand,
 ];
 
 export type FeaturedResource = {

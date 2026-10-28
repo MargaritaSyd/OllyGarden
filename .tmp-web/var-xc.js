@@ -1,0 +1,1 @@
+xc=[{label:`Light`,value:300},{label:`Regular`,value:400},{label:`Medium`,value:500},{label:`SemiBold`,value:600},{label:`Bold`,value:700}]

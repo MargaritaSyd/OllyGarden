@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { blogPostHref, blogPosts } from "@/lib/blog";
+import { brandKitMeta } from "@/lib/brand-kit/content";
 import {
   caseStudies,
   caseStudiesMeta,
@@ -75,6 +76,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: getAbsoluteUrl("/resources/agent-skills"),
       changeFrequency: "monthly",
       priority: 0.8,
+    },
+    {
+      url: getAbsoluteUrl(brandKitMeta.path),
+      changeFrequency: "monthly",
+      priority: 0.6,
     },
     {
       url: getAbsoluteUrl("/resources/faq"),

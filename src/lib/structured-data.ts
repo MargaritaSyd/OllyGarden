@@ -30,6 +30,7 @@ import {
   type BlogPost,
 } from "@/lib/blog";
 import { agentSkillsFaq, agentSkillsMeta, skillRepositories } from "@/lib/agent-skills";
+import { brandKitMeta } from "@/lib/brand-kit/content";
 import {
   caseStudies,
   caseStudiesMeta,
@@ -829,6 +830,33 @@ export function resourcesWebinarsGraph(): Graph {
   return {
     "@context": "https://schema.org",
     "@graph": [organizationSchema(), websiteSchema(), webPage, crumbs],
+  };
+}
+
+export function resourcesBrandKitGraph(): Graph {
+  const url = getAbsoluteUrl(brandKitMeta.path);
+  const page: WebPage = {
+    "@type": "WebPage",
+    "@id": `${url}#webpage`,
+    url,
+    name: brandKitMeta.title,
+    description: brandKitMeta.description,
+    inLanguage: siteConfig.language,
+    isPartOf: { "@id": getAbsoluteUrl("/#website") },
+    about: { "@id": getAbsoluteUrl("/#organization") },
+  };
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      organizationSchema(),
+      websiteSchema(),
+      page,
+      crumbsFromHome([
+        { name: "Resources", path: resourcesMeta.path },
+        { name: "Brand Kit", path: brandKitMeta.path },
+      ]),
+    ],
   };
 }
 

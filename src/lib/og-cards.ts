@@ -153,6 +153,10 @@ export const ogCards: Record<string, OgCard> = {
     headline: "OpenTelemetry skills\nfor *coding agents*",
     body: "Open source facts and OllyGarden opinions for any agent. The same skills power Rose.",
   },
+  "/resources/brand-kit": {
+    headline: "The OllyGarden\n*Brand Kit*",
+    body: "Logos, colours, type, icons, and photography, and the rules for using each one.",
+  },
   "/resources/faq": {
     headline: "Documentation *and FAQ*",
     body: "Everything you need to know about OllyGarden Insights, from getting started to advanced features.",

@@ -1,0 +1,1 @@
+kc=({name:e,body:t,size:n=24,className:r=``})=>(0,z.jsx)(`svg`,{className:r,width:n,height:n,viewBox:`0 0 24 24`,fill:`none`,"aria-hidden":`true`,dangerouslySetInnerHTML:{__html:t??Oc(e)}})

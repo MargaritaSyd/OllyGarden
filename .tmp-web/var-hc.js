@@ -1,0 +1,1 @@
+hc=(e,t=`horizontal`)=>fc+e.replace(`{l}`,t)

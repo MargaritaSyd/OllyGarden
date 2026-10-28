@@ -46,8 +46,11 @@ the visual language. For historical URL migrations only, compare the sitemap in 
   and FAQ from `src/lib/telemetry-quality.ts`. Its numbers come only from the published case
   studies; bump `updated` there when the copy changes, since it feeds the sitemap and JSON-LD.
 - The Trust Your Telemetry? game (`/resources/trust-your-telemetry`, plus a `/booth` kiosk) takes its cases
-  from `src/lib/trust-game/cases.ts` and its copy from `src/lib/trust-game/content.ts`; how to add
-  a case, the content rules, and the booth checklist are in `doc/trust-your-telemetry.md`.
+ from `src/lib/trust-game/cases.ts` and its copy from `src/lib/trust-game/content.ts`; how to add
+ a case, the content rules, and the booth checklist are in `doc/trust-your-telemetry.md`.
+- The brand kit (`/resources/brand-kit`) takes its copy, palette, and logo file names from
+ `src/lib/brand-kit/content.ts`, the icon artwork from `src/lib/brand-kit/icons.ts`, and the pixel
+ alphabet from `src/lib/brand-kit/pixel-font.ts`.
 - Press-release data lives in `src/lib/press.ts`. Static assets live under `public/`; reuse the
   existing brand and layout assets instead of redrawing them.
 - Global colors, typography, surfaces, and utility classes live in `src/app/globals.css`; reusable

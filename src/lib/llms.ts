@@ -1,4 +1,5 @@
 import { getAgentMarkdown } from "@/lib/agent-content";
+import { brandKitMeta } from "@/lib/brand-kit/content";
 import { agentSkillsFaq } from "@/lib/agent-skills";
 import { blogPostHref, blogPosts } from "@/lib/blog";
 import {
@@ -98,6 +99,11 @@ export function llmsIndex() {
         "Trust Your Telemetry? game",
         trustGameMeta.path,
         "Ten real, anonymized OpenTelemetry cases; decide which conclusions hold up.",
+      ),
+      link(
+        "Brand Kit",
+        brandKitMeta.path,
+        "Logos, colours, type, icons, and photography for using the OllyGarden brand.",
       ),
     ]),
     section("Developer tools", [
