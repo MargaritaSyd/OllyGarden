@@ -178,6 +178,32 @@ function ExtraSquares() {
   );
 }
 
+/** The brand-kit hero mosaic: the guide blob, one 317×687 graphic shifted down 52px. */
+export function GuideBlob() {
+  const rootRef = useRef<SVGSVGElement>(null);
+  usePixelGlow(rootRef);
+
+  return (
+    <svg
+      ref={rootRef}
+      className="bk-guide-blob motion-safe:animate-[is-blob-in_1.1s_cubic-bezier(0.16,1,0.3,1)_0.1s_both]"
+      width="317"
+      height="687"
+      viewBox="0 0 317 687"
+      fill="none"
+      aria-hidden="true"
+    >
+      <g transform="translate(0 52)">
+        <Mosaic />
+        <ExtraSquares />
+        <g transform="translate(0 126)">
+          <ExtraSquares />
+        </g>
+      </g>
+    </svg>
+  );
+}
+
 export function HeroBlob({ variant = "default" }: { variant?: "default" | "guide" }) {
   const rootRef = useRef<HTMLDivElement>(null);
   usePixelGlow(rootRef);

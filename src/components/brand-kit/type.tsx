@@ -65,15 +65,15 @@ export function BrandType() {
             <code>{typeCode}</code>
           </pre>
         </div>
-        <article className="bk-card">
-          <h3 className="text-lg font-bold">When Space Grotesk isn’t there</h3>
-          <p className="text-[15px] leading-6 text-mist/75">
+        <article className="bk-card bk-mini">
+          <h3 className="bk-card-title">When Space Grotesk isn’t there</h3>
+          <p className="bk-card-desc">
             Use the Arial family as a substitute in operational documents such as reports, presentations and internal emails.
           </p>
         </article>
-        <article className="bk-card">
-          <h3 className="text-lg font-bold">Free to share</h3>
-          <p className="text-[15px] leading-6 text-mist/75">
+        <article className="bk-card bk-mini">
+          <h3 className="bk-card-title">Free to share</h3>
+          <p className="bk-card-desc">
             Both fonts are under the OFL, so you can pass them to agencies and partners. One zip, with the licence and a short readme.
           </p>
           <a className="bk-btn bk-btn--secondary bk-btn--compact mt-auto" href={brandKitLinks.fonts} target="_blank" rel="noopener noreferrer">

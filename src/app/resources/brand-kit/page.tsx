@@ -8,6 +8,7 @@ import { BrandLogoStage } from "@/components/brand-kit/logo";
 import { ExternalMark } from "@/components/brand-kit/marks";
 import { BrandPattern } from "@/components/brand-kit/pattern";
 import { BrandType } from "@/components/brand-kit/type";
+import { GuideBlob } from "@/components/hero-blob";
 import { JsonLd } from "@/components/json-ld";
 import { PageBody, PageHero } from "@/components/page-hero";
 import { SiteCta } from "@/components/site-cta";
@@ -29,17 +30,18 @@ export default function BrandKitPage() {
       <PageHero
         className="bk-hero"
         titleId="brand-kit-title"
+        decoration={<GuideBlob />}
         eyebrow={
           <>
-            <BrandGlyph name="sprout" size={14} className="mr-2 inline-block align-[-2px] text-bitmap-highlight" />
-            Last reviewed · {brandKitMeta.reviewed}
+            <BrandGlyph name="sprout" size={14} />
+            {`Last reviewed · ${brandKitMeta.reviewed}`}
           </>
         }
         title={brandKitHero.title}
         lede={brandKitHero.lede}
       >
-        <div className="flex w-[min(820px,calc(100vw-6rem))] flex-col items-start gap-8">
-          <div className="flex flex-wrap gap-3">
+        <div className="bk-hero-actions">
+          <div className="bk-hero-cta">
             <a className="bk-btn bk-btn--primary" href={brandKitLinks.guideline} target="_blank" rel="noopener noreferrer">
               Open the Brand Guideline <ExternalMark />
             </a>

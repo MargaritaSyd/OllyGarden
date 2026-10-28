@@ -45,10 +45,10 @@ export function BrandDownloads() {
               <DownloadArt id={item.id} art={item.art} />
             </div>
             <span className="bk-pill w-fit">{item.source}</span>
-            <h3 id={`bk-dl-${item.id}`} className="text-xl font-bold">
+            <h3 id={`bk-dl-${item.id}`} className="bk-card-title">
               {item.title}
             </h3>
-            <p className="text-[15px] leading-6 text-mist/75">{item.description}</p>
+            <p className="bk-card-desc">{item.description}</p>
             <div className="mt-auto flex flex-wrap items-center gap-4 pt-2">
               <a className="bk-btn bk-btn--secondary bk-btn--compact" href={item.url} target="_blank" rel="noopener noreferrer">
                 {item.cta}

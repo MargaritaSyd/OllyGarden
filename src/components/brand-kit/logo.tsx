@@ -147,8 +147,8 @@ export function BrandLogoStage() {
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         {logoConstruction.map((item) => (
           <article key={item.title} className="bk-card">
-            <h3 className="text-lg font-bold">{item.title}</h3>
-            <p className="text-[15px] leading-6 text-mist/75">{item.text}</p>
+            <h3 className="bk-card-title">{item.title}</h3>
+            <p className="bk-card-desc">{item.text}</p>
           </article>
         ))}
       </div>

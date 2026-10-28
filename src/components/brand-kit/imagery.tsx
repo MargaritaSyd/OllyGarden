@@ -165,8 +165,8 @@ export function BrandImagery() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/images/brand-kit/photo-library.webp" alt="" />
         <div className="min-w-0 flex-1">
-          <h3 className="text-lg font-bold">Need a photo, not a filter?</h3>
-          <p className="mt-1 text-[15px] leading-6 text-mist/75">
+          <h3 className="bk-card-title">Need a photo, not a filter?</h3>
+          <p className="bk-card-desc">
             The Photo Library has all 22 brand photographs, already dithered and ready to place as they are. Use them instead of stock photos.
           </p>
         </div>
