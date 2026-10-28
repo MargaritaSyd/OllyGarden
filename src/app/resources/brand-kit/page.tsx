@@ -5,12 +5,12 @@ import { BrandGlyph } from "@/components/brand-kit/glyph";
 import { BrandIcons } from "@/components/brand-kit/icons";
 import { BrandImagery } from "@/components/brand-kit/imagery";
 import { BrandLogoStage } from "@/components/brand-kit/logo";
-import { ExternalMark } from "@/components/brand-kit/marks";
+import { ButtonArrow } from "@/components/brand-kit/marks";
 import { BrandPattern } from "@/components/brand-kit/pattern";
 import { BrandType } from "@/components/brand-kit/type";
 import { GuideBlob } from "@/components/hero-blob";
 import { JsonLd } from "@/components/json-ld";
-import { PageBody, PageHero } from "@/components/page-hero";
+import { PageHero } from "@/components/page-hero";
 import { SiteCta } from "@/components/site-cta";
 import { brandKitCta, brandKitHero, brandKitJump, brandKitLinks, brandKitMeta } from "@/lib/brand-kit/content";
 import { createPageMetadata } from "@/lib/metadata";
@@ -43,10 +43,10 @@ export default function BrandKitPage() {
         <div className="bk-hero-actions">
           <div className="bk-hero-cta">
             <a className="bk-btn bk-btn--primary" href={brandKitLinks.guideline} target="_blank" rel="noopener noreferrer">
-              Open the Brand Guideline <ExternalMark />
+              Open the Brand Guideline <ButtonArrow />
             </a>
             <a className="bk-btn bk-btn--secondary" href="#downloads">
-              Get the Files
+              Get the Files <ButtonArrow down />
             </a>
           </div>
           <nav className="bk-jump" aria-label="On this page">
@@ -59,17 +59,15 @@ export default function BrandKitPage() {
           </nav>
         </div>
       </PageHero>
-      <PageBody wide>
-        <div className="flex flex-col gap-24">
-          <BrandDownloads />
-          <BrandLogoStage />
-          <BrandColours />
-          <BrandType />
-          <BrandPattern />
-          <BrandIcons />
-          <BrandImagery />
-        </div>
-      </PageBody>
+      <div className="flex flex-col gap-24 pt-12 pb-24">
+        <BrandDownloads />
+        <BrandLogoStage />
+        <BrandColours />
+        <BrandType />
+        <BrandPattern />
+        <BrandIcons />
+        <BrandImagery />
+      </div>
       <BrandDock />
       <SiteCta content={brandKitCta} />
     </>

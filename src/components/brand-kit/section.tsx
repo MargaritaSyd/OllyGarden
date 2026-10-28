@@ -8,6 +8,7 @@ export function BrandSection({
   lede,
   icon,
   aside,
+  grid = false,
   children,
 }: {
   id: string;
@@ -16,22 +17,27 @@ export function BrandSection({
   lede: string;
   icon: string;
   aside?: ReactNode;
+  /** Dashed field behind this section only. It stops at the section edge. */
+  grid?: boolean;
   children: ReactNode;
 }) {
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-28">
-      <div className={aside ? "bk-head-split" : undefined}>
-        <div className="bk-head">
-          <BrandGlyph name={icon} size={32} className="bk-mark" />
-          <p className="bk-kicker">{eyebrow}</p>
-          <h2 id={`${id}-title`} className="bk-h2">
-            {title}
-          </h2>
-          <p className="bk-sub">{lede}</p>
+    <section id={id} aria-labelledby={`${id}-title`} className={grid ? "bk-grid-sec scroll-mt-28" : "scroll-mt-28"}>
+      {grid ? <div className="tulip-grid" aria-hidden="true" /> : null}
+      <div className="relative z-[1] mx-auto w-full max-w-[1232px] px-5 sm:px-8 lg:px-12">
+        <div className={aside ? "bk-head-split" : undefined}>
+          <div className="bk-head">
+            <BrandGlyph name={icon} size={32} className="bk-mark" />
+            <p className="bk-kicker">{eyebrow}</p>
+            <h2 id={`${id}-title`} className="bk-h2">
+              {title}
+            </h2>
+            <p className="bk-sub">{lede}</p>
+          </div>
+          {aside}
         </div>
-        {aside}
+        <div className="bk-section-body">{children}</div>
       </div>
-      <div className="bk-section-body">{children}</div>
     </section>
   );
 }

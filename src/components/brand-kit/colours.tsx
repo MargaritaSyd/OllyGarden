@@ -9,6 +9,7 @@ export function BrandColours() {
   return (
     <BrandSection
       id="colour"
+      grid
       icon="petals"
       eyebrow="Colour"
       title="Four colours and the tones between them"

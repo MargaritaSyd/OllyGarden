@@ -50,6 +50,7 @@ export function BrandPattern() {
   return (
     <BrandSection
       id="pattern"
+      grid
       icon="processor"
       eyebrow="Pixel pattern"
       title="Type a word, get a pattern"

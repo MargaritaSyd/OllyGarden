@@ -16,6 +16,28 @@ export function DownloadMark() {
   );
 }
 
+/** Horizontal arrow. `down` rotates it for in-page jumps. */
+export function ButtonArrow({ down = false }: { down?: boolean }) {
+  return (
+    <svg
+      className={down ? "bk-btn-arrow bk-btn-arrow--down" : "bk-btn-arrow"}
+      width="16"
+      height="12"
+      viewBox="0 0 16 12"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M1 6h13M9.5 1.5 14 6l-4.5 4.5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function ExternalMark() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">

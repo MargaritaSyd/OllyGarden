@@ -157,9 +157,10 @@ section.bk-hero > .relative > div:last-child {
   text-decoration: none;
   cursor: pointer;
   transition:
-    background-color 0.2s,
-    border-color 0.2s,
-    transform 0.2s;
+    transform 0.25s var(--bk-ease),
+    box-shadow 0.25s,
+    background-color 0.25s,
+    border-color 0.25s;
 }
 
 .bk-btn--primary {
@@ -180,8 +181,41 @@ section.bk-hero > .relative > div:last-child {
   font-size: 14px;
 }
 
-.bk-btn:hover {
-  transform: translateY(-1px);
+@media (hover: hover) {
+  .bk-btn--primary:hover {
+    transform: scale(1.04);
+    box-shadow: 0 0 28px #e3e27066;
+  }
+
+  .bk-btn--secondary:hover {
+    background-color: #ffffff38;
+    transform: scale(1.03);
+  }
+
+  .bk-btn:hover .bk-btn-arrow {
+    transform: translateX(3px);
+  }
+
+  .bk-btn:hover .bk-btn-arrow--down {
+    transform: translateY(3px) rotate(90deg);
+  }
+}
+
+.bk-btn-arrow {
+  display: block;
+  transition: transform 0.25s var(--bk-ease);
+}
+
+.bk-btn-arrow--down {
+  transform: rotate(90deg);
+}
+
+/* The dashed field fills the section and half the gap on either side, so it
+   stops before the next section without moving the copy. */
+.bk-grid-sec {
+  position: relative;
+  margin-block: -3rem;
+  padding-block: 3rem;
 }
 
 .bk-btn:focus-visible,
@@ -334,6 +368,15 @@ section.bk-hero > .relative > div:last-child {
   font-size: 15px;
 }
 
+/* Cards lift and light up on hover. Colour swatches keep their own motion. */
+.bk-card,
+.bk-dither {
+  transition:
+    transform 0.5s var(--bk-ease),
+    box-shadow 0.5s var(--bk-ease),
+    border-color 0.5s;
+}
+
 .bk-card {
   display: flex;
   flex-direction: column;
@@ -344,9 +387,30 @@ section.bk-hero > .relative > div:last-child {
   padding: 24px;
 }
 
+@media (hover: hover) {
+  .bk-card:hover,
+  .bk-dither:hover {
+    border-color: #e3e270cc;
+    transform: translateY(-6px);
+    box-shadow:
+      0 24px 50px #0006,
+      0 0 30px #d9e5331f,
+      inset 0 1px #ffffff14;
+  }
+
+  .bk-code:hover {
+    border-color: #212c2599;
+    box-shadow:
+      0 10px 15px -3px #0000001a,
+      0 4px 6px -4px #0000001a;
+  }
+}
+
 /* The code sample is a terminal, not a grain card. The photo banner keeps the
    grain and lays a flat green wash over it. */
 .bk-code {
+  gap: 0;
+  padding: 0;
   border: 1px solid #212c2599;
   border-radius: 16px;
   background: #092611;
@@ -503,6 +567,10 @@ section.bk-hero > .relative > div:last-child {
   color: var(--bk-mist);
   font: 500 14px/1.2 var(--font-sans), sans-serif;
   cursor: pointer;
+}
+
+.bk-toggle svg {
+  color: var(--bk-lime);
 }
 
 .bk-toggle:disabled {
@@ -880,12 +948,12 @@ section.bk-hero > .relative > div:last-child {
 .bk-term-bar {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
   border-bottom: 1px solid #1d3d1d;
   background: #04160a;
-  padding: 12px 16px;
-  color: var(--bk-olive);
-  font: 500 13px/1 var(--font-sans), sans-serif;
+  padding: 12px 16px 13px;
+  color: #90a1b9;
+  font: 12px/16px var(--font-jetbrains-mono), ui-monospace, monospace;
 }
 
 .bk-term-dots {
@@ -894,11 +962,22 @@ section.bk-hero > .relative > div:last-child {
 }
 
 .bk-term-dots i {
-  width: 8px;
-  height: 8px;
+  display: block;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: var(--color-bitmap-highlight);
-  opacity: 0.7;
+}
+
+.bk-term-dots i:first-child {
+  background: #fb2c36cc;
+}
+
+.bk-term-dots i:nth-child(2) {
+  background: #f0b100cc;
+}
+
+.bk-term-dots i:nth-child(3) {
+  background: #00c950cc;
 }
 
 .bk-range {
@@ -1444,9 +1523,16 @@ section.bk-hero > .relative > div:last-child {
   .bk-swatch-block,
   .bk-safe,
   .bk-safe-dots i,
-  .bk-pixels rect {
+  .bk-pixels rect,
+  .bk-card,
+  .bk-dither {
     transition: none;
     animation: none;
+  }
+
+  .bk-card:hover,
+  .bk-dither:hover {
+    transform: none;
   }
 
   .bk-icon-grid--pattern .bk-icon:hover .bk-icon-glyph {
@@ -1455,5 +1541,18 @@ section.bk-hero > .relative > div:last-child {
 
   .bk-btn:hover {
     transform: none;
+  }
+
+  .bk-btn-arrow {
+    transition: none;
+  }
+
+  .bk-btn:hover .bk-btn-arrow {
+    transform: none;
+  }
+
+  .bk-btn-arrow--down,
+  .bk-btn:hover .bk-btn-arrow--down {
+    transform: rotate(90deg);
   }
 }

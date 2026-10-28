@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { DownloadMark, ExternalMark } from "@/components/brand-kit/marks";
+import { ButtonArrow, DownloadMark } from "@/components/brand-kit/marks";
 import { BrandRules, BrandSection } from "@/components/brand-kit/section";
 import { bitmapRamp, brandKitLinks, imageryRules, imagerySample } from "@/lib/brand-kit/content";
 import { ditherPixels } from "@/lib/brand-kit/dither";
@@ -66,6 +66,7 @@ export function BrandImagery() {
   return (
     <BrandSection
       id="imagery"
+      grid
       icon="sun"
       eyebrow="Bitmap imagery"
       title="Dither any photo into the garden"
@@ -171,7 +172,7 @@ export function BrandImagery() {
           </p>
         </div>
         <a className="bk-btn bk-btn--primary bk-btn--compact" href={brandKitLinks.photos} target="_blank" rel="noopener noreferrer">
-          Open the Photo Library <ExternalMark />
+          Open the Photo Library <ButtonArrow />
         </a>
       </div>
     </BrandSection>

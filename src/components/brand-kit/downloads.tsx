@@ -1,5 +1,5 @@
 import { BrandSection } from "@/components/brand-kit/section";
-import { ExternalMark } from "@/components/brand-kit/marks";
+import { ButtonArrow, ExternalMark } from "@/components/brand-kit/marks";
 import { brandKitDownloads, logoSrc } from "@/lib/brand-kit/content";
 
 function DownloadArt({ id, art }: { id: string; art?: string }) {
@@ -27,6 +27,7 @@ export function BrandDownloads() {
   return (
     <BrandSection
       id="downloads"
+      grid
       icon="layers"
       eyebrow="Downloads"
       title="Everything in the kit"
@@ -52,7 +53,7 @@ export function BrandDownloads() {
             <div className="mt-auto flex flex-wrap items-center gap-4 pt-2">
               <a className="bk-btn bk-btn--secondary bk-btn--compact" href={item.url} target="_blank" rel="noopener noreferrer">
                 {item.cta}
-                <ExternalMark />
+                {item.id === "guideline" || item.id === "photos" ? <ButtonArrow /> : <ExternalMark />}
               </a>
               {item.extra ? (
                 <a className="bk-textlink" href={item.extra.url} target="_blank" rel="noopener noreferrer">

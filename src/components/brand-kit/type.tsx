@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Segmented } from "@/components/brand-kit/controls";
-import { ExternalMark } from "@/components/brand-kit/marks";
+import { ButtonArrow } from "@/components/brand-kit/marks";
 import { BrandSection } from "@/components/brand-kit/section";
 import { brandKitLinks, typeCode, typeGlyphs, typeSample, typeWeights } from "@/lib/brand-kit/content";
 
@@ -77,7 +77,7 @@ export function BrandType() {
             Both fonts are under the OFL, so you can pass them to agencies and partners. One zip, with the licence and a short readme.
           </p>
           <a className="bk-btn bk-btn--secondary bk-btn--compact mt-auto" href={brandKitLinks.fonts} target="_blank" rel="noopener noreferrer">
-            Download the fonts <ExternalMark />
+            Download the fonts <ButtonArrow />
           </a>
         </article>
       </div>
