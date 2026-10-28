@@ -52,7 +52,7 @@ export function BrandType() {
         </p>
       </div>
       <div className="bk-type-side mt-6">
-        <div className="bk-card overflow-hidden p-0">
+        <div className="bk-card bk-code overflow-hidden p-0">
           <div className="bk-term-bar">
             <span className="bk-term-dots" aria-hidden="true">
               <i />
