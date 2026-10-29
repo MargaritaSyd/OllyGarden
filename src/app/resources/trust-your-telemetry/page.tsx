@@ -3,7 +3,7 @@ import { JsonLd } from "@/components/json-ld";
 import { PageBody, PageHero } from "@/components/page-hero";
 import { QuizHeroDeco } from "@/components/quiz-hero-deco";
 import { SiteCta } from "@/components/site-cta";
-import { TrustGame, TrustNotice } from "@/components/trust-game";
+import { TrustGame, TrustNotice, TrustPlayButton } from "@/components/trust-game";
 import { TrustGameCards } from "@/components/trust-game-cards";
 import { createPageMetadata } from "@/lib/metadata";
 import { trustGameGraph } from "@/lib/structured-data";
@@ -44,21 +44,7 @@ export default function TrustGamePage() {
         title={trustGameHero.title}
         lede={registerOpenTelemetry(trustGameHero.lede)}
       >
-        <a
-          href="#trust-game"
-          className="group inline-flex h-12 items-center justify-center gap-2.5 rounded-2xl bg-mist px-8 text-base font-medium text-forest transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] motion-safe:hover:scale-[1.04] motion-safe:hover:shadow-[0_0_28px_rgba(227,226,112,0.4)]"
-        >
-          Play Now
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" className="motion-safe:group-hover:translate-y-0.5">
-            <path
-              d="M8 2v11M3.5 8.5 8 13l4.5-4.5"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </a>
+        <TrustPlayButton />
       </PageHero>
       <PageBody wide>
         <div id="trust-game">

@@ -344,6 +344,6 @@ export const imageryRules = [
 export const brandKitCta = {
   title: ["Need something", "that isn’t here?"],
   sub: "Writing about OllyGarden, planning an event with us or building something together? Tell us what you need and we will send the right files.",
-  primary: { label: "Contact Us", href: "/contact", arrow: true },
+  primary: { label: "Contact Us", href: "/contact" },
   secondary: { label: "Press Releases", href: "/resources/press-releases" },
 };

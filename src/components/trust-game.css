@@ -1,5 +1,9 @@
 /* Visual language of the Trust Your Telemetry? reference (web game and booth kiosk). */
 
+#trust-game {
+  scroll-margin-top: 112px;
+}
+
 .tg-page,
 .tb-page,
 .tg-how,
@@ -32,7 +36,6 @@
 
 .tg-card {
   display: grid;
-  overflow: hidden;
   border: 1px solid var(--card-border);
   border-radius: 24px;
   background: #002810 url("/images/texture-grain.png") 0 0 / 328px 140px;
@@ -93,7 +96,7 @@
 .tg-data {
   grid-area: data;
   min-width: 0;
-  padding: 8px clamp(24px, 3.4vw, 48px) 28px 0;
+  padding: 8px clamp(24px, 3.4vw, 48px) 28px;
   border-left: 1px solid var(--oq-rule);
 }
 
@@ -487,10 +490,6 @@
 }
 
 .tg-pitch {
-  padding: clamp(1.4rem, 3vw, 2.25rem);
-  border: 1px solid var(--card-border);
-  border-radius: 24px;
-  background: #19321e url("/images/texture-grain.png") 0 0 / 328px 140px;
   animation: oqIn 0.4s var(--ease-site) 0.2s backwards;
 }
 
@@ -549,6 +548,27 @@
   align-items: center;
   gap: 16px 24px;
   margin-top: 24px;
+}
+
+.tg-pitch-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 51px;
+  padding: 0 30px;
+  border: 1px solid #ffffff80;
+  border-radius: 16px;
+  background: #ffffff1f;
+  color: var(--paper);
+  font-family: var(--tg-display);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.tg-pitch-ghost:hover {
+  background: #ffffff38;
 }
 
 .tg-landed {
@@ -1051,13 +1071,169 @@
   display: none;
 }
 
-.tg-results {
+.tg-result-card {
   display: grid;
-  gap: 32px;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+  border-radius: 24px;
+  background: #002810 url("/images/texture-grain.png") 0 0 / 328px 140px;
 }
 
-.tg-results .tg-landed {
+.tg-result-main,
+.tg-result-side,
+.tg-review-pane {
+  min-width: 0;
+  padding: clamp(24px, 3.4vw, 48px);
+}
+
+.tg-result-side {
+  border-left: 1px solid var(--oq-rule);
+}
+
+.tg-result-main .tg-next {
+  width: 100%;
+}
+
+.tg-share {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--oq-rule);
+}
+
+.tg-review-pane {
   grid-column: 1 / -1;
+  border-top: 1px solid var(--oq-rule);
+}
+
+.tg-review {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(5, auto);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  column-gap: 48px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tg-review > li {
+  border-top: 1px solid #5e6e358c;
+}
+
+.tg-review > li:first-child,
+.tg-review > li:nth-child(6) {
+  border-top: 0;
+}
+
+.tg-review-item summary {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto 16px;
+  align-items: center;
+  column-gap: 12px;
+  padding: 12px 0;
+  list-style: none;
+  cursor: pointer;
+}
+
+.tg-review-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.tg-review-item summary::marker {
+  content: none;
+}
+
+.tg-review-item summary:focus-visible {
+  border-radius: 8px;
+  outline: 2px solid var(--lime-soft);
+  outline-offset: 3px;
+}
+
+.tg-review-item summary:hover .tg-review-topic {
+  color: var(--lime-soft);
+}
+
+.tg-review-badge {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--oq-right);
+  color: var(--bg);
+}
+
+.tg-review-item.is-wrong .tg-review-badge {
+  background: var(--oq-wrong);
+}
+
+.tg-review-topic {
+  color: var(--paper);
+  font-family: var(--tg-display);
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.tg-review-state {
+  color: var(--oq-muted);
+  font-size: 14px;
+}
+
+.tg-review-caret {
+  color: var(--oq-muted);
+  transition: transform 0.2s ease-out;
+}
+
+.tg-review-item[open] .tg-review-caret {
+  transform: rotate(180deg);
+}
+
+.tg-review-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 0 16px 36px;
+  color: var(--oq-body);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.tg-review-q,
+.tg-review-a,
+.tg-review-why {
+  margin: 0;
+}
+
+.tg-review-q {
+  color: var(--paper);
+  font-weight: 500;
+}
+
+.tg-review-a span {
+  display: block;
+  color: var(--oq-right);
+  font-family: var(--tg-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 16px;
+  text-transform: uppercase;
+}
+
+.tg-review-a.is-wrong span {
+  color: var(--oq-wrong);
+}
+
+.tg-review-why {
+  color: var(--oq-muted);
+}
+
+.tg-review-why b {
+  color: var(--oq-body);
+  font-weight: 600;
 }
 
 html.tb-lock,
@@ -2045,15 +2221,23 @@ html.tb-lock body {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .tg-results {
+  .tg-result-card {
     grid-template-columns: minmax(0, 1fr);
   }
-}
 
-@media (width >= 1024px) {
-  .tg-results {
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-    align-items: start;
+  .tg-result-side {
+    border-top: 1px solid var(--oq-rule);
+    border-left: 0;
+  }
+
+  .tg-review {
+    grid-auto-flow: row;
+    grid-template-rows: none;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tg-review > li:nth-child(6) {
+    border-top: 1px solid #5e6e358c;
   }
 }
 

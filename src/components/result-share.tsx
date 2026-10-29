@@ -7,11 +7,13 @@ export function ResultShare({
   text,
   url,
   align = "center",
+  className = "",
   onShared,
 }: {
   text: string;
   url: string;
   align?: "center" | "start";
+  className?: string;
   onShared: (channel: string) => void;
 }) {
   const [copied, setCopied] = useState(false);
@@ -52,7 +54,7 @@ export function ResultShare({
   const button = "rounded-xl border border-mist/30 px-5 py-2.5 font-semibold";
 
   return (
-    <div className="mt-8">
+    <div className={className || "mt-8"}>
       <p className="text-sm font-bold tracking-[.15em] text-bitmap-mid uppercase">
         Share your result
       </p>

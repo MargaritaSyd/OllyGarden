@@ -15,6 +15,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { BrandLogo } from "@/components/brand-logo";
+import { CtaArrow } from "@/components/cta-arrow";
 import { GetStartedLink } from "@/components/get-started-link";
 import { ResultShare } from "@/components/result-share";
 import { TelemetryScreen } from "@/components/trust-game-panels";
@@ -55,6 +56,36 @@ const BOOTH_WIDTH = 1920;
 const BOOTH_HEIGHT = 1080;
 
 const noSubscription = () => () => {};
+const trustPlayEvent = "trust-game-play";
+
+function scrollToGame() {
+  const target = document.getElementById("trust-game");
+  if (!target) return;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+}
+
+/** Hero control. Starts the round, then scrolls to the card; a round already open only scrolls. */
+export function TrustPlayButton() {
+  return (
+    <button
+      type="button"
+      className="group inline-flex h-12 items-center justify-center gap-2.5 rounded-2xl bg-mist px-8 text-base font-medium text-forest transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] motion-safe:hover:scale-[1.04] motion-safe:hover:shadow-[0_0_28px_rgba(227,226,112,0.4)]"
+      onClick={() => window.dispatchEvent(new Event(trustPlayEvent))}
+    >
+      Play Now
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" className="motion-safe:group-hover:translate-y-0.5">
+        <path
+          d="M8 2v11M3.5 8.5 8 13l4.5-4.5"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </button>
+  );
+}
 
 type Stage = { zoom: number; width: number; height: number };
 
@@ -151,6 +182,28 @@ export function TrustGame({ mode }: { mode: "web" | "booth" }) {
 
   const round = useRef<HTMLDivElement>(null);
   const claim = useRef<HTMLQuoteElement>(null);
+  const activeRef = useRef(active);
+  activeRef.current = active;
+
+  const onPlay = useEffectEvent(() => {
+    const playing = activeRef.current;
+    if (!playing) start(trustGameDeckSize);
+    requestAnimationFrame(() => {
+      const target = document.getElementById("trust-game");
+      if (!target) return;
+      if (!playing) {
+        const top = target.getBoundingClientRect().top;
+        if (top >= 96 && top <= window.innerHeight * 0.45) return;
+      }
+      scrollToGame();
+    });
+  });
+  useEffect(() => {
+    if (booth) return;
+    const play = () => onPlay();
+    window.addEventListener(trustPlayEvent, play);
+    return () => window.removeEventListener(trustPlayEvent, play);
+  }, [booth]);
   useEffect(() => {
     if (booth) return;
     if ((round.current?.getBoundingClientRect().top ?? 0) < 0) round.current?.scrollIntoView();
@@ -544,36 +597,40 @@ function WebResults({ answers, onRetake }: { answers: readonly TrustAnswer[]; on
 
   return (
     <section className="tg-page tg-results" aria-labelledby="trust-result">
-      <div>
-        <p className="tg-label">Your result</p>
-        <h2 id="trust-result" ref={heading} tabIndex={-1} className="tg-score">
-          {score}
-          <span>/{total}</span>
-        </h2>
-        <p className="tg-tier-name">
-          {tier.name} {tier.emoji}
-        </p>
-        <p className="tg-tier-msg">{tier.message}</p>
-        <div className="tg-stats">
-          <p className="tg-stat">
-            <b>{liesTrusted}</b>
-            bad calls you accepted
+      <div className="tg-result-card">
+        <div className="tg-result-main">
+          <p className="tg-label">Your result</p>
+          <h2 id="trust-result" ref={heading} tabIndex={-1} className="tg-score">
+            {score}
+            <span>/{total}</span>
+          </h2>
+          <p className="tg-tier-name">
+            {tier.name} {tier.emoji}
           </p>
-          <p className="tg-stat">
-            <b>{truthsDoubted}</b>
-            good calls you rejected
-          </p>
+          <p className="tg-tier-msg">{tier.message}</p>
+          <div className="tg-stats">
+            <p className="tg-stat">
+              <b>{liesTrusted}</b>
+              bad calls you accepted
+            </p>
+            <p className="tg-stat">
+              <b>{truthsDoubted}</b>
+              good calls you rejected
+            </p>
+          </div>
+          <div className="tg-actions">
+            <button type="button" className="tg-next" onClick={onRetake}>
+              Play again
+            </button>
+          </div>
+          <TrustShare score={score} tier={tier} answers={answers} />
         </div>
-        <div className="tg-actions">
-          <button type="button" className="tg-next" onClick={onRetake}>
-            Play again
-          </button>
+        <div className="tg-result-side">
+          <Pitch score={score} />
+          <LandedTrack score={score} total={total} />
         </div>
-        <TrustShare score={score} tier={tier} answers={answers} />
-        <TrustNotice className="tg-provenance" />
+        <CaseReview answers={answers} />
       </div>
-      <Pitch score={score} />
-      <LandedTrack score={score} total={total} />
     </section>
   );
 }
@@ -593,8 +650,12 @@ function Pitch({ score }: { score: number }) {
       </ul>
       <p className="tg-pitch-lede">{trustGamePitch.close}</p>
       <div className="tg-pitch-links">
-        <GetStartedLink analytics={{ id: "trust_game_get_started", section: "trust_game_results" }}>
+        <GetStartedLink
+          analytics={{ id: "trust_game_get_started", section: "trust_game_results" }}
+          size="og"
+        >
           Get Started Free
+          <CtaArrow />
         </GetStartedLink>
         <Link
           href="/products/insights"
@@ -610,9 +671,9 @@ function Pitch({ score }: { score: number }) {
               score,
             });
           }}
-          className="font-semibold underline-offset-2 hover:underline"
+          className="tg-pitch-ghost"
         >
-          Explore OllyGarden Insights →
+          Explore OllyGarden Insights
         </Link>
       </div>
     </aside>
@@ -675,7 +736,97 @@ function LandedTrack({ score, total, booth = false }: { score: number; total: nu
     </ol>
   );
 
-  return booth ? <div className="tb-landed">{track}</div> : <div className="tg-landed">{track}</div>;
+  if (booth) return <div className="tb-landed">{track}</div>;
+  return (
+    <div className="tg-landed">
+      <p className="tg-label">Where you landed</p>
+      {track}
+    </div>
+  );
+}
+
+function CaseReview({ answers }: { answers: readonly TrustAnswer[] }) {
+  return (
+    <div className="tg-review-pane">
+      <p className="tg-label">Case by case</p>
+      <ol className="tg-review">
+        {answers.map((answer) => {
+          const item = trustGameCases.find((entry) => entry.id === answer.id);
+          return item ? <CaseReviewItem key={answer.id} item={item} answer={answer} /> : null;
+        })}
+      </ol>
+    </div>
+  );
+}
+
+function CaseReviewItem({ item, answer }: { item: TrustCase; answer: TrustAnswer }) {
+  const verdict = item.truth
+    ? `${trustGameRule.verdict.holds}. ${trustGameRule.data.holds}`
+    : `${trustGameRule.verdict.fails}. ${trustGameRule.data[item.flaw]}`;
+  return (
+    <li>
+      <details className={`tg-review-item${answer.correct ? "" : " is-wrong"}`}>
+        <summary>
+          <span className="tg-review-badge" aria-hidden="true">
+            {answer.correct ? <ReviewMark correct /> : <ReviewMark />}
+          </span>
+          <span className="tg-review-topic">{item.headline}</span>
+          <span className="tg-review-state">{answer.correct ? "Right" : "Missed"}</span>
+          <ReviewCaret />
+        </summary>
+        <div className="tg-review-body">
+          <p className="tg-review-q">“{item.claim}”</p>
+          <p className="tg-review-a">
+            <span>Your call</span>
+            {answer.trusted ? trustGameRule.holds : trustGameRule.fails}
+          </p>
+          <p className={`tg-review-a${item.truth ? "" : " is-wrong"}`}>
+            <span>The verdict</span>
+            {verdict}
+          </p>
+          <p className="tg-review-why">
+            <b>The tell:</b> {item.tell}
+          </p>
+          {item.truth ? null : (
+            <p className="tg-review-why">
+              <b>The fix:</b> {item.fix}
+            </p>
+          )}
+        </div>
+      </details>
+    </li>
+  );
+}
+
+function ReviewMark({ correct = false }: { correct?: boolean }) {
+  return (
+    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      {correct ? (
+        <path
+          d="M2.5 7.2 5.4 10 11.5 3.8"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      ) : (
+        <path
+          d="M3.5 3.5 10.5 10.5M10.5 3.5 3.5 10.5"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+      )}
+    </svg>
+  );
+}
+
+function ReviewCaret() {
+  return (
+    <svg className="tg-review-caret" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M4 6.5 8 10.5 12 6.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
 }
 
 function TrustShare({
@@ -694,10 +845,11 @@ function TrustShare({
   ].join("\n");
 
   return (
-    <ResultShare
+      <ResultShare
       text={text}
       url={url}
       align="start"
+      className="tg-share"
       onShared={(channel) => capturePostHogEvent("trust_game_shared", { channel, score })}
     />
   );
