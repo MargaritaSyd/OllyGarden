@@ -1,9 +1,9 @@
 import { InView } from "@/components/in-view";
 import { homeSecurity } from "@/lib/home";
 
-// Figma 2371:27005: flat #011e0c panel with the same dashed grid as the blog
-// section, copy on the left and the SOC seal on the right. No glyph, no pixel
-// art, no gradient.
+// Flat #011e0c panel with the dashed grid. Desktop puts the copy on the left
+// and the SOC seal on the right; from the md breakpoint down the card stacks
+// and centers the seal.
 export function HomeSecurity() {
   return (
     <InView as="section" aria-labelledby="ogsec-title" className="ogsec">
@@ -22,8 +22,8 @@ export function HomeSecurity() {
           <img
             src={homeSecurity.badgeSrc}
             alt={homeSecurity.badgeAlt}
-            width={180}
-            height={180}
+            width={171}
+            height={171}
             loading="lazy"
             decoding="async"
           />

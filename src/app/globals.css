@@ -1775,34 +1775,33 @@ body {
   }
 }
 
-/* Home Security, Figma variant 4 (node 2371:29228): full-bleed gradient panel,
-   copy on the left, 6 x 6 pixel cluster with the SOC badge hugging the right. */
-/* Home security panel — Figma 2371:27005. Flat #011e0c behind the shared
-   .tulip-grid overlay (same grid as the blog section). */
+/* Home security panel. Flat #011e0c behind the shared .tulip-grid overlay.
+   Sizes follow the reference site: row on desktop, centered column from md down. */
 .ogsec {
+  --sec-bg: #011e0c;
+  --sec-card: #011a09;
+  --sec-border: #d1d10052;
+  --sec-border-hover: #d1d10085;
   --sec-eyebrow: #9ca703;
   --sec-paper: #faf9f0;
   --sec-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --sec-radius: 24px;
   isolation: isolate;
   position: relative;
-  display: grid;
   overflow: hidden;
-  min-height: 404px;
-  padding: 0;
-  background: #011e0c;
+  padding: 96px 104px;
+  background: var(--sec-bg);
 }
 
 .ogsec-inner {
-  box-sizing: border-box;
   position: relative;
   z-index: 1;
-  width: 100%;
-  max-width: 1440px;
+  max-width: 1232px;
   margin-inline: auto;
-  padding: 96px 104px;
 }
 
 .ogsec-card {
+  box-sizing: border-box;
   display: flex;
   position: relative;
   align-items: center;
@@ -1810,9 +1809,9 @@ body {
   gap: 48px;
   min-height: 235px;
   padding: 32px 56px;
-  border: 1px solid #d1d10052;
-  border-radius: 24px;
-  background-color: #011a09;
+  border: 1px solid var(--sec-border);
+  border-radius: var(--sec-radius);
+  background-color: var(--sec-card);
   background-image: linear-gradient(182deg, #787e2716 0%, #787e2700 45%);
   transition:
     border-color 0.45s var(--sec-ease),
@@ -1821,7 +1820,7 @@ body {
 
 .ogsec-card:hover,
 .ogsec-card:focus-within {
-  border-color: #d1d10085;
+  border-color: var(--sec-border-hover);
   box-shadow:
     0 18px 44px #00000057,
     0 0 0 1px #d1d10014,
@@ -1832,25 +1831,25 @@ body {
   display: flex;
   min-width: 0;
   flex-direction: column;
-  align-items: flex-start;
   gap: 16px;
+  margin-bottom: 6px;
 }
 
 .ogsec-eyebrow {
   margin: 0;
   font-size: 16px;
   font-weight: 700;
-  line-height: normal;
+  line-height: 20px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--sec-eyebrow);
 }
 
 .ogsec-title {
-  margin: 0;
+  margin: -6px 0 0;
   font-size: 48px;
   font-weight: 700;
-  line-height: normal;
+  line-height: 61px;
   letter-spacing: -0.02em;
   color: var(--sec-paper);
 }
@@ -1859,18 +1858,17 @@ body {
   margin: 0;
   font-size: 16px;
   font-weight: 400;
-  line-height: 1.4;
+  line-height: 22px;
   letter-spacing: 0.02em;
   color: var(--sec-paper);
+  opacity: 0.92;
 }
 
 .ogsec-badge {
-  --seal: 180px;
   position: relative;
-  justify-self: end;
-  width: var(--seal);
-  height: var(--seal);
-  margin-right: 21px;
+  flex: 0 0 auto;
+  width: 171px;
+  height: 171px;
   transition: transform 0.45s var(--sec-ease);
 }
 
@@ -1878,19 +1876,17 @@ body {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
   border-radius: 50%;
 }
 
 .ogsec-tm {
   position: absolute;
   top: 89%;
-  left: 100%;
-  margin-left: 4px;
-  font-size: 5px;
+  left: 91%;
+  font-size: 8px;
   font-weight: 700;
   line-height: 1;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #fff;
 }
@@ -1936,48 +1932,48 @@ body {
 }
 
 @media (width <= 1279px) {
-  .ogsec-inner {
-    padding-inline: clamp(40px, 7.2vw, 104px);
+  .ogsec {
+    padding: 88px clamp(40px, 6vw, 80px);
   }
 
   .ogsec-title {
     font-size: 42px;
+    line-height: 54px;
+  }
+
+  .ogsec-badge {
+    width: 150px;
+    height: 150px;
   }
 }
 
 @media (width <= 1023px) {
   .ogsec {
-    min-height: 0;
-  }
-
-  .ogsec-inner {
-    padding: 64px clamp(24px, 5vw, 48px);
+    padding: 72px clamp(24px, 5vw, 48px);
   }
 
   .ogsec-card {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 32px;
     min-height: 0;
     padding: 40px;
+    text-align: center;
+  }
+
+  .ogsec-copy {
+    align-items: center;
+  }
+
+  .ogsec-badge {
+    width: 128px;
+    height: 128px;
   }
 }
 
 @media (width <= 767px) {
-  .ogsec-eyebrow {
-    font-size: 14px;
-  }
-
-  .ogsec-title {
-    font-size: 32px;
-  }
-
-  .ogsec-body {
-    font-size: 14px;
-  }
-
-  .ogsec-badge {
-    --seal: 140px;
+  .ogsec {
+    padding: 56px 22px;
   }
 
   .ogsec-card {
@@ -1985,9 +1981,33 @@ body {
     padding: 32px 24px;
   }
 
+  .ogsec-eyebrow {
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  .ogsec-title {
+    font-size: 32px;
+    line-height: 40px;
+  }
+
+  .ogsec-body {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .ogsec-badge {
+    width: 104px;
+    height: 104px;
+  }
+
+  .ogsec-tm {
+    font-size: 7px;
+  }
+
   .ogsec-card:hover,
   .ogsec-card:focus-within {
-    border-color: #d1d10052;
+    border-color: var(--sec-border);
     box-shadow: none;
   }
 
@@ -2000,6 +2020,12 @@ body {
 @media (width <= 479px) {
   .ogsec-title {
     font-size: 28px;
+    line-height: 34px;
+  }
+
+  .ogsec-badge {
+    width: 96px;
+    height: 96px;
   }
 }
 
