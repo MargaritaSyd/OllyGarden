@@ -39,7 +39,7 @@ export default function InstrumentationScorePage() {
       <div className="relative overflow-hidden">
         <div className="tulip-grid" aria-hidden="true" />
         <div className="relative z-[1]">
-          <FaqAccordion content={instrumentationScoreFaq} />
+          <FaqAccordion content={instrumentationScoreFaq} startClosed />
           <RelatedReading {...instrumentationScoreReading} />
         </div>
       </div>

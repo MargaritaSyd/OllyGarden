@@ -115,7 +115,7 @@ export function ScoreHero() {
             href={spec.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex h-12 items-center justify-center gap-2.5 rounded-2xl border border-mist/25 px-[30px] text-base font-semibold text-mist transition-colors hover:border-sunflower hover:text-sunflower max-sm:w-full max-sm:max-w-[340px]"
+            className="inline-flex h-12 items-center justify-center gap-2.5 rounded-2xl border border-mist/25 px-[30px] text-base font-semibold text-mist transition-[scale,background-color,border-color] duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-white/55 hover:bg-white/10 motion-safe:hover:scale-[1.03] max-sm:w-full max-sm:max-w-[340px]"
           >
             <GitHubMark />
             {spec.label}
@@ -396,13 +396,19 @@ export function ScoreGetYours() {
               {insights.title}
             </h3>
             <p className="text-base leading-[1.5] text-mist/75">{insights.body}</p>
-            <div className="mt-auto flex flex-wrap items-center gap-x-6 gap-y-3">
+            <div className="mt-auto flex flex-wrap items-center gap-x-7 gap-y-4">
               <GetStartedLink href={insights.href} analytics={{ id: "score_get_yours_insights", section: "get_score" }}>
                 {insights.cta}
               </GetStartedLink>
-              <Link href={insights.productHref} className={`${textLink} text-[15px]`}>
-                {insights.link} →
-              </Link>
+              <GetStartedLink
+                href={insights.productHref}
+                variant="secondary"
+                tone="paper"
+                analytics={{ id: "score_get_yours_insights_learn", section: "get_score" }}
+              >
+                {insights.link}
+                <CtaArrow />
+              </GetStartedLink>
             </div>
             <Image
               src={insights.shot.src}

@@ -35,7 +35,7 @@ export default function TelemetryQualityPage() {
       <div className="relative overflow-hidden">
         <div className="tulip-grid" aria-hidden="true" />
         <div className="relative z-[1]">
-          <FaqAccordion content={telemetryQualityFaq} inset="guide" />
+          <FaqAccordion content={telemetryQualityFaq} inset="guide" startClosed />
           <RelatedReading {...telemetryQualityReading} inset="guide" />
         </div>
       </div>
