@@ -1490,6 +1490,8 @@ html.tb-lock body {
 
 .tb-sample {
   display: flex;
+  flex: 1 1 auto;
+  height: 780px;
   max-height: 780px;
   min-height: 0;
   flex-direction: column;
@@ -1539,9 +1541,11 @@ html.tb-lock body {
   font-size: 40px;
   font-weight: 700;
   line-height: 1.2;
+  text-wrap: pretty;
 }
 
 .tb-sample-data {
+  flex: 1 1 auto;
   min-height: 0;
   zoom: 1.32;
   mask-image: linear-gradient(#000 60%, #0000);
@@ -1871,6 +1875,7 @@ html.tb-lock body {
 }
 
 .tb-data-inner .tgp-window {
+  flex: auto;
   border-color: #faf9f029;
   background: #011609eb;
   box-shadow: 0 32px 80px #00000073;
@@ -2110,10 +2115,12 @@ html.tb-lock body {
 @keyframes tbPulse {
   0%,
   100% {
-    box-shadow: 0 0 0 0 #e3e27000;
+    box-shadow: 0 0 #e3e27000;
   }
   50% {
-    box-shadow: 0 0 40px #e3e27073;
+    box-shadow:
+      0 0 0 14px #e3e2701f,
+      0 0 48px #e3e27059;
   }
 }
 

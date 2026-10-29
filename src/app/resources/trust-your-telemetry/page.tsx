@@ -85,7 +85,7 @@ export default function TrustGamePage() {
           </div>
         </section>
       </PageBody>
-      <FaqAccordion content={trustGameFaq} />
+      <FaqAccordion content={trustGameFaq} startClosed />
       <SiteCta content={trustGameCta} />
     </>
   );
