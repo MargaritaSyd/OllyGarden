@@ -1,4 +1,8 @@
-import { agentNotFoundMarkdown, getAgentMarkdown } from "@/lib/agent-content";
+import {
+  agentNotFoundMarkdown,
+  agentPageRedirect,
+  getAgentMarkdown,
+} from "@/lib/agent-content";
 import { getAbsoluteUrl } from "@/lib/site";
 
 const headers = {
@@ -20,6 +24,18 @@ async function respond(
   const { slug } = await context.params;
   const path = originalPath(slug);
   const markdown = await getAgentMarkdown(path, request.url);
+  if (!markdown) {
+    const destination = await agentPageRedirect(path, request.url);
+    if (destination) {
+      return new Response(null, {
+        status: 308,
+        headers: {
+          ...headers,
+          Location: destination === "/" ? "/index.md" : `${destination}.md`,
+        },
+      });
+    }
+  }
   const body =
     request.method === "HEAD"
       ? null

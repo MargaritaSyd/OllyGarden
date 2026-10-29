@@ -1,0 +1,331 @@
+<p>Traces tell you which request was slow. Metrics tell you that CPU usage went up. Neither tells you which function burned the CPU. That question belongs to profiles, the fourth OpenTelemetry signal, which entered public Alpha in March 2026. The OpenTelemetry eBPF profiler answers it for every process on a Linux node without touching application code, and it now ships as a regular Collector distribution.</p>
+<p>At OllyGarden, we continuously profile our own Go services, and we recently moved that setup to OpenTelemetry profiling. We did it for two reasons. It shows us, function by function, where our running services spend their CPU, and it is the best way we know to build practical knowledge of an emerging technology before we advise anyone else on it. This post collects some of what we learned in the process, and shows how you can get the same result on your own machine.</p>
+<p>One caution before you start: profiling in OpenTelemetry is still Alpha, and not every observability vendor can ingest OpenTelemetry Protocol (OTLP) profiles yet. That includes most of the platforms that market themselves as &quot;OTel-native&quot;. Check that your backend accepts the signal before planning anything beyond a local experiment.</p>
+<p>The fastest way to understand what profiling gives you is to run it. This post sets up the smallest working pipeline we know of: a local kind cluster, the eBPF profiler as a DaemonSet, and Grafana&#39;s all-in-one otel-lgtm image as the backend. Plain <code>kubectl apply</code>, no Helm, no custom images, about ten minutes end to end. Along the way we cover the one setting kind needs that a cloud cluster does not, because that is where most first attempts stall.</p>
+<h2>What we are building</h2>
+<p>The eBPF profiler runs as one pod per node and samples the stacks of every process on that node. Its <code>k8s_attributes</code> processor matches each process to its pod through the container ID and adds the namespace, pod, deployment, and <code>service.name</code>. The profiler then exports OTLP profiles over gRPC to the otel-lgtm container, whose own Collector forwards them to Pyroscope, and Grafana renders them as flame graphs.</p>
+<figure class="post-flow" aria-label="Profiling pipeline on a kind cluster">
+  <ol>
+    <li><strong>kind node</strong> <span>Every process on the node</span></li>
+    <li data-emphasis><strong>eBPF profiler</strong> <span>DaemonSet, adds Kubernetes metadata</span></li>
+    <li><strong>otel-lgtm Collector</strong> <span>OTLP over gRPC on port 4317</span></li>
+    <li><strong>Pyroscope</strong> <span>Stores the profiles</span></li>
+    <li><strong>Grafana</strong> <span>Renders flame graphs</span></li>
+  </ol>
+  <figcaption>The profiler samples every process on the node, enriches each profile with pod metadata, and exports it over OTLP to otel-lgtm, whose Collector forwards it to Pyroscope for Grafana to query.</figcaption>
+</figure>
+
+<p>We pin the profiler to <code>otel/opentelemetry-collector-ebpf-profiler:0.163.2</code> and the backend to <code>grafana/otel-lgtm:0.38.1</code>. The version choice is deliberate. The OTLP profiles protocol is still in Development, and otel-lgtm 0.38.1 runs Collector 0.163.2 internally, so matching the profiler to it avoids any wire-format surprises between the two. When you upgrade one, upgrade the other.</p>
+<p>You need Docker, kind, and kubectl on a Linux machine with kernel 5.10 or newer. The profiler loads eBPF programs into the kernel the containers share, so macOS and Windows hosts work only through a Linux VM such as the one Docker Desktop runs.</p>
+<h2>Create the cluster and the backend</h2>
+<p>The cluster needs nothing special:</p>
+<pre data-title="kind.yaml"><code class="hljs language-yaml"><span class="hljs-attr">kind:</span> <span class="hljs-string">Cluster</span>
+<span class="hljs-attr">apiVersion:</span> <span class="hljs-string">kind.x-k8s.io/v1alpha4</span>
+<span class="hljs-attr">name:</span> <span class="hljs-string">otel-profiling</span>
+</code></pre><pre><code class="hljs language-bash">kind create cluster --config kind.yaml
+</code></pre><p>kind names the kubeconfig context <code>kind-otel-profiling</code>. Every command below passes it explicitly, which is a good habit on any machine that talks to more than one cluster.</p>
+<p>The backend is a trimmed version of the manifest in the otel-lgtm repository, pinned to a release instead of <code>latest</code> and exposing only Grafana and the OTLP ports:</p>
+<pre data-title="lgtm.yaml"><code class="hljs language-yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">Namespace</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">observability</span>
+<span class="hljs-meta">---</span>
+<span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">Service</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">lgtm</span>
+  <span class="hljs-attr">namespace:</span> <span class="hljs-string">observability</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">selector:</span>
+    <span class="hljs-attr">app:</span> <span class="hljs-string">lgtm</span>
+  <span class="hljs-attr">ports:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">grafana</span>
+      <span class="hljs-attr">port:</span> <span class="hljs-number">3000</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">otlp-grpc</span>
+      <span class="hljs-attr">port:</span> <span class="hljs-number">4317</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">otlp-http</span>
+      <span class="hljs-attr">port:</span> <span class="hljs-number">4318</span>
+<span class="hljs-meta">---</span>
+<span class="hljs-attr">apiVersion:</span> <span class="hljs-string">apps/v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">Deployment</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">lgtm</span>
+  <span class="hljs-attr">namespace:</span> <span class="hljs-string">observability</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">replicas:</span> <span class="hljs-number">1</span>
+  <span class="hljs-attr">selector:</span>
+    <span class="hljs-attr">matchLabels:</span>
+      <span class="hljs-attr">app:</span> <span class="hljs-string">lgtm</span>
+  <span class="hljs-attr">template:</span>
+    <span class="hljs-attr">metadata:</span>
+      <span class="hljs-attr">labels:</span>
+        <span class="hljs-attr">app:</span> <span class="hljs-string">lgtm</span>
+    <span class="hljs-attr">spec:</span>
+      <span class="hljs-attr">containers:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">lgtm</span>
+          <span class="hljs-attr">image:</span> <span class="hljs-string">grafana/otel-lgtm:0.38.1</span>
+          <span class="hljs-attr">ports:</span>
+            <span class="hljs-bullet">-</span> <span class="hljs-attr">containerPort:</span> <span class="hljs-number">3000</span>
+            <span class="hljs-bullet">-</span> <span class="hljs-attr">containerPort:</span> <span class="hljs-number">4317</span>
+            <span class="hljs-bullet">-</span> <span class="hljs-attr">containerPort:</span> <span class="hljs-number">4318</span>
+          <span class="hljs-attr">readinessProbe:</span>
+            <span class="hljs-attr">exec:</span>
+              <span class="hljs-attr">command:</span> [<span class="hljs-string">cat</span>, <span class="hljs-string">/tmp/ready</span>]
+</code></pre><pre><code class="hljs language-bash">kubectl --context kind-otel-profiling apply -f lgtm.yaml
+kubectl --context kind-otel-profiling -n observability rollout status deploy/lgtm --<span class="hljs-built_in">timeout</span>=5m
+</code></pre><p>The otel-lgtm Collector already starts with the <code>service.profilesSupport</code> feature gate and has a <code>profiles</code> pipeline from its OTLP receiver to Pyroscope, so there is nothing to configure on this side.</p>
+<h2>Deploy something worth profiling</h2>
+<p>An idle cluster produces flame graphs full of kubelet and containerd. To see what the profiler does for an application, deploy one that spends its CPU somewhere recognizable. This one is a Python &quot;checkout&quot; service with two expensive steps, a recursive pricing rule and a receipt signature that hashes in a loop:</p>
+<pre data-title="checkout.yaml"><code class="hljs language-yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">Namespace</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">shop</span>
+<span class="hljs-meta">---</span>
+<span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">ConfigMap</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">checkout</span>
+  <span class="hljs-attr">namespace:</span> <span class="hljs-string">shop</span>
+<span class="hljs-attr">data:</span>
+  <span class="hljs-attr">app.py:</span> <span class="hljs-string">|
+    import hashlib
+    import time
+</span>
+
+    <span class="hljs-attr">def apply_discounts(items):</span>
+        <span class="hljs-comment"># Naive recursion stands in for an expensive pricing rule.</span>
+        <span class="hljs-attr">def tier(n):</span>
+            <span class="hljs-string">return</span> <span class="hljs-string">n</span> <span class="hljs-string">if</span> <span class="hljs-string">n</span> <span class="hljs-string">&lt;</span> <span class="hljs-number">2</span> <span class="hljs-string">else</span> <span class="hljs-string">tier(n</span> <span class="hljs-bullet">-</span> <span class="hljs-number">1</span><span class="hljs-string">)</span> <span class="hljs-string">+</span> <span class="hljs-string">tier(n</span> <span class="hljs-bullet">-</span> <span class="hljs-number">2</span><span class="hljs-string">)</span>
+        <span class="hljs-string">return</span> <span class="hljs-string">sum(tier(18</span> <span class="hljs-string">+</span> <span class="hljs-string">item</span> <span class="hljs-string">%</span> <span class="hljs-number">4</span><span class="hljs-string">)</span> <span class="hljs-string">for</span> <span class="hljs-string">item</span> <span class="hljs-string">in</span> <span class="hljs-string">items)</span>
+
+
+    <span class="hljs-attr">def sign_receipt(order_id):</span>
+        <span class="hljs-string">digest</span> <span class="hljs-string">=</span> <span class="hljs-string">str(order_id).encode()</span>
+        <span class="hljs-attr">for _ in range(5000):</span>
+            <span class="hljs-string">digest</span> <span class="hljs-string">=</span> <span class="hljs-string">hashlib.sha256(digest).digest()</span>
+        <span class="hljs-string">return</span> <span class="hljs-string">digest.hex()</span>
+
+
+    <span class="hljs-attr">def handle_order(order_id):</span>
+        <span class="hljs-string">items</span> <span class="hljs-string">=</span> <span class="hljs-string">range(order_id</span> <span class="hljs-string">%</span> <span class="hljs-number">5</span> <span class="hljs-string">+</span> <span class="hljs-number">1</span><span class="hljs-string">)</span>
+        <span class="hljs-string">apply_discounts(items)</span>
+        <span class="hljs-string">sign_receipt(order_id)</span>
+
+
+    <span class="hljs-string">order_id</span> <span class="hljs-string">=</span> <span class="hljs-number">0</span>
+    <span class="hljs-attr">while True:</span>
+        <span class="hljs-attr">for _ in range(20):</span>
+            <span class="hljs-string">order_id</span> <span class="hljs-string">+=</span> <span class="hljs-number">1</span>
+            <span class="hljs-string">handle_order(order_id)</span>
+        <span class="hljs-string">time.sleep(0.1)</span>
+<span class="hljs-meta">---</span>
+<span class="hljs-attr">apiVersion:</span> <span class="hljs-string">apps/v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">Deployment</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">checkout</span>
+  <span class="hljs-attr">namespace:</span> <span class="hljs-string">shop</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">replicas:</span> <span class="hljs-number">1</span>
+  <span class="hljs-attr">selector:</span>
+    <span class="hljs-attr">matchLabels:</span>
+      <span class="hljs-attr">app:</span> <span class="hljs-string">checkout</span>
+  <span class="hljs-attr">template:</span>
+    <span class="hljs-attr">metadata:</span>
+      <span class="hljs-attr">labels:</span>
+        <span class="hljs-attr">app:</span> <span class="hljs-string">checkout</span>
+    <span class="hljs-attr">spec:</span>
+      <span class="hljs-attr">containers:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">checkout</span>
+          <span class="hljs-attr">image:</span> <span class="hljs-string">python:3.13-slim</span>
+          <span class="hljs-attr">command:</span> [<span class="hljs-string">python</span>, <span class="hljs-string">-u</span>, <span class="hljs-string">/app/app.py</span>]
+          <span class="hljs-attr">resources:</span>
+            <span class="hljs-attr">requests:</span>
+              <span class="hljs-attr">cpu:</span> <span class="hljs-string">100m</span>
+              <span class="hljs-attr">memory:</span> <span class="hljs-string">64Mi</span>
+            <span class="hljs-attr">limits:</span>
+              <span class="hljs-attr">cpu:</span> <span class="hljs-string">500m</span>
+              <span class="hljs-attr">memory:</span> <span class="hljs-string">128Mi</span>
+          <span class="hljs-attr">volumeMounts:</span>
+            <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">app</span>
+              <span class="hljs-attr">mountPath:</span> <span class="hljs-string">/app</span>
+      <span class="hljs-attr">volumes:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">app</span>
+          <span class="hljs-attr">configMap:</span>
+            <span class="hljs-attr">name:</span> <span class="hljs-string">checkout</span>
+</code></pre><pre><code class="hljs language-bash">kubectl --context kind-otel-profiling apply -f checkout.yaml
+</code></pre><p>Note what is missing: no SDK, no agent, no environment variables. The service has no idea it is about to be profiled.</p>
+<h2>Deploy the eBPF profiler</h2>
+<p>Here is the complete profiler manifest. The sections after it walk through each part.</p>
+<pre data-title="profiler.yaml"><code class="hljs language-yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">Namespace</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">profiling</span>
+<span class="hljs-meta">---</span>
+<span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">ServiceAccount</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">otel-ebpf-profiler</span>
+  <span class="hljs-attr">namespace:</span> <span class="hljs-string">profiling</span>
+<span class="hljs-meta">---</span>
+<span class="hljs-attr">apiVersion:</span> <span class="hljs-string">rbac.authorization.k8s.io/v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">ClusterRole</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">otel-ebpf-profiler</span>
+<span class="hljs-attr">rules:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> [<span class="hljs-string">&quot;&quot;</span>]
+    <span class="hljs-attr">resources:</span> [<span class="hljs-string">pods</span>, <span class="hljs-string">namespaces</span>]
+    <span class="hljs-attr">verbs:</span> [<span class="hljs-string">get</span>, <span class="hljs-string">list</span>, <span class="hljs-string">watch</span>]
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> [<span class="hljs-string">apps</span>]
+    <span class="hljs-attr">resources:</span> [<span class="hljs-string">replicasets</span>]
+    <span class="hljs-attr">verbs:</span> [<span class="hljs-string">get</span>, <span class="hljs-string">list</span>, <span class="hljs-string">watch</span>]
+<span class="hljs-meta">---</span>
+<span class="hljs-attr">apiVersion:</span> <span class="hljs-string">rbac.authorization.k8s.io/v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">ClusterRoleBinding</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">otel-ebpf-profiler</span>
+<span class="hljs-attr">roleRef:</span>
+  <span class="hljs-attr">apiGroup:</span> <span class="hljs-string">rbac.authorization.k8s.io</span>
+  <span class="hljs-attr">kind:</span> <span class="hljs-string">ClusterRole</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">otel-ebpf-profiler</span>
+<span class="hljs-attr">subjects:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">kind:</span> <span class="hljs-string">ServiceAccount</span>
+    <span class="hljs-attr">name:</span> <span class="hljs-string">otel-ebpf-profiler</span>
+    <span class="hljs-attr">namespace:</span> <span class="hljs-string">profiling</span>
+<span class="hljs-meta">---</span>
+<span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">ConfigMap</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">otel-ebpf-profiler</span>
+  <span class="hljs-attr">namespace:</span> <span class="hljs-string">profiling</span>
+<span class="hljs-attr">data:</span>
+  <span class="hljs-attr">config.yaml:</span> <span class="hljs-string">|
+    receivers:
+      profiling:
+        # kind nodes are containers: pods live in nested PID namespaces.
+        pid_namespace_translation_mode: auto
+    processors:
+      memory_limiter:
+        check_interval: 1s
+        limit_mib: 800
+        spike_limit_mib: 200
+      k8s_attributes:
+        filter:
+          node_from_env_var: K8S_NODE_NAME
+        pod_association:
+          - sources:
+              - from: resource_attribute
+                name: container.id
+        extract:
+          metadata:
+            - k8s.namespace.name
+            - k8s.pod.name
+            - k8s.deployment.name
+            - k8s.node.name
+            - k8s.container.name
+            - service.name
+      resource:
+        attributes:
+          - key: k8s.cluster.name
+            value: kind-otel-profiling
+            action: upsert
+    exporters:
+      debug:
+        verbosity: basic
+      otlp_grpc:
+        endpoint: lgtm.observability.svc:4317
+        tls:
+          insecure: true
+    service:
+      pipelines:
+        profiles:
+          receivers: [profiling]
+          processors: [memory_limiter, k8s_attributes, resource]
+          exporters: [otlp_grpc, debug]
+</span><span class="hljs-meta">---</span>
+<span class="hljs-attr">apiVersion:</span> <span class="hljs-string">apps/v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">DaemonSet</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">otel-ebpf-profiler</span>
+  <span class="hljs-attr">namespace:</span> <span class="hljs-string">profiling</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">selector:</span>
+    <span class="hljs-attr">matchLabels:</span>
+      <span class="hljs-attr">app.kubernetes.io/name:</span> <span class="hljs-string">otel-ebpf-profiler</span>
+  <span class="hljs-attr">template:</span>
+    <span class="hljs-attr">metadata:</span>
+      <span class="hljs-attr">labels:</span>
+        <span class="hljs-attr">app.kubernetes.io/name:</span> <span class="hljs-string">otel-ebpf-profiler</span>
+    <span class="hljs-attr">spec:</span>
+      <span class="hljs-attr">serviceAccountName:</span> <span class="hljs-string">otel-ebpf-profiler</span>
+      <span class="hljs-attr">hostPID:</span> <span class="hljs-literal">true</span>
+      <span class="hljs-attr">tolerations:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">operator:</span> <span class="hljs-string">Exists</span>
+      <span class="hljs-attr">containers:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">profiler</span>
+          <span class="hljs-attr">image:</span> <span class="hljs-string">otel/opentelemetry-collector-ebpf-profiler:0.163.2</span>
+          <span class="hljs-attr">args:</span>
+            <span class="hljs-bullet">-</span> <span class="hljs-string">--config=/conf/config.yaml</span>
+            <span class="hljs-bullet">-</span> <span class="hljs-string">--feature-gates=+service.profilesSupport</span>
+          <span class="hljs-attr">env:</span>
+            <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">K8S_NODE_NAME</span>
+              <span class="hljs-attr">valueFrom:</span>
+                <span class="hljs-attr">fieldRef:</span>
+                  <span class="hljs-attr">fieldPath:</span> <span class="hljs-string">spec.nodeName</span>
+          <span class="hljs-attr">securityContext:</span>
+            <span class="hljs-attr">privileged:</span> <span class="hljs-literal">true</span>
+          <span class="hljs-attr">resources:</span>
+            <span class="hljs-attr">requests:</span>
+              <span class="hljs-attr">cpu:</span> <span class="hljs-string">100m</span>
+              <span class="hljs-attr">memory:</span> <span class="hljs-string">256Mi</span>
+            <span class="hljs-attr">limits:</span>
+              <span class="hljs-attr">memory:</span> <span class="hljs-string">1Gi</span>
+          <span class="hljs-attr">volumeMounts:</span>
+            <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">conf</span>
+              <span class="hljs-attr">mountPath:</span> <span class="hljs-string">/conf</span>
+            <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">tracefs</span>
+              <span class="hljs-attr">mountPath:</span> <span class="hljs-string">/sys/kernel/tracing</span>
+      <span class="hljs-attr">volumes:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">conf</span>
+          <span class="hljs-attr">configMap:</span>
+            <span class="hljs-attr">name:</span> <span class="hljs-string">otel-ebpf-profiler</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">tracefs</span>
+          <span class="hljs-attr">hostPath:</span>
+            <span class="hljs-attr">path:</span> <span class="hljs-string">/sys/kernel/tracing</span>
+</code></pre><pre><code class="hljs language-bash">kubectl --context kind-otel-profiling apply -f profiler.yaml
+kubectl --context kind-otel-profiling -n profiling rollout status ds/otel-ebpf-profiler
+</code></pre><h3>What the profiler needs from the node</h3>
+<p>The profiler is not a normal workload. It loads eBPF programs and reads the memory maps of processes it does not own, so it runs <code>privileged</code> with <code>hostPID: true</code>. It also needs tracefs at <code>/sys/kernel/tracing</code> to attach its scheduler tracepoints, and a container gets a fresh <code>/sys</code> without it, which is why the manifest mounts it from the host. The toleration lets it run on every node, including tainted control-plane nodes, since a profiler that skips nodes leaves blind spots.</p>
+<h3>The pipeline</h3>
+<p>The <code>profiles</code> pipeline reads like any other Collector pipeline, with a few profile-specific details. The <code>--feature-gates=+service.profilesSupport</code> argument is mandatory; without it the Collector refuses to start a <code>profiles</code> pipeline at all. <code>memory_limiter</code> uses absolute <code>limit_mib</code> values on purpose: in a privileged pod with the host PID namespace, percentage limits resolve against the node&#39;s memory rather than the container limit. There is no <code>batch</code> processor, because it does not support profiles yet, and the receiver already batches on its own reporting interval.</p>
+<p><code>k8s_attributes</code> does the work that makes the data useful. The profiler sees processes, not pods, so the processor associates each one with a pod through <code>container.id</code> instead of the usual pod IP, and only watches pods on its own node. It then derives <code>service.name</code> from the workload, which is how the Python process above shows up as <code>checkout</code> instead of <code>python3.13</code>. Deriving the deployment name goes through the owning ReplicaSet, hence the extra RBAC rule.</p>
+<p>The <code>debug</code> exporter is there for the first run. Once the data shows up in Grafana, remove it.</p>
+<h3>What is different on kind</h3>
+<p>One setting in the manifest exists only because kind nodes are themselves Docker containers: <code>pid_namespace_translation_mode: auto</code>. On EKS, GKE, AKS, or a bare-metal kubelet, you can drop it. With <code>hostPID: true</code> on a real node, the profiler lands in the kernel&#39;s root PID namespace and sees every process with the PIDs the kernel uses. On kind, &quot;host&quot; means the node container, which is already one level down, and pods sit in namespaces below that. Without translation, the receiver fails at startup and the pod restarts in a loop:</p>
+<pre data-title="Profiler log"><code class="hljs language-plaintext">Error: cannot start pipelines: failed to start &quot;profiling&quot; receiver: failed to load eBPF tracer: failed to load eBPF code: failed to set RODATA variables: failed to determine system configs: system analysis request was not handled for pid 3553 at 0x20
+</code></pre><p>The <code>auto</code> mode, available since ebpf-profiler <code>v0.0.202640</code> (Collector distribution 0.163.0), translates PIDs for the profiler&#39;s namespace and its descendants.</p>
+<!-- cta -->
+
+<h2>Verify that profiles flow</h2>
+<p>Start with the profiler logs:</p>
+<pre><code class="hljs language-bash">kubectl --context kind-otel-profiling -n profiling logs ds/otel-ebpf-profiler -c profiler
+</code></pre><p>A healthy start logs <code>eBPF tracer loaded</code>, <code>Attached sched monitor</code>, and <code>Everything is ready</code>. After that, the <code>debug</code> exporter prints a line per reporting interval. The counts to look for are at the end:</p>
+<pre data-title="Profiler log"><code class="hljs language-plaintext">2026-10-28T15:33:28.449Z	info	Profiles	{&quot;resource&quot;: {&quot;service.instance.id&quot;: &quot;af5b5329-cfcc-4a66-9589-3211bc8758ad&quot;, &quot;service.name&quot;: &quot;otelcol-ebpf-profiler&quot;, &quot;service.version&quot;: &quot;0.163.2&quot;}, &quot;otelcol.component.id&quot;: &quot;debug&quot;, &quot;otelcol.component.kind&quot;: &quot;exporter&quot;, &quot;otelcol.signal&quot;: &quot;profiles&quot;, &quot;resource profiles&quot;: 6, &quot;sample records&quot;: 37}
+</code></pre><p>No lines, or zero counts, mean the receiver is not producing anything, and the error above them usually says why. Counts above zero mean data is leaving the node.</p>
+<p>Then open Grafana:</p>
+<pre><code class="hljs language-bash">kubectl --context kind-otel-profiling -n observability port-forward svc/lgtm 3000:3000
+</code></pre><p>Browse to <code>http://localhost:3000</code>, open <strong>Drilldown &gt; Profiles</strong>, and select the <strong>Flame graph</strong> tab. The <code>checkout</code> service and the <code>process_cpu/cpu</code> profile type should already be selected; if not, pick them from the dropdowns at the top. The flame graph shows <code>handle_order</code> splitting its time between <code>apply_discounts</code>, with the recursive <code>tier</code> calls stacked on top of it, and <code>sign_receipt</code>, where the hashing loop runs. In our run, <code>sign_receipt</code> took about 56% of the CPU time and <code>tier</code> about 44%. Those are Python function names from an unmodified interpreter: the profiler unwinds the CPython stack itself, as it does for Java, Node.js, Ruby, .NET, and others, while native code such as Go is symbolized directly.</p>
+<p><img src="https://ollygarden.com/blog-images/opentelemetry-profiling-on-a-local-kubernetes-cluster/flamegraph.png" alt="Flame graph of the checkout service in Grafana"></p>
+<p>The other services in the list are the rest of the node: the control plane pods (<code>etcd</code>, <code>kube-apiserver</code>, <code>coredns</code>), the otel-lgtm components, the profiler itself, the containerd shims, and the processes that run outside any pod, which have no <code>service.name</code> and appear as <code>unknown_service:kubelet</code> and <code>unknown_service:containerd</code>. Pod processes carry <code>k8s.namespace.name</code>, <code>k8s.deployment.name</code>, and the rest of the attributes from <code>k8s_attributes</code>. Pyroscope keeps their dotted names, so filter with quoted labels such as <code>{&quot;k8s.namespace.name&quot;=&quot;shop&quot;}</code>.</p>
+<p>When you are done, delete the cluster, which removes everything this post created:</p>
+<pre><code class="hljs language-bash">kind delete cluster --name otel-profiling
+</code></pre><h2>Limitations, and when not to do it this way</h2>
+<p>This setup is for learning and for local experiments, and a few of its choices do not carry over to production.</p>
+<p>The profiler profiles every process on the node. It has no process, container, or namespace selection, and upstream has declined to add one. Keeping only some workloads means dropping the rest after <code>k8s_attributes</code> with the <code>filter</code> processor&#39;s <code>profile_conditions</code>. The <code>otelcol-ebpf-profiler</code> distribution does not include <code>filter</code>, so production setups either build their own distribution with it or relay through a gateway Collector that has it. Sampling cost on the node stays the same either way; only the exported volume shrinks.</p>
+<p>otel-lgtm keeps everything in memory-backed volumes in a single container. It is a demo backend, and Grafana says so. For anything persistent, send profiles to a real Pyroscope deployment or to Grafana Cloud Profiles, which accepts OTLP profiles over gRPC.</p>
+<p>The signal itself is Alpha. The OTLP profiles protocol is in Development, the <code>profiling</code> receiver is in Development, and the feature gate is alpha. Expect breaking changes between releases, which is why every image here is pinned and why the profiler and the backend&#39;s Collector are kept on the same version.</p>
+<h2>Let your coding agent do the setup</h2>
+<p>Most of the work in this post was not writing YAML. It was knowing which image version has which receiver key, that kind needs PID namespace translation, that <code>batch</code> does not support profiles, that <code>memory_limiter</code> percentages lie in a privileged pod, and which error message points at which of those. That knowledge changes with every profiler release.</p>
+<p>The <code>otel-profiles</code> skill in our open source OllyGarden Agent Skills for OpenTelemetry packages exactly that. With it, a coding agent such as Claude Code, Cursor, or Codex can pick a consistent set of versions, detect a local cluster like kind and apply the right changes, validate the configuration against the pinned image before deploying, read the <code>debug</code> output to confirm data is flowing, and map an error string to its fix. It automates and validates most of the steps in this post, and it stays current as the profiler evolves.</p>
+<p>Install all the skills with one command:</p>
+<pre><code class="hljs language-bash">npx skills add https://github.com/ollygarden/opentelemetry-agent-skills
+</code></pre><p>If the skills save you time, star the repository at <a href="https://github.com/ollygarden/opentelemetry-agent-skills">github.com/ollygarden/opentelemetry-agent-skills</a>, and open an issue when they get something wrong. That feedback is what keeps them accurate.</p>

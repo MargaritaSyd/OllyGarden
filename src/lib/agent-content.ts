@@ -6,6 +6,7 @@ import { caseStudiesMeta } from "@/lib/case-studies";
 import { caseStudyMarkdown } from "@/lib/case-study-markdown";
 import { htmlTextContent, htmlToMarkdown } from "@/lib/html-to-markdown";
 import { instrumentationScoreMeta } from "@/lib/instrumentation-score";
+import { kubeconNa2026Meta } from "@/lib/kubecon-na-2026";
 import { legalPages } from "@/lib/legal";
 import { telemetryQualityMeta } from "@/lib/telemetry-quality";
 import { quizMeta } from "@/lib/quiz/topics";
@@ -83,6 +84,10 @@ const agentPages: Record<string, AgentPage> = {
     title: "Events",
     description: "Meet OllyGarden at observability and OpenTelemetry events.",
   },
+  [kubeconNa2026Meta.path]: {
+    title: kubeconNa2026Meta.title,
+    description: kubeconNa2026Meta.description,
+  },
   "/resources/faq": {
     title: "Frequently Asked Questions",
     description: "Answers about OllyGarden products, privacy, and pricing.",
@@ -117,16 +122,6 @@ const agentPages: Record<string, AgentPage> = {
     description:
       "Build OllyGarden's first enterprise sales motion in the United States.",
   },
-  "/careers/chief-of-staff": {
-    title: "Chief of Staff",
-    description:
-      "Run OllyGarden's operating cadence, board and investor operations, and finance, reporting to the CEO. Remote, CET hours, full-time.",
-  },
-  "/careers/ai-software-engineer": {
-    title: "AI Software Engineer",
-    description:
-      "Build Rose, OllyGarden's AI agent for OpenTelemetry instrumentation, and own our open source agent skills. Remote, Europe or Latin America, full-time.",
-  },
 };
 
 const markdownAliases: Record<string, string> = {
@@ -142,20 +137,42 @@ function staticMarkdown(path: string, page: AgentPage) {
   return `# ${page.title}\n\n${page.description}\n\nCanonical URL: ${getAbsoluteUrl(path)}${extras}\n\n## Agent resources\n\n- [Developer resources](${getAbsoluteUrl("/developers.md")})\n- [LLM index](${getAbsoluteUrl("/llms.txt")})\n- [Sitemap](${getAbsoluteUrl("/sitemap.xml")})`;
 }
 
+// Redirects are not followed: a redirected path is not a page, and following
+// it would label the destination's content with this path as canonical.
+async function fetchOwnPage(path: string, requestUrl: string) {
+  // Encoded slashes in the slug can turn the path into `//host`, which
+  // resolves off-site; only ever re-render this site's own pages.
+  const target = new URL(path, requestUrl);
+  if (target.origin !== new URL(requestUrl).origin) return null;
+  return fetch(target, {
+    cache: "no-store",
+    redirect: "manual",
+    headers: {
+      Accept: "text/html",
+      "X-OllyGarden-Markdown-Source": "1",
+    },
+  });
+}
+
+/** The same-origin path that `path` redirects to, or null. */
+export async function agentPageRedirect(path: string, requestUrl: string) {
+  try {
+    const response = await fetchOwnPage(path, requestUrl);
+    const location = response?.headers.get("location");
+    if (!location || response!.status < 300 || response!.status > 399) {
+      return null;
+    }
+    const target = new URL(location, requestUrl);
+    return target.origin === new URL(requestUrl).origin ? target.pathname : null;
+  } catch {
+    return null;
+  }
+}
+
 async function renderedPageMarkdown(path: string, requestUrl: string) {
   try {
-    // Encoded slashes in the slug can turn the path into `//host`, which
-    // resolves off-site; only ever re-render this site's own pages.
-    const target = new URL(path, requestUrl);
-    if (target.origin !== new URL(requestUrl).origin) return null;
-    const response = await fetch(target, {
-      cache: "no-store",
-      headers: {
-        Accept: "text/html",
-        "X-OllyGarden-Markdown-Source": "1",
-      },
-    });
-    if (!response.ok) return null;
+    const response = await fetchOwnPage(path, requestUrl);
+    if (!response?.ok) return null;
     const html = await response.text();
     const main = html.match(/<main[^>]*>([\s\S]*?)<\/main>/i)?.[1];
     if (!main) return null;

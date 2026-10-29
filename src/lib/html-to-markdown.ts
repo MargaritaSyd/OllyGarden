@@ -1,3 +1,5 @@
+import { codeLanguage, codeTitle } from "./blog-code.ts";
+
 function decodeHtml(value: string) {
   return value
     .replaceAll("&nbsp;", " ")
@@ -30,10 +32,10 @@ export function htmlToMarkdown(html: string) {
   const markdown = html
     .replace(/<(script|style)[^>]*>[\s\S]*?<\/\1>/gi, "")
     .replace(
-      /<pre[^>]*><code[^>]*>([\s\S]*?)<\/code><\/pre>/gi,
-      (_, code: string) =>
+      /<pre([^>]*)><code([^>]*)>([\s\S]*?)<\/code><\/pre>/gi,
+      (_, preAttributes: string, attributes: string, code: string) =>
         preserve(
-          `\n\n\`\`\`\n${decodeHtml(code.replace(/<[^>]+>/g, ""))}\n\`\`\`\n\n`,
+          `\n\n\`\`\`${codeLanguage(attributes) ?? ""}${codeTitle(preAttributes) ? ` title="${codeTitle(preAttributes)}"` : ""}\n${decodeHtml(code.replace(/<[^>]+>/g, ""))}\n\`\`\`\n\n`,
         ),
     )
     .replace(/<table[^>]*>([\s\S]*?)<\/table>/gi, (_, table: string) => {

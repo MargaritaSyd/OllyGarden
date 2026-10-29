@@ -7,6 +7,7 @@ import {
   caseStudyHref,
 } from "@/lib/case-studies";
 import { instrumentationScoreMeta, specSource } from "@/lib/instrumentation-score";
+import { kubeconNa2026Meta } from "@/lib/kubecon-na-2026";
 import { legalPages } from "@/lib/legal";
 import { telemetryQualityMeta } from "@/lib/telemetry-quality";
 import { indexablePressReleases, pressReleaseHref } from "@/lib/press";
@@ -41,6 +42,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: getAbsoluteUrl("/resources/events"),
       changeFrequency: "weekly",
       priority: 0.8,
+    },
+    {
+      url: getAbsoluteUrl(kubeconNa2026Meta.path),
+      changeFrequency: "weekly",
+      priority: 0.7,
     },
     {
       url: getAbsoluteUrl("/resources/press-releases"),
@@ -140,18 +146,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       url: getAbsoluteUrl("/careers/founding-enterprise-account-executive"),
       lastModified: new Date("2026-08-31"),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: getAbsoluteUrl("/careers/chief-of-staff"),
-      lastModified: new Date("2026-10-27"),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: getAbsoluteUrl("/careers/ai-software-engineer"),
-      lastModified: new Date("2026-10-09"),
       changeFrequency: "monthly",
       priority: 0.8,
     },

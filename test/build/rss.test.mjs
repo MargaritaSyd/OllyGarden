@@ -113,6 +113,7 @@ for (const [source, destination] of [
   ["/solutions", "/solutions/overview"],
   ["/solutions/retail", "/solutions/retail-ecommerce"],
   ["/kubecon-eu-2026", "/resources/blog/ollygarden-at-kubecon-eu-2026"],
+  ["/kubecon-na-2026", "/resources/events/kubecon-na-2026"],
   ["/press", "/resources/press-releases"],
   [
     "/press/portel-april-2026",
@@ -128,7 +129,9 @@ for (const [source, destination] of [
   ["/resources/trust-game", "/resources/trust-your-telemetry"],
   ["/resources/trust-game/booth", "/resources/trust-your-telemetry/booth"],
   ["/careers/engineering-manager", "/careers"],
-  ["/careers/executive-assistant", "/careers/chief-of-staff"],
+  ["/careers/executive-assistant", "/careers"],
+  ["/careers/chief-of-staff", "/careers"],
+  ["/careers/ai-software-engineer", "/careers"],
 ]) {
   test(`${source} redirects permanently to ${destination}`, async () => {
     const response = await fetch(`${origin}${source}`, { redirect: "manual" });
@@ -145,8 +148,6 @@ for (const [page, heading] of [
     "/careers/founding-enterprise-account-executive",
     "Founding Enterprise Account Executive",
   ],
-  ["/careers/chief-of-staff", "Chief of Staff"],
-  ["/careers/ai-software-engineer", "AI Software Engineer"],
   ["/privacy-policy", "Your rights"],
   ["/data-protection-policy", "Data Protection Policy"],
   ["/terms-of-use", "OllyGarden, Inc. Terms of Service"],
@@ -338,6 +339,23 @@ test("llms.txt lists every blog post and llms-full.txt includes their text", asy
   assert.doesNotMatch(full, /\*\*What is Tulip\?\*\*/);
   assert.doesNotMatch(index, /products\/tulip/);
   assert.ok(full.length > index.length * 5, "llms-full.txt should carry article text");
+});
+
+test("Markdown requests for redirected pages redirect to the destination's Markdown", async () => {
+  for (const [source, destination] of [
+    ["/careers/chief-of-staff", "/careers.md"],
+    ["/careers/ai-software-engineer", "/careers.md"],
+    ["/about", "/company.md"],
+  ]) {
+    for (const response of [
+      await fetch(`${origin}${source}.md`, { redirect: "manual" }),
+      await fetch(`${origin}/agent-content${source}.md`, { redirect: "manual" }),
+    ]) {
+      assert.equal(response.status, 308, source);
+      assert.equal(response.headers.get("location"), destination, source);
+      assert.match(response.headers.get("vary") ?? "", /Accept/, source);
+    }
+  }
 });
 
 test("unknown agent content returns a useful Markdown 404", async () => {

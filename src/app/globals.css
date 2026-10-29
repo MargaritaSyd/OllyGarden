@@ -3880,16 +3880,7 @@ body {
 }
 
 .post-richtext pre {
-  margin: 0 0 1.5rem;
   overflow-x: auto;
-  border: 1px solid rgb(227 226 112 / 0.4);
-  border-radius: 1rem;
-  background:
-    linear-gradient(rgb(0 20 8 / 0.82), rgb(0 20 8 / 0.82)),
-    var(--color-forest) url("/images/texture-grain.png") repeat;
-  background-size:
-    auto,
-    328px 140px;
   padding: 1.25rem;
   font-family: ui-monospace, "Cascadia Code", "Segoe UI Mono", monospace;
   font-size: 0.875rem;
@@ -3905,28 +3896,164 @@ body {
   color: inherit;
 }
 
-.post-richtext .hljs-comment,
-.post-richtext .hljs-quote {
-  color: rgb(221 227 216 / 0.58);
+.post-richtext .post-code {
+  margin: 0 0 1.5rem;
+  overflow: hidden;
+  border: 1px solid rgb(227 226 112 / 0.4);
+  border-radius: 1rem;
+  background:
+    linear-gradient(rgb(0 20 8 / 0.82), rgb(0 20 8 / 0.82)),
+    var(--color-forest) url("/images/texture-grain.png") repeat;
+  background-size:
+    auto,
+    328px 140px;
+}
+
+.post-richtext .post-code-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 2.75rem;
+  border-bottom: 1px solid rgb(227 226 112 / 0.2);
+  padding: 0 0.5rem 0 1.25rem;
+  font-family: ui-monospace, "Cascadia Code", "Segoe UI Mono", monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: rgb(221 227 216 / 0.7);
+}
+
+.post-richtext .post-code-copy {
+  border-radius: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  font: inherit;
+  color: var(--color-sunflower);
+  cursor: pointer;
+}
+
+.post-richtext .post-code-copy:hover {
+  background: rgb(227 226 112 / 0.1);
+}
+
+.post-richtext .post-code-copy:focus-visible,
+.post-richtext pre:focus-visible {
+  outline: 2px solid var(--color-sunflower);
+  outline-offset: -2px;
+}
+
+.post-richtext .post-code-status:not(:empty) {
+  display: block;
+  padding: 0 1.25rem 0.875rem;
+  font-size: 0.8125rem;
+  color: var(--color-mist);
+}
+
+/* Token roles: keys and keywords carry structure, values read as data, comments recede. */
+.post-richtext .hljs-attr,
+.post-richtext .hljs-selector-class {
+  color: var(--color-bitmap-highlight);
 }
 
 .post-richtext .hljs-keyword,
-.post-richtext .hljs-selector-tag,
+.post-richtext .hljs-built_in,
 .post-richtext .hljs-type,
-.post-richtext .hljs-literal,
-.post-richtext .hljs-built_in {
-  color: var(--color-bitmap-highlight);
+.post-richtext .hljs-function {
+  font-weight: 600;
+  color: var(--color-mist);
 }
 
 .post-richtext .hljs-string,
 .post-richtext .hljs-title,
-.post-richtext .hljs-attr,
-.post-richtext .hljs-attribute,
-.post-richtext .hljs-number,
-.post-richtext .hljs-bullet,
-.post-richtext .hljs-meta,
 .post-richtext .hljs-params {
-  color: var(--color-mist);
+  color: #9fdfb1;
+}
+
+.post-richtext .hljs-number,
+.post-richtext .hljs-literal,
+.post-richtext .hljs-variable {
+  color: var(--color-wrong-text);
+}
+
+.post-richtext .hljs-bullet,
+.post-richtext .hljs-meta {
+  color: #b7c23a;
+}
+
+.post-richtext .hljs-comment {
+  font-style: italic;
+  color: rgb(221 227 216 / 0.58);
+}
+
+/* A left-to-right flow of components; stacks vertically on narrow screens. */
+.post-richtext .post-flow {
+  margin: 0.5rem 0 2rem;
+}
+
+.post-richtext .post-flow ol {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 1.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.post-richtext .post-flow li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.375rem;
+  margin: 0;
+  border: 1px solid rgb(227 226 112 / 0.3);
+  border-radius: 1rem;
+  background: rgb(0 40 14 / 0.6);
+  padding: 1rem 0.75rem;
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: #a8a8a8;
+}
+
+.post-richtext .post-flow li[data-emphasis] {
+  border-color: var(--color-sunflower);
+}
+
+.post-richtext .post-flow li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: calc(50% - 0.3rem);
+  right: -1.15rem;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-top: 2px solid var(--color-bitmap-mid);
+  border-right: 2px solid var(--color-bitmap-mid);
+  transform: rotate(45deg);
+}
+
+.post-richtext .post-flow strong {
+  font-size: 0.9375rem;
+}
+
+.post-richtext .post-flow figcaption {
+  margin-top: 1rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: #a8a8a8;
+}
+
+@media (max-width: 720px) {
+  .post-richtext .post-flow ol {
+    grid-auto-flow: row;
+  }
+
+  .post-richtext .post-flow li:not(:last-child)::after {
+    top: auto;
+    right: calc(50% - 0.3rem);
+    bottom: -1.2rem;
+    transform: rotate(135deg);
+  }
 }
 
 .post-richtext blockquote {

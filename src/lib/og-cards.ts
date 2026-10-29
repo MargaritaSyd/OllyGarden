@@ -93,14 +93,6 @@ export const ogCards: Record<string, OgCard> = {
     headline: "Founding Enterprise *Account Executive*",
     body: "United States, remote, full-time. Build OllyGarden's first enterprise sales motion and turn what works into a repeatable playbook.",
   },
-  "/careers/chief-of-staff": {
-    headline: "Chief of *Staff*",
-    body: "Remote, CET hours, full-time. Run OllyGarden's operating cadence, board and investor operations, and finance on the way to our Series A.",
-  },
-  "/careers/ai-software-engineer": {
-    headline: "AI Software *Engineer*",
-    body: "Europe or Latin America, remote, full-time. Build Rose, our AI agent for OpenTelemetry instrumentation, and own our open source agent skills.",
-  },
   "/contact": {
     headline: "Let's talk about *your telemetry*",
     body: "Questions about Insights, Rose, the Instrumentation Score, or partnerships? Our team is ready to connect.",
@@ -116,6 +108,10 @@ export const ogCards: Record<string, OgCard> = {
   "/resources/events": {
     headline: "Meet us at the *next event*",
     body: "Where to find OllyGarden next: conferences, meetups, and community days.",
+  },
+  "/resources/events/kubecon-na-2026": {
+    headline: "Meet us at *KubeCon*\n*+ CloudNativeCon*\nNorth America 2026",
+    body: "Salt Lake City, November 9–12. Booth 356, two talks, and Observability Day.",
   },
   "/resources/webinars-conferences": {
     headline: "Webinars and *conference talks*",
@@ -215,6 +211,10 @@ export const ogCards: Record<string, OgCard> = {
   "/resources/blog/the-scrape-interval-nobody-chose": {
     headline: "The scrape interval *nobody chose*",
     body: "A wrong scrape interval inflates ingest, egress, and compute. Measure DPM and match intervals to the decisions each metric supports.",
+  },
+  "/resources/blog/opentelemetry-profiling-on-a-local-kubernetes-cluster": {
+    headline: "How to set up\n*OpenTelemetry*\nprofiling on kind",
+    body: "The eBPF profiler on a local Kubernetes cluster, flame graphs in Grafana, and no code changes.",
   },
   "/resources/blog/teach-your-coding-agent-opentelemetry": {
     headline: "Teach your coding agent *OpenTelemetry*",

@@ -8,6 +8,7 @@ import type {
   CollectionPage,
   ContactPage,
   DefinedTerm,
+  Event,
   FAQPage,
   Graph,
   NewsArticle,
@@ -39,6 +40,7 @@ import {
   type CaseStudy,
 } from "@/lib/case-studies";
 import { communityMeta } from "@/lib/community";
+import { kubeconNa2026Meta, kubeconNa2026Talks } from "@/lib/kubecon-na-2026";
 import { companyMeta } from "@/lib/company";
 import { contactMeta } from "@/lib/contact";
 import { careersMeta } from "@/lib/careers";
@@ -569,6 +571,69 @@ export function resourcesEventsGraph(): Graph {
   return {
     "@context": "https://schema.org",
     "@graph": [organizationSchema(), websiteSchema(), webPage, crumbs],
+  };
+}
+
+export function kubeconNa2026Graph(): Graph {
+  const url = getAbsoluteUrl(kubeconNa2026Meta.path);
+  const venue = {
+    "@type": "Place",
+    name: kubeconNa2026Meta.venue,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: kubeconNa2026Meta.city,
+      addressRegion: kubeconNa2026Meta.region,
+      addressCountry: kubeconNa2026Meta.country,
+    },
+  } as const;
+
+  const conference: Event = {
+    "@type": "Event",
+    "@id": `${url}#event`,
+    name: kubeconNa2026Meta.name,
+    startDate: kubeconNa2026Meta.startDate,
+    endDate: kubeconNa2026Meta.endDate,
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    eventStatus: "https://schema.org/EventScheduled",
+    location: venue,
+    url: kubeconNa2026Meta.scheduleHref,
+    subEvent: kubeconNa2026Talks.map((talk) => ({
+      "@type": "Event",
+      name: talk.title,
+      description: talk.summary,
+      startDate: talk.startsAt,
+      endDate: talk.endsAt,
+      eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+      eventStatus: "https://schema.org/EventScheduled",
+      location: { ...venue, name: `${kubeconNa2026Meta.venue}, ${talk.room}` },
+      url: talk.href,
+      performer: talk.speakers.map((speaker) => ({
+        "@type": "Person",
+        name: speaker.name,
+        worksFor: { "@type": "Organization", name: speaker.company },
+      })),
+    })),
+  };
+
+  const webPage: WebPage = {
+    "@type": "WebPage",
+    "@id": `${url}#webpage`,
+    url,
+    name: kubeconNa2026Meta.title,
+    description: kubeconNa2026Meta.description,
+    inLanguage: siteConfig.language,
+    isPartOf: { "@id": getAbsoluteUrl("/#website") },
+    about: { "@id": `${url}#event` },
+  };
+
+  const crumbs = crumbsFromHome([
+    { name: "Events", path: "/resources/events" },
+    { name: kubeconNa2026Meta.name, path: kubeconNa2026Meta.path },
+  ]);
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [organizationSchema(), websiteSchema(), webPage, conference, crumbs],
   };
 }
 

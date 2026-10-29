@@ -78,6 +78,28 @@ export type BlogPost = {
 
 export const blogPosts: readonly BlogPost[] = [
   {
+    slug: "opentelemetry-profiling-on-a-local-kubernetes-cluster",
+    title: "How to Set Up OpenTelemetry Profiling on a Local Kubernetes Cluster",
+    excerpt:
+      "The smallest working continuous profiling pipeline we know of: the OpenTelemetry eBPF profiler on a local kind cluster, sending flame graphs to Grafana's otel-lgtm stack, plus the one setting kind needs that a cloud cluster does not.",
+    seo: {
+      title: "How to Set Up OpenTelemetry Profiling on Local Kubernetes",
+      description:
+        "Run the OpenTelemetry eBPF profiler on a local kind cluster and see flame graphs in Grafana's otel-lgtm stack, with no code changes and no Helm.",
+    },
+    date: "2026-10-28",
+    tags: ["Profiling", "Kubernetes", "OpenTelemetry"],
+    image: "/images/blog/opentelemetry-profiling-on-a-local-kubernetes-cluster.png",
+    cta: {
+      kind: "skills",
+      title: "Let your coding agent set up profiling",
+      body:
+        "The otel-profiles skill in our free, open source Agent Skills for OpenTelemetry picks consistent versions, detects local clusters like kind, validates the configuration, and maps profiler errors to their fixes.",
+    },
+
+    ribbon: "Latest Post",
+  },
+  {
     slug: "introducing-minimum-viable-instrumentation",
     title: "Introducing Minimum Viable Instrumentation",
     excerpt:
@@ -96,7 +118,7 @@ export const blogPosts: readonly BlogPost[] = [
       body:
         "OllyGarden Rose reviews the instrumentation in your repositories, and with Minimum Viable Instrumentation it also plans, implements, and verifies a baseline where none exists, as a pull request your developers review before anything merges.",
     },
-    ribbon: "Latest Post",
+    ribbon: "Featured",
   },
   {
     slug: "where-sensitive-data-hides-in-opentelemetry-pipelines",

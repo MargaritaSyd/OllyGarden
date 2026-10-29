@@ -1,4 +1,5 @@
 import { blogVideos } from "@/lib/blog";
+import { kubeconNa2026Meta } from "@/lib/kubecon-na-2026";
 
 export const communityMeta = {
   title: "Upcoming Events & Conferences — OllyGarden",
@@ -21,6 +22,7 @@ export type CommunityEvent = {
   place: string;
   title: string;
   summary: string;
+  /** An OllyGarden page for the event, or the external registration page. */
   href: string;
 };
 
@@ -28,13 +30,13 @@ export const communityEvents: readonly CommunityEvent[] = [
   {
     host: "KubeCon + CloudNativeCon",
     posterTitle: "KubeCon® + CloudNativeCon® North America 2026",
-    note: "OllyGarden will be there as a sponsor.",
+    note: "Find us at booth 356.",
     date: "November 9–12, 2026",
     place: "Salt Lake City 🇺🇸",
     title: "KubeCon + CloudNativeCon North America 2026",
     summary:
-      "The CNCF's flagship cloud native conference — four days of keynotes, maintainer sessions and co-located events.",
-    href: "https://events.linuxfoundation.org/kubecon-cloudnativecon-north-america/register/",
+      "Visit us at booth 356, catch our two talks, and join Observability Day, co-chaired by Juraci Paixão Kröhling.",
+    href: kubeconNa2026Meta.path,
   },
 ];
 

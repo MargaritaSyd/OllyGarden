@@ -1,4 +1,4 @@
-import { announcement } from "@/lib/announcement";
+import { pressReleaseHref } from "@/lib/press";
 import { siteConfig } from "@/lib/site";
 
 export const roseHero = {
@@ -100,7 +100,6 @@ export const roseHow = {
 
 /**
  * Minimum Viable Instrumentation announcement. Figma: hero strip 2371:32444, section 2371:31595.
- * The launch post URL lives in `src/lib/announcement.ts`, shared with the site-wide bar.
  */
 export const roseMvi = {
   id: "mvi",
@@ -168,7 +167,9 @@ export const roseMvi = {
     title: "Less noise. More context.",
     body: "Useful coverage and meaningful context, with less unnecessary telemetry.",
     cta: "Read the Announcement",
-    announcementHref: announcement.href,
+    announcementHref: pressReleaseHref(
+      "ollygarden-raises-4m-launches-minimum-viable-instrumentation",
+    ),
   },
 } as const;
 

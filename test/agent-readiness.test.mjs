@@ -87,8 +87,6 @@ test("legal, quiz, and role routes are canonical content rather than redirects",
     "/otel-quiz",
     "/resources/trust-your-telemetry",
     "/careers/founding-enterprise-account-executive",
-    "/careers/chief-of-staff",
-    "/careers/ai-software-engineer",
   ]) {
     assert.ok(
       !config.includes(`["${path}",`),
@@ -107,8 +105,6 @@ test("legal, quiz, and role routes are canonical content rather than redirects",
     "resources/trust-your-telemetry",
     "resources/trust-your-telemetry/booth",
     "careers/founding-enterprise-account-executive",
-    "careers/chief-of-staff",
-    "careers/ai-software-engineer",
   ]) {
     assert.ok(existsSync(join(root, `src/app/${route}/page.tsx`)));
   }

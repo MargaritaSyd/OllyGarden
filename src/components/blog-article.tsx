@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BlogCard } from "@/components/blog-card";
+import { BlogCodeCopy } from "@/components/blog-code-copy";
 import { BlogCta } from "@/components/blog-cta";
 import { BlogEyebrow, BlogMeta, BlogTags } from "@/components/blog-ui";
 import { CtaArrow } from "@/components/cta-arrow";
@@ -91,6 +92,7 @@ export function BlogArticle({
             {bodyAfter.trim() ? (
               <div className="post-richtext" dangerouslySetInnerHTML={{ __html: bodyAfter }} />
             ) : null}
+            <BlogCodeCopy key={post.slug} />
           </div>
 
           {prev || next ? (

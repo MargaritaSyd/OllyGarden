@@ -33,6 +33,7 @@ the visual language. For historical URL migrations only, compare the sitemap in 
 - Canonical blog metadata lives in `src/lib/blog.ts`, with article HTML in
   `content/blog/<slug>.html`. Do not add posts to the starter `src/lib/posts.ts` or the redirected
   `src/app/blog/` pages; the public blog lives under `/resources/blog`.
+  Code-block and diagram markup for articles is in `doc/blog.md`.
 - Customer case studies live in `src/lib/case-studies.ts`, with audio scripts in
   `content/case-studies/<slug>.txt`; anonymization, storytelling, linking, and audio rules are in
   `doc/case-studies.md`.
@@ -48,6 +49,9 @@ the visual language. For historical URL migrations only, compare the sitemap in 
 - The Trust Your Telemetry? game (`/resources/trust-your-telemetry`, plus a `/booth` kiosk) takes its cases
  from `src/lib/trust-game/cases.ts` and its copy from `src/lib/trust-game/content.ts`; how to add
  a case, the content rules, and the booth checklist are in `doc/trust-your-telemetry.md`.
+- Event pages live under `/resources/events/<event>` with their copy and talk data in
+  `src/lib/<event>.ts` (for example `src/lib/kubecon-na-2026.ts`); the `/resources/events` cards come
+  from `src/lib/community.ts`. The site-wide announcement bar's copy lives in `src/lib/announcement.ts`.
 - The brand kit (`/resources/brand-kit`) takes its copy, palette, and logo file names from
  `src/lib/brand-kit/content.ts`, the icon artwork from `src/lib/brand-kit/icons.ts`, and the pixel
  alphabet from `src/lib/brand-kit/pixel-font.ts`.

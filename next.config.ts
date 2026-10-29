@@ -14,6 +14,7 @@ const permanentRedirects = [
   ["/solutions", "/solutions/overview"],
   ["/solutions/retail", "/solutions/retail-ecommerce"],
   ["/kubecon-eu-2026", "/resources/blog/ollygarden-at-kubecon-eu-2026"],
+  ["/kubecon-na-2026", "/resources/events/kubecon-na-2026"],
   ["/press", "/resources/press-releases"],
   [
     "/press/portel-april-2026",
@@ -32,7 +33,9 @@ const permanentRedirects = [
   ["/resources/trust-game/booth", "/resources/trust-your-telemetry/booth"],
   ["/resources/trust-game/result/:token", "/resources/trust-your-telemetry/result/:token"],
   ["/careers/engineering-manager", "/careers"],
-  ["/careers/executive-assistant", "/careers/chief-of-staff"],
+  ["/careers/executive-assistant", "/careers"],
+  ["/careers/chief-of-staff", "/careers"],
+  ["/careers/ai-software-engineer", "/careers"],
 ] as const;
 
 const nextConfig: NextConfig = {

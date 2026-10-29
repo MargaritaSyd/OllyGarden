@@ -1,5 +1,6 @@
 import { ResourceCard, ResourceCardPoster } from "@/components/resource-card";
 import { communityEvents, communityHero } from "@/lib/community";
+import { isExternalHref } from "@/lib/dom";
 
 export function CommunityEvents() {
   return (
@@ -29,27 +30,30 @@ export function CommunityEvents() {
           className="grid grid-cols-1 gap-10 max-[720px]:mx-auto max-[720px]:max-w-[400px] min-[721px]:grid-cols-2 min-[1101px]:grid-cols-3"
           aria-label="Next Events"
         >
-          {communityEvents.map((event) => (
-            <li key={event.href} className="h-full">
-              <ResourceCard
-                href={event.href}
-                external
-                ariaLabel={`${event.title}, ${event.date} in ${event.place.replace(/\s+[\u{1F1E6}-\u{1F1FF}]+$/u, "")} — register (opens in a new tab)`}
-                media={
-                  <ResourceCardPoster
-                    host={event.host}
-                    posterTitle={event.posterTitle}
-                    note={event.note}
-                  />
-                }
-                date={event.date}
-                suffix={event.place}
-                title={event.title}
-                description={event.summary}
-                cta="Register"
-              />
-            </li>
-          ))}
+          {communityEvents.map((event) => {
+            const external = isExternalHref(event.href);
+            return (
+              <li key={event.href} className="h-full">
+                <ResourceCard
+                  href={event.href}
+                  external={external}
+                  ariaLabel={`${event.title}, ${event.date} in ${event.place.replace(/\s+[\u{1F1E6}-\u{1F1FF}]+$/u, "")} — ${external ? "register (opens in a new tab)" : "see where to find us"}`}
+                  media={
+                    <ResourceCardPoster
+                      host={event.host}
+                      posterTitle={event.posterTitle}
+                      note={event.note}
+                    />
+                  }
+                  date={event.date}
+                  suffix={event.place}
+                  title={event.title}
+                  description={event.summary}
+                  cta={external ? "Register" : "See where to find us"}
+                />
+              </li>
+            );
+          })}
         </ul>
       </div>
     </section>
