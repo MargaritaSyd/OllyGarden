@@ -56,8 +56,8 @@ export function BrandPattern() {
       title="Type a word, get a pattern"
       lede="The pixel pattern is one of the key elements of the brand: it pairs with the bitmap imagery and carries the tech side of the look. It can also spell numbers, words and short phrases, handy for simple social assets. Click any tile to change its colour."
     >
-      <div className="bk-card gap-5">
-        <div className="flex flex-wrap items-end gap-4">
+      <div className="bk-card bk-maker gap-5">
+        <div className="bk-maker-bar">
           <label className="bk-field">
             <span>Line 1</span>
             <input value={first} maxLength={limit} spellCheck={false} onChange={(event) => setFirst(cleanLine(event.target.value))} />
@@ -66,7 +66,7 @@ export function BrandPattern() {
             <span>Line 2</span>
             <input value={second} maxLength={limit} spellCheck={false} onChange={(event) => setSecond(cleanLine(event.target.value))} />
           </label>
-          <div className="ml-auto flex flex-wrap gap-3">
+          <div className="bk-maker-actions">
             <button type="button" className="bk-toggle" onClick={() => setSeed((value) => value + 1)}>
               <BrandGlyph name="movement-double" size={16} /> Shuffle tiles
             </button>

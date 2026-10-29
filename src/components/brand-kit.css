@@ -477,6 +477,15 @@ section.bk-hero > .relative > div:last-child {
   font: 500 64px/1 var(--font-inconsolata), ui-monospace, monospace;
 }
 
+.bk-dl-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 20px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
 .bk-textlink {
   display: inline-flex;
   align-items: center;
@@ -519,6 +528,14 @@ section.bk-hero > .relative > div:last-child {
 .bk-variations strong {
   color: var(--bk-mist);
   font-weight: 600;
+}
+
+.bk-stage-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .bk-seg {
@@ -1037,6 +1054,25 @@ section.bk-hero > .relative > div:last-child {
   outline-offset: 6px;
 }
 
+.bk-maker-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+  width: 100%;
+}
+
+.bk-maker-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.bk-maker-actions .bk-toggle {
+  height: 46px;
+}
+
 .bk-field {
   display: flex;
   flex-direction: column;
@@ -1313,6 +1349,12 @@ section.bk-hero > .relative > div:last-child {
   padding: 24px;
 }
 
+.bk-dither-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
 .bk-photo-banner {
   flex-direction: row;
   align-items: center;
@@ -1495,22 +1537,82 @@ section.bk-hero > .relative > div:last-child {
     transform: rotate(180deg);
   }
 
-  .bk-field input,
-  .bk-maker-actions,
-  .bk-photo-banner > img {
-    width: 100%;
-  }
-
+  .bk-maker,
+  .bk-icon-card,
   .bk-dither {
     padding: 16px;
   }
 
-  .bk-photo-banner {
+  .bk-field {
+    flex: 1 1 120px;
+  }
+
+  .bk-field input,
+  .bk-photo-banner > img {
+    width: 100%;
+  }
+
+  .bk-maker-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .bk-maker-actions > *,
+  .bk-dither-actions > .bk-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .bk-seg--sets {
+    flex-wrap: nowrap;
+    max-width: 100%;
+  }
+
+  .bk-seg--sets .bk-seg-btn {
+    flex: 0 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  .bk-photo-banner.bk-card {
     flex-direction: column;
+    align-items: stretch;
+    padding: 16px 16px 24px;
+  }
+
+  .bk-photo-banner > .bk-btn {
+    width: 100%;
+    height: auto;
+    padding: 14px 24px;
+    font-size: 16px;
   }
 
   .bk-photo-banner > img {
     height: 160px;
+  }
+}
+
+/* The reference stretches every `.ogbtn` from 479px down. Inside these cards
+   that is the content width, so the actions stack and fill the row. */
+@media (width <= 479px) {
+  .bk-dl-foot .bk-btn,
+  .bk-dither-actions > .bk-btn,
+  .bk-maker-actions > .bk-btn {
+    flex-basis: 100%;
+    width: 100%;
+    max-width: 340px;
+    margin-inline: auto;
+  }
+
+  .bk-photo-banner > .bk-btn {
+    width: 100%;
+    max-width: 340px;
+    margin-inline: auto;
+  }
+
+  .bk-maker-actions > .bk-toggle {
+    flex-basis: 100%;
+    width: 100%;
   }
 }
 

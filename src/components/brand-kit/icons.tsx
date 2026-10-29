@@ -32,9 +32,10 @@ export function BrandIcons() {
         </figure>
       }
     >
-      <div className="bk-card gap-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="bk-card bk-icon-card gap-5">
+        <div className="bk-stage-bar">
           <Segmented
+            className="bk-seg--sets"
             label="Icon set"
             value={set}
             onChange={(value) => setSet(value as "pattern" | "marketing")}

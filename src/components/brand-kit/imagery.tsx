@@ -142,7 +142,7 @@ export function BrandImagery() {
               <span>Shadows</span>
             </div>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="bk-dither-actions">
             <label className="bk-btn bk-btn--secondary bk-btn--compact">
               Try your own photo
               <input

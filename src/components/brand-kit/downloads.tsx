@@ -50,10 +50,10 @@ export function BrandDownloads() {
               {item.title}
             </h3>
             <p className="bk-card-desc">{item.description}</p>
-            <div className="mt-auto flex flex-wrap items-center gap-4 pt-2">
+            <div className="bk-dl-foot">
               <a className="bk-btn bk-btn--secondary bk-btn--compact" href={item.url} target="_blank" rel="noopener noreferrer">
                 {item.cta}
-                {item.id === "guideline" || item.id === "photos" ? <ButtonArrow /> : <ExternalMark />}
+                <ButtonArrow />
               </a>
               {item.extra ? (
                 <a className="bk-textlink" href={item.extra.url} target="_blank" rel="noopener noreferrer">
